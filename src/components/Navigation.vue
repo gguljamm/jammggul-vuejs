@@ -4,31 +4,31 @@
     <li>
       <img
         @click="navChange('about')"
-        src="/static/images/i_mug.jpg" >
+        src="../assets/images/i_mug.jpg" >
       <div>ABOUT</div>
     </li>
     <li>
       <img
         @click="navChange('practice')"
-        src="/static/images/i_icecoffee.jpg" >
+        src="../assets/images/i_icecoffee.jpg" >
       <div>PRACTICE</div>
     </li>
     <li>
       <img
         @click="navChange('devInfo')"
-        src="/static/images/i_donut.jpg" >
+        src="../assets/images/i_donut.jpg" >
       <div>DEV INFO</div>
     </li>
     <li>
       <img
         @click="navChange('travel')"
-        src="/static/images/i_takeout.jpg" >
+        src="../assets/images/i_takeout.jpg" >
       <div>TRAVEL</div>
     </li>
     <li>
       <img
         @click="navChange('contacts')"
-        src="/static/images/i_muffin.jpg" >
+        src="../assets/images/i_muffin.jpg" >
       <div>CONTACTS</div>
     </li>
   </ul>
