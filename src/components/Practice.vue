@@ -5,14 +5,14 @@
 </template>
 
 <script>
-export default {
-  name: 'practice',
-//  methods: {
-//    dateClick() {
-//      this.$emit('p-input-click');
-//    },
-//  },
-};
+  export default {
+    name: 'practice',
+    //  methods: {
+    //    dateClick() {
+    //      this.$emit('p-input-click');
+    //    },
+    //  },
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

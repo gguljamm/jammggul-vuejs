@@ -1,4 +1,4 @@
-# vuehomepage
+# jamggul
 
 > A Vue.js project
 

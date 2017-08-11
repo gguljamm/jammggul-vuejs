@@ -2,7 +2,7 @@
   <div id="app">
     <div class="wrapper">
       <div id="GNB">
-        <img @click="logoClick" src="/static/images/logo_org.png" >
+        <img @click="logoClick" src="./assets/images/logo_org.png" >
       </div>
       <navigation
         @transChange="changePage"></navigation>
@@ -22,40 +22,41 @@
 </template>
 
 <script>
-import Navigation from './components/Navigation';
-import About from './components/About';
-import Practice from './components/Practice';
-import DevInfo from './components/Dev-Info';
-import Travel from './components/Travel';
-import Contacts from './components/Contacts';
+  import Navigation from './components/Navigation';
+  import About from './components/About';
+  import Practice from './components/Practice';
+  import DevInfo from './components/Dev-Info';
+  import Travel from './components/Travel';
+  import Contacts from './components/Contacts';
 
-export default {
-  name: 'app',
-  components: {
-    Navigation,
-    About,
-    Practice,
-    DevInfo,
-    Travel,
-    Contacts,
-  },
-  methods: {
-    logoClick() {
-      location.reload();
+  export default {
+    name: 'app',
+    components: {
+      Navigation,
+      About,
+      Practice,
+      DevInfo,
+      Travel,
+      Contacts,
     },
-    changePage(changePage) {
-      this.page = changePage;
+    methods: {
+      logoClick() {
+        location.reload();
+      },
+      changePage(changePage) {
+        this.page = changePage;
+      },
     },
-  },
-  data() {
-    return {
-      page: 'about',
-    };
-  },
-};
+    data() {
+      return {
+        page: 'about',
+      };
+    },
+  };
 </script>
 
 <style>
+  @import './assets/lib/normalize.css';
   @import url('https://fonts.googleapis.com/css?family=Fredoka+One');
   html, body {
     width: 100%;
@@ -110,5 +111,4 @@ export default {
     left: 0;
     z-index: -1;
   }
-
 </style>
