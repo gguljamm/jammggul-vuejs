@@ -2,7 +2,7 @@
   <div id="app">
     <div class="wrapper">
       <div id="GNB">
-        <img @click="logoClick" src="./assets/images/logo_org.png" >
+        <img @click="logoClick" src="../src/assets/images/logo_org.png" >
       </div>
       <navigation
         @transChange="changePage"></navigation>
