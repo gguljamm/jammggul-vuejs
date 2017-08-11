@@ -1,6 +1,9 @@
 <template>
   <div id="GNB">
-    <img @click="logoClick" src="../assets/images/logo_org.png" >
+    <img
+      @click="logoClick"
+      src="../assets/images/logo_org.png" >
+    <img src="../assets/images/i_mug.jpg" >
   </div>
 </template>
 
