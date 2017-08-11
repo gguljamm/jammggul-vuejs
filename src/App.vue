@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     <div class="wrapper">
-      <div id="GNB">
-        <img @click="logoClick" src="../src/assets/images/logo_org.png" >
-      </div>
+      <gnb></gnb>
       <navigation
         @transChange="changePage"></navigation>
       <about
@@ -22,6 +20,7 @@
 </template>
 
 <script>
+  import Gnb from './components/Header';
   import Navigation from './components/Navigation';
   import About from './components/About';
   import Practice from './components/Practice';
@@ -32,6 +31,7 @@
   export default {
     name: 'app',
     components: {
+      Gnb,
       Navigation,
       About,
       Practice,
@@ -40,7 +40,7 @@
       Contacts,
     },
     methods: {
-      logoClick() {
+      pageReload() {
         location.reload();
       },
       changePage(changePage) {
@@ -91,16 +91,6 @@
     -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
     -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
     box-shadow: 1px 1px 1px rgba(0,0,0,.3);
-  }
-  #GNB {
-    width: 100%;
-    height: 80px;
-    text-align: center;
-  }
-  #GNB > img {
-    margin: 5px;
-    height: 70px;
-    cursor: pointer;
   }
   .footer{
     background-color: #aabbcc;
