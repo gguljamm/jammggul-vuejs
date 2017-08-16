@@ -1,21 +1,10 @@
-# jamggul
+# JammGgul
 
-> A Vue.js project
+> Create a personal homepage using 'vue.js'
 
-## Build Setup
+## Bbjective
 
 ``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
+# 재미있는 홈페이지.
+vue.js를 최대한 활용하여 만들어보기. 
 ```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

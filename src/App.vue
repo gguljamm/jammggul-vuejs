@@ -1,19 +1,20 @@
 <template>
   <div id="app">
     <div class="wrapper">
-      <gnb></gnb>
+      <gnb
+        @transReload="pageReload"></gnb>
       <navigation
         @transChange="changePage"></navigation>
       <about
         v-if="page=='about'"></about>
+      <daily
+        v-if="page=='daily'"></daily>
       <practice
         v-if="page=='practice'"></practice>
       <devInfo
         v-if="page=='devInfo'"></devInfo>
       <travel
         v-if="page=='travel'"></travel>
-      <contacts
-        v-if="page=='contacts'"></contacts>
     </div>
     <div class="footer"></div>
   </div>
@@ -26,7 +27,7 @@
   import Practice from './components/Practice';
   import DevInfo from './components/Dev-Info';
   import Travel from './components/Travel';
-  import Contacts from './components/Contacts';
+  import Daily from './components/Daily';
 
   export default {
     name: 'app',
@@ -34,10 +35,10 @@
       Gnb,
       Navigation,
       About,
+      Daily,
       Practice,
       DevInfo,
       Travel,
-      Contacts,
     },
     methods: {
       pageReload() {
@@ -87,7 +88,7 @@
     left: 0;
     right: 0;
     bottom: 10px;
-    background-color: rgb(249,249,239);
+    background-color: #f6f6f6;
     -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
     -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
     box-shadow: 1px 1px 1px rgba(0,0,0,.3);
