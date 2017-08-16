@@ -1,13 +1,13 @@
 <template>
 <div id="About">
   <div class="catchphrase">Dazzling Day, Sunny Day</div>
-  <img id="CloudBack" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud2.png?raw=true">
-  <img id="UpIcon" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/up.png?raw=true">
-  <img id="Cloud1" class="movingCloud" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud1.png?raw=true">
-  <img id="Cloud2" class="movingCloud" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud3.png?raw=true">
-  <img id="Cloud3" class="movingCloud" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud1.png?raw=true">
-  <img id="Cloud4" class="movingCloud" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud2.png?raw=true">
-  <img id="Cloud5" class="movingCloud" src="https://github.com/gguljamm/vuejs/blob/master/src/assets/images/cloud3.png?raw=true">
+  <img id="CloudBack" src="../assets/images/cloud2.png">
+  <img id="UpIcon" src="../assets/images/up.png">
+  <img id="Cloud1" class="movingCloud" src="../assets/images/cloud1.png">
+  <img id="Cloud2" class="movingCloud" src="../assets/images/cloud3.png">
+  <img id="Cloud3" class="movingCloud" src="../assets/images/cloud1.png">
+  <img id="Cloud4" class="movingCloud" src="../assets/images/cloud2.png">
+  <img id="Cloud5" class="movingCloud" src="../assets/images/cloud3.png">
 </div>
 </template>
 
@@ -146,11 +146,13 @@
   @keyframes cloud1{
     from{
       right: -410px;
+      margin-bottom: 25px;
     }
     to{
       right: 100%;
+      margin-bottom: 25px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 25px;
     }
     25%, 75%{
@@ -160,11 +162,13 @@
   @keyframes cloud2 {
     from{
       right: -300px;
+      margin-bottom: 40px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 40px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 40px;
     }
     25%, 75%{
@@ -174,11 +178,13 @@
   @keyframes cloud3 {
     from{
       right: -320px;
+      margin-bottom: 20px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 20px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 20px;
     }
     25%, 75%{
@@ -188,11 +194,13 @@
   @keyframes cloud4 {
     from{
       right: -310px;
+      margin-bottom: 30px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 30px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 30px;
     }
     25%, 75%{
@@ -202,11 +210,13 @@
   @-webkit-keyframes cloud1{
     from{
       right: -410px;
+      margin-bottom: 25px;
     }
     to{
       right: 100%;
+      margin-bottom: 25px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 25px;
     }
     25%, 75%{
@@ -216,11 +226,13 @@
   @-webkit-keyframes cloud2 {
     from{
       right: -300px;
+      margin-bottom: 40px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 40px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 40px;
     }
     25%, 75%{
@@ -230,11 +242,13 @@
   @-webkit-keyframes cloud3 {
     from{
       right: -320px;
+      margin-bottom: 20px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 20px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 20px;
     }
     25%, 75%{
@@ -244,11 +258,13 @@
   @-webkit-keyframes cloud4 {
     from{
       right: -310px;
+      margin-bottom: 30px;
     }
     to{
-      right: 100%
+      right: 100%;
+      margin-bottom: 30px;
     }
-    0%, 50%, 100%{
+    50%{
       margin-bottom: 30px;
     }
     25%, 75%{
