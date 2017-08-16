@@ -1,12 +1,12 @@
 <template>
-<div id="Contacts">
-  컨텍미
+<div id="Daily">
+  데일리
 </div>
 </template>
 
 <script>
 export default {
-  name: 'contacts',
+  name: 'daily',
 //  methods: {
 //    dateClick() {
 //      this.$emit('p-input-click');
