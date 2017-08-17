@@ -1,27 +1,38 @@
 <template>
-  <div id="app">
+  <div id="app" v-bind:class="[isMobile?'mobile':'web']">
     <div class="wrapper">
-      <gnb
-        @transReload="pageReload"></gnb>
-      <navigation
-        @transChange="changePage"></navigation>
-      <about
-        v-if="page=='about'"></about>
-      <daily
-        v-if="page=='daily'"></daily>
-      <practice
-        v-if="page=='practice'"></practice>
-      <devInfo
-        v-if="page=='devInfo'"></devInfo>
-      <travel
-        v-if="page=='travel'"></travel>
+      <div id="GNB" v-bind:class="backColor">
+        <div>
+          <img
+            @click="pageReload"
+            src="./assets/images/jamm-resize.png" alt="jammggul" >
+          <transition name="fade">
+            <button id="MobMenu"
+              v-if="isMobile"
+              v-bind:key="mobNavOpen"
+              @click="mobNavOpen=!mobNavOpen">
+              <i aria-hidden="true"
+                v-bind:class="[mobNavOpen?'fa fa-times':'fa fa-bars']"></i>
+            </button>
+          </transition>
+        </div>
+      </div>
+      <transition name="fade">
+        <navigation
+          v-bind:class="[this.page]"
+          :page="this.page"
+          v-if="mobNavOpen"
+          @transChange="changePage"></navigation>
+      </transition>
+      <transition name="component-fade" mode="out-in">
+        <commponent v-bind:is="page"></commponent>
+      </transition>
     </div>
     <div class="footer"></div>
   </div>
 </template>
 
 <script>
-  import Gnb from './components/Header';
   import Navigation from './components/Navigation';
   import About from './components/About';
   import Practice from './components/Practice';
@@ -32,7 +43,6 @@
   export default {
     name: 'app',
     components: {
-      Gnb,
       Navigation,
       About,
       Daily,
@@ -47,11 +57,43 @@
       changePage(changePage) {
         this.page = changePage;
       },
+      getWindowWidth() {
+        const nowWidth = document.documentElement.clientWidth;
+        this.windowWidth = nowWidth;
+        if (nowWidth < 1300) {
+          if (!this.isMobile) {
+            this.isMobile = true;
+            this.mobNavOpen = false;
+          }
+        } else {
+          this.isMobile = false;
+          this.mobNavOpen = true;
+        }
+      },
+    },
+    computed: {
+      backColor() {
+        return {
+          backColor: this.page !== 'about' && this.isMobile,
+        };
+      },
+    },
+    mounted() {
+      this.$nextTick(function catchResize() {
+        window.addEventListener('resize', this.getWindowWidth);
+        this.getWindowWidth();
+      });
     },
     data() {
       return {
         page: 'about',
+        windowWidth: 0,
+        isMobile: false,
+        mobNavOpen: false,
       };
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.getWindowWidth);
     },
   };
 </script>
@@ -93,6 +135,47 @@
     -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
     box-shadow: 1px 1px 1px rgba(0,0,0,.3);
   }
+  #GNB {
+    width: 100%;
+    height: 70px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+  }
+  #GNB.backColor{
+    background-color: cornflowerblue;
+  }
+  #GNB > div {
+    position: relative;
+    max-width: 1080px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+  #GNB > div > img {
+    margin: 5px;
+    height: 60px;
+    padding: 5px;
+    cursor: pointer;
+    background-color: #FFF;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.15);
+    -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.15);
+    box-shadow: 1px 1px 1px rgba(0,0,0,.15);
+  }
+  #MobMenu{
+    position: absolute;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    margin-top: 15px;
+    border: none;
+    right: 15px;
+    font-size: 24px;
+    color: #FFF;
+    background-color: transparent;
+    cursor: pointer;
+  }
   .footer{
     background-color: #aabbcc;
     height: 10px;
@@ -101,5 +184,18 @@
     bottom: 0;
     left: 0;
     z-index: -1;
+  }
+  .component-fade-enter-active, .component-fade-leave-active {
+    transition: opacity .2s ease;
+  }
+  .component-fade-enter, .component-fade-leave-to
+    /* .component-fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .2s
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0
   }
 </style>

@@ -33,9 +33,9 @@
     height: 100%;
     z-index: 0;
     background: lightskyblue; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(lightskyblue, #a7d2cb); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(lightskyblue, #a7d2cb); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(lightskyblue, #a7d2cb); /* For Firefox 3.6 to 15 */
+    background: -webkit-linear-gradient(cornflowerblue, #a7d2cb); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(cornflowerblue, #a7d2cb); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(cornflowerblue, #a7d2cb); /* For Firefox 3.6 to 15 */
     background: linear-gradient(cornflowerblue, #a7d2cb); /* Standard syntax */
     overflow: hidden;
   }
@@ -85,7 +85,7 @@
   }
   #Cloud3{
     width: 320px;
-    bottom: 60px;
+    bottom: 10px;
     animation: cloud3 30s linear infinite;
     animation-delay: -14s;
   }
@@ -97,7 +97,7 @@
   }
   #Cloud5{
     width: 320px;
-    bottom: 30px;
+    bottom: 0;
     animation: cloud3 30s linear infinite;
     animation-delay: -24s;
   }
