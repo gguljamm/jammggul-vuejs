@@ -46,21 +46,21 @@
 </template>
 
 <script>
-export default {
-  name: 'navigation',
-  props: ['page'],
-  data() {
-    return {
-      activeTab: this.page,
-    };
-  },
-  methods: {
-    navChange(page) {
-      this.activeTab = page;
-      this.$emit('transChange', page);
+  export default {
+    name: 'navigation',
+    props: ['page'],
+    data() {
+      return {
+        activeTab: this.page,
+      };
     },
-  },
-};
+    methods: {
+      navChange(page) {
+        this.activeTab = page;
+        this.$emit('transChange', page);
+      },
+    },
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

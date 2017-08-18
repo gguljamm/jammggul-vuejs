@@ -5,19 +5,19 @@
 </template>
 
 <script>
-export default {
-  name: 'daily',
+  export default {
+    name: 'daily',
 //  methods: {
 //    dateClick() {
 //      this.$emit('p-input-click');
 //    },
 //  },
-  data() {
-    return {
-      list: [],
-    };
-  },
-};
+    data() {
+      return {
+        list: [],
+      };
+    },
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
