@@ -198,4 +198,18 @@
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0
   }
+  @media all and (max-width: 768px){
+    #GNB {
+      height: 50px;
+    }
+    #GNB > div > img {
+      margin: 5px;
+      height: 40px;
+      padding: 5px;
+    }
+    #MobMenu{
+      margin-top: 5px;
+      right: 10px;
+    }
+  }
 </style>
