@@ -74,7 +74,7 @@
     computed: {
       backColor() {
         return {
-          backColor: this.page !== 'about' && this.isMobile,
+          backColor: this.page !== 'about',
         };
       },
     },
@@ -101,6 +101,7 @@
 <style>
   @import './assets/lib/normalize.css';
   @import url('https://fonts.googleapis.com/css?family=Fredoka+One');
+  @import url(https://fonts.googleapis.com/css?family=Open+Sans:800);
   html, body {
     width: 100%;
     height: 100%;
@@ -118,6 +119,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
+    overflow: hidden
   }
   #app *{
     -webkit-box-sizing: border-box;
@@ -126,6 +128,7 @@
   }
   .wrapper{
     position: absolute;
+    overflow-y: auto;
     top: 0;
     left: 0;
     right: 0;
@@ -197,6 +200,9 @@
   }
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0
+  }
+  .clear{
+    clear: both;
   }
   @media all and (max-width: 768px){
     #GNB {
