@@ -65,7 +65,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  @import url('https://fonts.googleapis.com/css?family=Gloria+Hallelujah');
+  @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan');
   .navigation{
     z-index: 1;
   }
@@ -143,7 +143,7 @@
     line-height: 20px;
     font-size: 14px;
     font-weight: bold;
-    font-family: 'Gloria Hallelujah', cursive;
+    font-family: 'Baloo Bhaijaan', cursive;
   }
   .clear{
     clear:both;

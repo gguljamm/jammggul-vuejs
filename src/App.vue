@@ -149,7 +149,6 @@
   }
   #GNB > div {
     position: relative;
-    max-width: 1080px;
     margin: 0 auto;
     z-index: 1;
   }

@@ -1,14 +1,14 @@
 <template>
 <div id="Daily">
   <div class="mainTitle">
-    <button class="filter"><span>All</span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
+    <button class="filter"><span>Recent</span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
     <button class="write" @click="authClick">
       <span v-if="!isAuth"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 글쓰기</span>
       <span v-else><i class="fa fa-minus-square-o" aria-hidden="true"></i> 접기</span>
     </button>
   </div>
-  <div class="inputBox">
-    <div v-if="isAuth">
+  <div class="inputBox" v-if="isAuth">
+    <div>
       <textarea id="TextArea"></textarea>
       <input id="ImgArea" type="file"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
     </div>
@@ -32,7 +32,7 @@
                 <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
                 <i v-if="item.imgUrl" class="fa fa-picture-o" aria-hidden="true"></i>
               </span>
-              <img v-if="item.imgUrl" v-bind:src="item.imgUrl">
+              <img v-if="item.imgUrl" v-bind:src="item.imgUrl" style="width: 100%;">
             </div>
           </div>
         </div>
@@ -87,16 +87,68 @@
         });
       },
       submit() {
-        const img = document.getElementById('ImgArea').files[0];
-        if (img) {
-          const name = `daily/${img.name}`;
-          const ref = firebase.storage().ref().child(name);
-          ref.put(img).then((snapshot) => {
-            this.upload(snapshot.downloadURL);
-          });
+        const file = document.getElementById('ImgArea').files[0];
+        if (file) {
+          const param = {
+            maxSize: 500,
+            thisFile: file,
+          };
+          this.resizeImage(param);
         } else {
           this.upload('');
         }
+      },
+      submitImage(file, resizedImage) {
+        const name = `daily/${file.name}`;
+        const ref = firebase.storage().ref().child(name);
+        ref.put(resizedImage).then((snapshot) => {
+          this.upload(snapshot.downloadURL);
+        });
+      },
+      resizeImage(settings) {
+        const file = settings.thisFile;
+        const maxSize = settings.maxSize;
+        const reader = new FileReader();
+        const image = new Image();
+        const canvas = document.createElement('canvas');
+        const dataURItoBlob = (dataURI) => {
+          const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
+            atob(dataURI.split(',')[1]) :
+            unescape(dataURI.split(',')[1]);
+          const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+          const max = bytes.length;
+          const ia = new Uint8Array(max);
+          for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
+          return new Blob([ia], { type: mime });
+        };
+        const resize = () => {
+          let width = image.width;
+          let height = image.height;
+
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg');
+          this.submitImage(file, dataURItoBlob(dataUrl));
+        };
+
+        return new Promise((ok, no) => {
+          if (!file.type.match(/image.*/)) {
+            no(alert('no image file!')); // eslint-disable-line
+            return;
+          }
+
+          reader.onload = (readerEvent) => {
+            image.onload = () => ok(resize());
+            image.src = readerEvent.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
       },
       upload(url) {
         const newDate = new Date();
@@ -133,7 +185,7 @@
       };
     },
     mounted() {
-      firebase.database().ref('/daily').orderByChild('date').once('value', (data) => {
+      firebase.database().ref('/daily').limitToLast(20).once('value', (data) => {
         const list = data.val();
         Object.keys(list).reverse().forEach((key) => {
           const getDate = list[key].date.toString();
@@ -153,7 +205,7 @@
         inserted: (item) => {
           const height = item.querySelector('.content > div > div').offsetHeight;
           const img = item.querySelector('.content img');
-          if (height > 100) {
+          if (height > 140) {
             item.setAttribute('class', 'clickable more');
           } else if (img) {
             item.setAttribute('class', 'clickable img');
@@ -175,32 +227,27 @@
     position: relative;
     height: 50px;
   }
-  .filter{
+  .mainTitle > button{
     position: absolute;
     margin-top: 10px;
     height: 30px;
-    right: 0;
-    border: 1px solid #a7d2cb;
-    background-color: #FFF;
+    top: 0;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    width: 80px;
+    padding: 0 20px;
     cursor: pointer;
   }
+  .filter{
+    right: 10px;
+    border: 1px solid #a7d2cb;
+    background-color: #FFF;
+  }
   .write{
-    width: 100px;
-    height: 30px;
     border: 0;
     color: #FFF;
     background-color: #c98474;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    position: absolute;
-    margin-top: 10px;
-    left: 0;
-    cursor: pointer;
+    left: 10px;
   }
   .filter > i, .write > i{
     margin-left: 10px;
@@ -211,7 +258,7 @@
     float: left;
   }
   .dailyList > li .dailyBox{
-    height: 150px;
+    height: 190px;
   }
   .dailyList > li.clickable .dailyBox{
     cursor: pointer;
@@ -248,7 +295,7 @@
     border: 1px solid #ececec;
     background-color: #FFF;
     border-top: 0;
-    height: 120px;
+    height: 160px;
     padding: 10px;
     padding-bottom: 9px;
     line-height: 20px;
@@ -275,9 +322,13 @@
     right: 0;
     bottom: 0;
     color: #c98474;
+    background-color: #FFF;
   }
   .icons > i{
     margin-left: 10px;
+  }
+  .selected .icons{
+    background: none;
   }
   .icons .moreIcon{
     visibility: hidden;
@@ -291,7 +342,7 @@
   }
   .selected .content{
     height: auto;
-    min-height: 120px;
+    min-height: 160px;
   }
   .selected .content > div{
     overflow-y: visible;
