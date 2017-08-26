@@ -74,7 +74,7 @@
     -webkit-box-shadow: 1px 1px 5px rgba(0,0,0,.15);
     -moz-box-shadow: 1px 1px 5px rgba(0,0,0,.15);
     box-shadow: 1px 1px 5px rgba(0,0,0,.15);
-    right: 10px;
+    right: 20px;
     top: 50%;
     margin-top: -235px;
     border: 1px solid #f1f2f3;
@@ -143,7 +143,7 @@
     line-height: 20px;
     font-size: 14px;
     font-weight: bold;
-    font-family: 'Baloo Bhaijaan', cursive;
+    font-family: 'Baloo Bhaijaan', sans-serif;
   }
   .clear{
     clear:both;

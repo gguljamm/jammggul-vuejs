@@ -1,18 +1,35 @@
 <template>
 <div id="Daily">
   <div class="mainTitle">
-    <button class="filter"><span>Recent</span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
-    <button class="write" @click="authClick">
-      <span v-if="!isAuth"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 글쓰기</span>
-      <span v-else><i class="fa fa-minus-square-o" aria-hidden="true"></i> 접기</span>
-    </button>
-  </div>
-  <div class="inputBox" v-if="isAuth">
-    <div>
-      <textarea id="TextArea"></textarea>
-      <input id="ImgArea" type="file"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+    <div v-if="itemsView.length > 0" class="filter">
+      <button @click="filterOpen=!filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i><span>{{ filterOption }}</span></button>
+      <div class="calendar" v-if="filterOpen"><div>
+        <span></span>
+        <div class="year">
+          <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+          {{ selectedYear }}
+          <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+        </div>
+        <ul>
+          <li
+            v-for="(month, index) in arrMonth"
+            v-bind:class="month.num > 0?'':'nonSelectable'"
+            @click="month.num > 0?monthClick(index):null"
+            >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span></li>
+        </ul>
+        <div class="recent">
+          <button @click="filtering('recent')">Recently 20</button>
+        </div>
+      </div></div>
+    </div>
+    <div class="write">
+      <button @click="authClick">
+        <span v-if="!isAuth"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>Write</span></span>
+        <span v-else><i class="fa fa-minus-square-o" aria-hidden="true"></i> 접기</span>
+      </button>
     </div>
   </div>
+  <input-box v-if="isAuth"></input-box>
   <div class="sk-folding-cube"
     v-if="!loaded">
     <div class="sk-cube1 sk-cube"></div>
@@ -21,7 +38,7 @@
     <div class="sk-cube3 sk-cube"></div>
   </div>
   <ul class="dailyList">
-    <li v-for="item in items" v-getheight="{ item }">
+    <li v-for="item in itemsView" v-getHeight="{ item }">
       <div class="dailyBox" @click="listClick($event)">
         <div>
           <div class="title">{{ item.date }}</div>
@@ -32,7 +49,7 @@
                 <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
                 <i v-if="item.imgUrl" class="fa fa-picture-o" aria-hidden="true"></i>
               </span>
-              <img v-if="item.imgUrl" v-bind:src="item.imgUrl" style="width: 100%;">
+              <img v-if="item.imgUrl" v-bind:data-url="item.imgUrl" style="width: 100%;">
             </div>
           </div>
         </div>
@@ -44,9 +61,35 @@
 </template>
 
 <script>
+  import InputBox from '../components/Input-Box';
+
   export default {
     name: 'daily',
+    components: {
+      'input-box': InputBox,
+    },
+    data() {
+      return {
+        items: [],
+        itemsView: [],
+        isAuth: false,
+        loaded: false,
+        itemsLength: {},
+        filterOpen: false,
+        filterOption: 'Recent',
+        nowYear: (new Date()).getFullYear(),
+        selectedYear: (new Date()).getFullYear(),
+        arrMonth: [{ text: 'JAN', num: 0 }, { text: 'FEB', num: 0 }, { text: 'MAR', num: 0 }, { text: 'AFR', num: 0 }, { text: 'MAY', num: 0 }, { text: 'JUN', num: 0 }, { text: 'JUL', num: 0 }, { text: 'AUG', num: 0 }, { text: 'SEP', num: 0 }, { text: 'OCT', num: 0 }, { text: 'NOV', num: 0 }, { text: 'DEC', num: 0 }],
+      };
+    },
     methods: {
+      monthClick(thisMonth) {
+        const obj = {
+          year: this.selectedYear,
+          month: thisMonth,
+        };
+        this.filtering(obj);
+      },
       listClick(event) {
         for (let x = 0; x < event.path.length; x += 1) {
           if (event.path[x].localName === 'li') {
@@ -64,6 +107,11 @@
               selected[0].setAttribute('class', 'dailyBox');
             }
             getEvent.path[x].className = 'dailyBox selected';
+            const img = getEvent.path[x].querySelector('img');
+            if (img && img.getAttribute('data-url')) {
+              img.setAttribute('src', img.getAttribute('data-url'));
+              img.removeAttribute('data-url');
+            }
             break;
           } else if (getEvent.path[x].className === 'dailyBox selected') {
             getEvent.path[x].className = 'dailyBox';
@@ -81,88 +129,41 @@
         firebase.auth().signInWithPopup(provider).then((result) => {
           if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
+          } else {
+            alert('나만 글쓸거야!!'); // eslint-disable-line
           }
         }).catch(() => {
-          alert('나만 글쓸거야!!'); // eslint-disable-line
+          alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
         });
       },
-      submit() {
-        const file = document.getElementById('ImgArea').files[0];
-        if (file) {
-          const param = {
-            maxSize: 500,
-            thisFile: file,
-          };
-          this.resizeImage(param);
+      filtering(opt) {
+        this.itemsView = [];
+        if (opt === 'recent') {
+          this.filterOption = 'Recent';
+          for (let x = this.items.length - 1, y = 0; x >= 0; x -= 1, y += 1) {
+            if (y >= 20) {
+              break;
+            }
+            this.itemsView.push(this.items[x]);
+          }
         } else {
-          this.upload('');
+          this.filterOption = `${opt.year}-${this.zeros(opt.month + 1)}`;
+          const month = this.itemsLength[opt.year][1 + opt.month];
+          for (let x = month.length - 1; x >= 0; x -= 1) {
+            this.itemsView.push(month[x]);
+          }
         }
+        this.changeMonthNum();
       },
-      submitImage(file, resizedImage) {
-        const name = `daily/${file.name}`;
-        const ref = firebase.storage().ref().child(name);
-        ref.put(resizedImage).then((snapshot) => {
-          this.upload(snapshot.downloadURL);
-        });
-      },
-      resizeImage(settings) {
-        const file = settings.thisFile;
-        const maxSize = settings.maxSize;
-        const reader = new FileReader();
-        const image = new Image();
-        const canvas = document.createElement('canvas');
-        const dataURItoBlob = (dataURI) => {
-          const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
-            atob(dataURI.split(',')[1]) :
-            unescape(dataURI.split(',')[1]);
-          const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-          const max = bytes.length;
-          const ia = new Uint8Array(max);
-          for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
-          return new Blob([ia], { type: mime });
-        };
-        const resize = () => {
-          let width = image.width;
-          let height = image.height;
-
-          if (width > maxSize) {
-            height *= maxSize / width;
-            width = maxSize;
+      changeMonthNum() {
+        const selectedMonths = this.itemsLength[this.selectedYear];
+        for (let x = 0; x < 12; x += 1) {
+          if (selectedMonths[x + 1] && selectedMonths[x + 1].length > 0) {
+            this.arrMonth[x].num = selectedMonths[x + 1].length;
+          } else {
+            this.arrMonth[x].num = 0;
           }
-
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg');
-          this.submitImage(file, dataURItoBlob(dataUrl));
-        };
-
-        return new Promise((ok, no) => {
-          if (!file.type.match(/image.*/)) {
-            no(alert('no image file!')); // eslint-disable-line
-            return;
-          }
-
-          reader.onload = (readerEvent) => {
-            image.onload = () => ok(resize());
-            image.src = readerEvent.target.result;
-          };
-          reader.readAsDataURL(file);
-        });
-      },
-      upload(url) {
-        const newDate = new Date();
-        const text = document.getElementById('TextArea').value;
-        let dateString = newDate.getFullYear();
-        dateString += this.zeros(parseInt(newDate.getMonth(), 10) + 1);
-        dateString += this.zeros(newDate.getDate());
-        firebase.database().ref('/daily').push({
-          date: parseInt(dateString, 10),
-          content: text,
-          imgUrl: url,
-        }).then(() => {
-          alert('포스팅 성공!'); // eslint-disable-line
-        });
+        }
       },
       zeros(n) {
         let zero = '';
@@ -177,35 +178,44 @@
         return zero + newN;
       },
     },
-    data() {
-      return {
-        items: [],
-        isAuth: false,
-        loaded: false,
-      };
-    },
     mounted() {
-      firebase.database().ref('/daily').limitToLast(20).once('value', (data) => {
-        const list = data.val();
-        Object.keys(list).reverse().forEach((key) => {
-          const getDate = list[key].date.toString();
-          let newDate = getDate.slice(0, 4);
-          newDate += '-';
-          newDate += getDate.slice(4, 6);
-          newDate += '-';
-          newDate += getDate.slice(6, 8);
-          list[key].date = newDate;
-          this.items.push(list[key]);
+      firebase.database().ref('/daily')
+        .orderByChild('date')
+        .once('value')
+        .then((data) => {
+          data.forEach((key) => {
+            const resp = key.val();
+            const getDate = resp.date.toString();
+            let newDate = getDate.slice(0, 4);
+            newDate += '-';
+            newDate += getDate.slice(4, 6);
+            newDate += '-';
+            newDate += getDate.slice(6, 8);
+            resp.date = newDate;
+            this.items.push(resp);
+            const year = resp.date.slice(0, 4);
+            const month = parseInt(resp.date.slice(5, 7), 10);
+            if (this.itemsLength[year]) {
+              if (this.itemsLength[year][month]) {
+                this.itemsLength[year][month].push(resp);
+              } else {
+                this.itemsLength[year][month] = [resp];
+              }
+            } else {
+              this.itemsLength[year] = {};
+              this.itemsLength[year][month] = [resp];
+            }
+          });
+          this.filtering('recent');
+          this.loaded = true;
         });
-        this.loaded = true;
-      });
     },
     directives: {
-      getheight: {
+      getHeight: {
         inserted: (item) => {
           const height = item.querySelector('.content > div > div').offsetHeight;
           const img = item.querySelector('.content img');
-          if (height > 140) {
+          if (height > 120) {
             item.setAttribute('class', 'clickable more');
           } else if (img) {
             item.setAttribute('class', 'clickable img');
@@ -226,31 +236,42 @@
   .mainTitle{
     position: relative;
     height: 50px;
+    padding: 0 10px;
   }
-  .mainTitle > button{
-    position: absolute;
+  .mainTitle > div{
     margin-top: 10px;
-    height: 30px;
     top: 0;
+  }
+  .mainTitle > div > button{
+    height: 30px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
     padding: 0 20px;
     cursor: pointer;
   }
-  .filter{
-    right: 10px;
+  .mainTitle > div.filter{
+    float: right;
+  }
+  .mainTitle > div.write{
+    float: left;
+  }
+  .filter > button{
     border: 1px solid #a7d2cb;
     background-color: #FFF;
   }
-  .write{
+  .write > button{
     border: 0;
     color: #FFF;
     background-color: #c98474;
     left: 10px;
   }
-  .filter > i, .write > i{
-    margin-left: 10px;
+  .filter i, .write i{
+    margin-right: 5px;
+  }
+  .filter li > span{
+    width: 20px;
+    text-align: center;
   }
   .dailyList > li{
     width: 33.3333%;
@@ -308,9 +329,11 @@
     position: relative;
   }
   .content > div{
-    height: 100%;
+    height: 120px;
     overflow-y: hidden;
-    position: relative;
+  }
+  .selected .content > div{
+    height: 100%;
   }
   .content > div img{
     visibility: hidden;
@@ -319,8 +342,8 @@
   }
   .icons{
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: 10px;
+    bottom: 10px;
     color: #c98474;
     background-color: #FFF;
   }
@@ -356,34 +379,115 @@
   .selected .icons > i{
     visibility: hidden;
   }
-  .inputBox{
-    text-align: right;
-    padding-bottom: 20px;
+  .calendar{
+    z-index:11;
+    position: absolute;
+    top: 55px;
+    right: 0;
+    text-align: center;
+    font-family: 'Baloo Bhaijaan', sans-serif;
+    padding: 0 10px;
   }
-  .inputBox button{
-    width: 100px;
-    height: 30px;
+  .calendar > div{
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #FFF;
+    width: 380px;
+    border: 1px solid #a1a2a3;
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
+    -moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
+  }
+  .calendar > div > span{
+    position: absolute;
+    right: 30px;
+    top: -15px;
+    width: 0;
+    height: 0;
+    border-right: 11px solid transparent;
+    border-left: 11px solid transparent;
+    border-bottom: 15px solid rgba(0,0,0,.3);
+  }
+  .calendar > div > span:before{
+    position: absolute;
+    content: '';
+    top: 2px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-right: 10px solid transparent;
+    border-left: 10px solid transparent;
+    border-bottom: 14px solid #FFF;
+  }
+  .calendar .year{
+    width: 100%;
+    height: 50px;
+    border-bottom: 1px solid #e1e2e3;
+    line-height: 49px;
+    font-size: 18px;
+  }
+  .calendar .year i{
+    cursor: pointer;
+    width: 60px;
+    height: 49px;
+    line-height: 49px;
+  }
+  .calendar .year i.fa-chevron-circle-left{
+    float: left;
+  }
+  .calendar .year i.fa-chevron-circle-right{
+    float: right;
+  }
+  .calendar ul{
+    padding: 9px;
+    padding-bottom: 10px;
+  }
+  .calendar ul li{
+    height: 50px;
+    line-height: 50px;
+    cursor: pointer;
+    width: 120px;
+    display: inline-block;
+  }
+  .calendar ul li.nonSelectable{
+    cursor: default;
+    opacity: 0.5;
+    background-color: #eee;
+  }
+  .calendar ul li:not(.nonSelectable):hover{
+    background-color: rgba(242, 211, 136, .5);
+  }
+  .calendar ul li > span{
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    background-color: #c98474;
+    color: #FFF;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 12px;
+  }
+  .calendar .recent{
+    width: 100%;
+    padding: 0 9px;
+    margin-bottom: 9px;
+  }
+  .calendar .recent > button{
+    width: 100%;
+    height: 40px;
+    background-color: #f2d388;
     border: 0;
     color: #FFF;
-    background-color: #c98474;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
   }
-  .inputBox > div{
-    border: 1px solid #c98474;
-    padding: 10px;
-    -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
-    -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
-    box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
-    background-color: #FFF;
-  }
-  .inputBox textarea{
-    width: 100%;
-    height: 300px;
-    margin-bottom: 10px;
-    resize: none;
+  .calendar .recent > button:hover{
+    opacity: 0.8;
   }
 
 
@@ -481,6 +585,12 @@
   @media all and (max-width: 500px){
     .dailyList > li{
       width: 100%;
+    }
+    .calendar > div{
+      width: 100%;
+    }
+    .calendar ul li{
+      width: 33.3333%;
     }
   }
 </style>

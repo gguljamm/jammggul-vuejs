@@ -17,13 +17,11 @@
           </transition>
         </div>
       </div>
-      <transition name="fade">
-        <navigation
-          v-bind:class="[this.page]"
-          :page="this.page"
-          v-if="mobNavOpen"
-          @transChange="changePage"></navigation>
-      </transition>
+      <navigation
+        v-bind:class="[this.page]"
+        :page="this.page"
+        v-if="mobNavOpen"
+        @transChange="changePage"></navigation>
       <transition name="component-fade" mode="out-in">
         <commponent v-bind:is="page"></commponent>
       </transition>
