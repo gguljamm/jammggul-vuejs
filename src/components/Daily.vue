@@ -3,24 +3,27 @@
   <div class="mainTitle">
     <div v-if="itemsView.length > 0" class="filter">
       <button @click="filterOpen=!filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i><span>{{ filterOption }}</span></button>
-      <div class="monthSelector" v-if="filterOpen"><div>
-        <span></span>
-        <div class="year">
-          <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
-          {{ selectedYear }}
-          <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
-        </div>
-        <ul>
-          <li
-            v-for="(month, index) in arrMonth"
-            v-bind:class="month.num > 0?'':'nonSelectable'"
-            @click="month.num > 0?monthClick(index):null"
-            >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span></li>
-        </ul>
-        <div class="recent">
-          <button @click="filtering('recent')">Recently 20</button>
-        </div>
-      </div></div>
+      <div v-if="filterOpen">
+        <div class="monthSelector" @click.stop><div>
+          <span></span>
+          <div class="year">
+            <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+            {{ selectedYear }}
+            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+          </div>
+          <ul>
+            <li
+              v-for="(month, index) in arrMonth"
+              v-bind:class="month.num > 0?'':'nonSelectable'"
+              @click="month.num > 0?monthClick(index):null"
+              >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span></li>
+          </ul>
+          <div class="recent">
+            <button @click="filtering('recent')">Recently 20</button>
+          </div>
+        </div></div>
+        <div class="monthSelectorBack" @click="popClose"></div>
+      </div>
     </div>
     <div class="write">
       <button @click="authClick">
@@ -87,6 +90,9 @@
       };
     },
     methods: {
+      popClose() {
+        this.filterOpen = false;
+      },
       isLoaded(a, b) {
         return (a && !b);
       },
@@ -402,8 +408,17 @@
   .selected .icons > i{
     visibility: hidden;
   }
+  .monthSelectorBack{
+    z-index: 11;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,.3);
+  }
   .monthSelector{
-    z-index:11;
+    z-index:12;
     position: absolute;
     top: 55px;
     right: 0;
