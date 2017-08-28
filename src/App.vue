@@ -58,7 +58,7 @@
       getWindowWidth() {
         const nowWidth = document.documentElement.clientWidth;
         this.windowWidth = nowWidth;
-        if (nowWidth < 1300) {
+        if (nowWidth < 1270) {
           if (!this.isMobile) {
             this.isMobile = true;
             this.mobNavOpen = false;
@@ -98,7 +98,6 @@
 
 <style>
   @import './assets/lib/normalize.css';
-  @import url('https://fonts.googleapis.com/css?family=Fredoka+One');
   @import url(https://fonts.googleapis.com/css?family=Open+Sans:800);
   html, body {
     width: 100%;
@@ -215,4 +214,5 @@
       right: 10px;
     }
   }
+  @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 </style>

@@ -104,8 +104,8 @@
     position: relative;
   }
   .navigation ul li > div{
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
     padding: 10px 15px 10px 15px;
     text-align: center;
     cursor: pointer;
@@ -127,8 +127,8 @@
     background-color: rgb(167, 210, 203);
   }
   .navigation ul li img{
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     -webkit-border-radius: 25px;
     -moz-border-radius: 25px;
     border-radius: 25px;
@@ -138,7 +138,7 @@
   }
   .navigation ul li > div div{
     position: absolute;
-    width: 100px;
+    width: 90px;
     left: 0;
     line-height: 20px;
     font-size: 14px;

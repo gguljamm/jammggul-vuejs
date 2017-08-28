@@ -3,7 +3,7 @@
   <div class="mainTitle">
     <div v-if="itemsView.length > 0" class="filter">
       <button @click="filterOpen=!filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i><span>{{ filterOption }}</span></button>
-      <div class="calendar" v-if="filterOpen"><div>
+      <div class="monthSelector" v-if="filterOpen"><div>
         <span></span>
         <div class="year">
           <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
@@ -30,31 +30,35 @@
     </div>
   </div>
   <input-box v-if="isAuth"></input-box>
-  <div class="sk-folding-cube"
-    v-if="!loaded">
-    <div class="sk-cube1 sk-cube"></div>
-    <div class="sk-cube2 sk-cube"></div>
-    <div class="sk-cube4 sk-cube"></div>
-    <div class="sk-cube3 sk-cube"></div>
-  </div>
+  <loading v-if="!loaded"></loading>
   <ul class="dailyList">
-    <li v-for="item in itemsView" v-getHeight="{ item }">
-      <div class="dailyBox" @click="listClick($event)">
-        <div>
-          <div class="title">{{ item.date }}</div>
-          <div class="content">
+    <transition-group tag="div" name="component-fade" mode="out-in">
+      <li
+        v-for="item, index in itemsView"
+        v-bind:key="`${item.date}-${index}`"
+        v-bind:class="item.imgUrl?'clickable':''"
+        v-getHeight="{ item }">
+          <div class="dailyBox" @click="listClick($event, item)">
             <div>
-              <div><div v-for="line in item.content.split('\n')">{{ line }}<br></div></div>
-              <span class="icons">
-                <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
-                <i v-if="item.imgUrl" class="fa fa-picture-o" aria-hidden="true"></i>
-              </span>
-              <img v-if="item.imgUrl" v-bind:data-url="item.imgUrl" style="width: 100%;">
+              <div class="title">{{ item.date }}</div>
+              <div class="content">
+                <div>
+                  <div><div v-for="line,key in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
+                  <span class="icons">
+                    <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
+                    <i v-if="item.imgUrl" class="fa fa-picture-o" aria-hidden="true"></i>
+                  </span>
+                  <div v-if="isLoaded(item.imgUrl, item.loaded)" class="imgLoader">
+                    <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-bind:src="item.loaded?item.imgUrl:''">
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </li>
+      </li>
+    </transition-group>
   </ul>
   <div class="clear"></div>
 </div>
@@ -83,6 +87,9 @@
       };
     },
     methods: {
+      isLoaded(a, b) {
+        return (a && !b);
+      },
       monthClick(thisMonth) {
         const obj = {
           year: this.selectedYear,
@@ -90,7 +97,8 @@
         };
         this.filtering(obj);
       },
-      listClick(event) {
+      listClick(event, item) {
+        const thisItem = item;
         for (let x = 0; x < event.path.length; x += 1) {
           if (event.path[x].localName === 'li') {
             if (event.path[x].className.indexOf('clickable') < 0) {
@@ -107,10 +115,12 @@
               selected[0].setAttribute('class', 'dailyBox');
             }
             getEvent.path[x].className = 'dailyBox selected';
-            const img = getEvent.path[x].querySelector('img');
-            if (img && img.getAttribute('data-url')) {
-              img.setAttribute('src', img.getAttribute('data-url'));
-              img.removeAttribute('data-url');
+            if (item.imgUrl) {
+              const loadImg = new Image();
+              loadImg.src = item.imgUrl;
+              loadImg.onload = () => {
+                thisItem.loaded = true;
+              };
             }
             break;
           } else if (getEvent.path[x].className === 'dailyBox selected') {
@@ -149,10 +159,11 @@
         } else {
           this.filterOption = `${opt.year}-${this.zeros(opt.month + 1)}`;
           const month = this.itemsLength[opt.year][1 + opt.month];
-          for (let x = month.length - 1; x >= 0; x -= 1) {
+          for (let x = 0; x < month.length; x += 1) {
             this.itemsView.push(month[x]);
           }
         }
+        this.filterOpen = false;
         this.changeMonthNum();
       },
       changeMonthNum() {
@@ -192,6 +203,7 @@
             newDate += '-';
             newDate += getDate.slice(6, 8);
             resp.date = newDate;
+            resp.loaded = false;
             this.items.push(resp);
             const year = resp.date.slice(0, 4);
             const month = parseInt(resp.date.slice(5, 7), 10);
@@ -213,12 +225,12 @@
     directives: {
       getHeight: {
         inserted: (item) => {
+          if (item.className.indexOf('clickable') > 0) {
+            return;
+          }
           const height = item.querySelector('.content > div > div').offsetHeight;
-          const img = item.querySelector('.content img');
           if (height > 120) {
-            item.setAttribute('class', 'clickable more');
-          } else if (img) {
-            item.setAttribute('class', 'clickable img');
+            item.setAttribute('class', `clickable more ${item.className}`);
           }
         },
       },
@@ -235,7 +247,7 @@
   }
   .mainTitle{
     position: relative;
-    height: 50px;
+    height: 55px;
     padding: 0 10px;
   }
   .mainTitle > div{
@@ -243,12 +255,13 @@
     top: 0;
   }
   .mainTitle > div > button{
-    height: 30px;
+    height: 35px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
     padding: 0 20px;
     cursor: pointer;
+    font-size: 14px;
   }
   .mainTitle > div.filter{
     float: right;
@@ -273,18 +286,18 @@
     width: 20px;
     text-align: center;
   }
-  .dailyList > li{
+  .dailyList li{
     width: 33.3333%;
     padding: 0 10px 20px 10px;
     float: left;
   }
-  .dailyList > li .dailyBox{
+  .dailyList li .dailyBox{
     height: 190px;
   }
-  .dailyList > li.clickable .dailyBox{
+  .dailyList li.clickable .dailyBox{
     cursor: pointer;
   }
-  .dailyList > li .dailyBox > div{
+  .dailyList li .dailyBox > div{
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
@@ -292,7 +305,7 @@
     -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
     box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
   }
-  .dailyList > li .dailyBox.selected > div{
+  .dailyList li .dailyBox.selected > div{
     -webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
     -moz-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
@@ -327,6 +340,7 @@
     -moz-border-radius-bottomright: 10px;
     border-bottom-right-radius: 10px;
     position: relative;
+    font-family: 'Noto Sans KR', sans-serif;
   }
   .content > div{
     height: 120px;
@@ -339,6 +353,15 @@
     visibility: hidden;
     max-width: 100%;
     margin-top: 20px;
+  }
+  .content .imgLoader{
+    width: 100%;
+    text-align: center;
+    padding: 15px 0 10px 0;
+    display: none;
+  }
+  .selected .content .imgLoader{
+    display: inline-block;
   }
   .icons{
     position: absolute;
@@ -379,7 +402,7 @@
   .selected .icons > i{
     visibility: hidden;
   }
-  .calendar{
+  .monthSelector{
     z-index:11;
     position: absolute;
     top: 55px;
@@ -388,7 +411,7 @@
     font-family: 'Baloo Bhaijaan', sans-serif;
     padding: 0 10px;
   }
-  .calendar > div{
+  .monthSelector > div{
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
@@ -399,7 +422,7 @@
     -moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
     box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
   }
-  .calendar > div > span{
+  .monthSelector > div > span{
     position: absolute;
     right: 30px;
     top: -15px;
@@ -409,7 +432,7 @@
     border-left: 11px solid transparent;
     border-bottom: 15px solid rgba(0,0,0,.3);
   }
-  .calendar > div > span:before{
+  .monthSelector > div > span:before{
     position: absolute;
     content: '';
     top: 2px;
@@ -420,45 +443,45 @@
     border-left: 10px solid transparent;
     border-bottom: 14px solid #FFF;
   }
-  .calendar .year{
+  .monthSelector .year{
     width: 100%;
     height: 50px;
     border-bottom: 1px solid #e1e2e3;
     line-height: 49px;
     font-size: 18px;
   }
-  .calendar .year i{
+  .monthSelector .year i{
     cursor: pointer;
     width: 60px;
     height: 49px;
     line-height: 49px;
   }
-  .calendar .year i.fa-chevron-circle-left{
+  .monthSelector .year i.fa-chevron-circle-left{
     float: left;
   }
-  .calendar .year i.fa-chevron-circle-right{
+  .monthSelector .year i.fa-chevron-circle-right{
     float: right;
   }
-  .calendar ul{
+  .monthSelector ul{
     padding: 9px;
     padding-bottom: 10px;
   }
-  .calendar ul li{
+  .monthSelector ul li{
     height: 50px;
     line-height: 50px;
     cursor: pointer;
     width: 120px;
     display: inline-block;
   }
-  .calendar ul li.nonSelectable{
+  .monthSelector ul li.nonSelectable{
     cursor: default;
     opacity: 0.5;
     background-color: #eee;
   }
-  .calendar ul li:not(.nonSelectable):hover{
+  .monthSelector ul li:not(.nonSelectable):hover{
     background-color: rgba(242, 211, 136, .5);
   }
-  .calendar ul li > span{
+  .monthSelector ul li > span{
     width: 16px;
     height: 16px;
     line-height: 16px;
@@ -471,12 +494,12 @@
     margin-left: 5px;
     font-size: 12px;
   }
-  .calendar .recent{
+  .monthSelector .recent{
     width: 100%;
     padding: 0 9px;
     margin-bottom: 9px;
   }
-  .calendar .recent > button{
+  .monthSelector .recent > button{
     width: 100%;
     height: 40px;
     background-color: #f2d388;
@@ -486,110 +509,22 @@
     font-size: 16px;
     font-weight: bold;
   }
-  .calendar .recent > button:hover{
+  .monthSelector .recent > button:hover{
     opacity: 0.8;
   }
-
-
-  .sk-folding-cube {
-    margin: 20px auto;
-    width: 40px;
-    height: 40px;
-    position: relative;
-    -webkit-transform: rotateZ(45deg);
-    transform: rotateZ(45deg);
-  }
-  .sk-folding-cube .sk-cube {
-    float: left;
-    width: 50%;
-    height: 50%;
-    position: relative;
-    -webkit-transform: scale(1.1);
-    -ms-transform: scale(1.1);
-    transform: scale(1.1);
-  }
-  .sk-folding-cube .sk-cube:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #F2D388;
-    -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
-    animation: sk-foldCubeAngle 2.4s infinite linear both;
-    -webkit-transform-origin: 100% 100%;
-    -ms-transform-origin: 100% 100%;
-    transform-origin: 100% 100%;
-  }
-  .sk-folding-cube .sk-cube2 {
-    -webkit-transform: scale(1.1) rotateZ(90deg);
-    transform: scale(1.1) rotateZ(90deg);
-  }
-  .sk-folding-cube .sk-cube3 {
-    -webkit-transform: scale(1.1) rotateZ(180deg);
-    transform: scale(1.1) rotateZ(180deg);
-  }
-  .sk-folding-cube .sk-cube4 {
-    -webkit-transform: scale(1.1) rotateZ(270deg);
-    transform: scale(1.1) rotateZ(270deg);
-  }
-  .sk-folding-cube .sk-cube2:before {
-    -webkit-animation-delay: 0.3s;
-    animation-delay: 0.3s;
-  }
-  .sk-folding-cube .sk-cube3:before {
-    -webkit-animation-delay: 0.6s;
-    animation-delay: 0.6s;
-  }
-  .sk-folding-cube .sk-cube4:before {
-    -webkit-animation-delay: 0.9s;
-    animation-delay: 0.9s;
-  }
-  @-webkit-keyframes sk-foldCubeAngle {
-    0%, 10% {
-      -webkit-transform: perspective(140px) rotateX(-180deg);
-      transform: perspective(140px) rotateX(-180deg);
-      opacity: 0;
-    } 25%, 75% {
-        -webkit-transform: perspective(140px) rotateX(0deg);
-        transform: perspective(140px) rotateX(0deg);
-        opacity: 1;
-      } 90%, 100% {
-          -webkit-transform: perspective(140px) rotateY(180deg);
-          transform: perspective(140px) rotateY(180deg);
-          opacity: 0;
-        }
-  }
-
-  @keyframes sk-foldCubeAngle {
-    0%, 10% {
-      -webkit-transform: perspective(140px) rotateX(-180deg);
-      transform: perspective(140px) rotateX(-180deg);
-      opacity: 0;
-    } 25%, 75% {
-        -webkit-transform: perspective(140px) rotateX(0deg);
-        transform: perspective(140px) rotateX(0deg);
-        opacity: 1;
-      } 90%, 100% {
-          -webkit-transform: perspective(140px) rotateY(180deg);
-          transform: perspective(140px) rotateY(180deg);
-          opacity: 0;
-        }
-  }
   @media all and (max-width: 768px){
-    .dailyList > li{
+    .dailyList li{
       width: 50%;
     }
   }
   @media all and (max-width: 500px){
-    .dailyList > li{
+    .dailyList li{
       width: 100%;
     }
-    .calendar > div{
+    .monthSelector > div{
       width: 100%;
     }
-    .calendar ul li{
+    .monthSelector ul li{
       width: 33.3333%;
     }
   }
