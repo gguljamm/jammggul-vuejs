@@ -7,9 +7,9 @@
         <div class="monthSelector" @click.stop><div>
           <span></span>
           <div class="year">
-            <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+            <i class="disabled fa fa-chevron-circle-left" aria-hidden="true"></i>
             {{ selectedYear }}
-            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+            <i class="disabled fa fa-chevron-circle-right" aria-hidden="true"></i>
           </div>
           <ul>
             <li
@@ -55,7 +55,9 @@
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-bind:src="item.loaded?item.imgUrl:''">
+                  <transition name="component-fade" mode="out-in">
+                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-bind:src="item.loaded?item.imgUrl:''">
+                  </transition>
                 </div>
               </div>
             </div>
@@ -250,6 +252,7 @@
     max-width: 1080px;
     width: 100%;
     margin: 0 auto;
+    padding-bottom: 50px;
   }
   .mainTitle{
     position: relative;
@@ -358,6 +361,7 @@
   .content > div img{
     visibility: hidden;
     max-width: 100%;
+    width: 100%;
     margin-top: 20px;
   }
   .content .imgLoader{
@@ -470,6 +474,10 @@
     width: 60px;
     height: 49px;
     line-height: 49px;
+  }
+  .monthSelector .year i.disabled{
+    opacity: 0.5;
+    cursor: default;
   }
   .monthSelector .year i.fa-chevron-circle-left{
     float: left;

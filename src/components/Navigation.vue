@@ -1,5 +1,6 @@
 <template>
 <div id="Navigation" class="navigation">
+  <span class="clamp"></span>
   <ul>
     <li
       v-bind:class="{active: activeTab == 'about'}"
@@ -81,17 +82,47 @@
     z-index: 1;
     background-color: #FFF;
   }
-  .mobile .navigation.about{
-    position: relative;
-    background-color: rgba(255,255,255,.5);
-  }
-  .mobile .navigation:not(.about){
-    position: relative;
-    background-color: #FFF;
-    border-bottom: 1px solid #c1c2c3;
-  }
   .web .navigation ul{
     padding: 10px 0;
+  }
+  .mobile .navigation .clamp{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: 22px;
+    top: -20px;
+    overflow: hidden;
+  }
+  .mobile .navigation .clamp:before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    border-bottom: 15px solid #FFF;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    width: 0;
+    height: 0;
+    -webkit-filter: drop-shadow(1px 1px 2px rgba(0,0,0,.5));
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,.5));
+  }
+  .mobile .navigation.about .clamp:before{
+    -webkit-filter: none;
+    filter: none;
+    border-bottom-color: rgba(255,255,255,.5);
+  }
+  .mobile .navigation{
+    position: relative;
+    padding: 5px 10px 0 10px;
+  }
+  .mobile .navigation.about ul{
+    background-color: rgba(255,255,255,.5);
+  }
+  .mobile .navigation ul{
+    background-color: #FFF;
+    -webkit-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
+    box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
   }
   .mobile .navigation ul{
     white-space: nowrap;

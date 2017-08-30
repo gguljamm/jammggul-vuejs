@@ -99,6 +99,7 @@
 <style>
   @import './assets/lib/normalize.css';
   @import url(https://fonts.googleapis.com/css?family=Open+Sans:800);
+  @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
   html, body {
     width: 100%;
     height: 100%;
@@ -126,6 +127,7 @@
   .wrapper{
     position: absolute;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     top: 0;
     left: 0;
     right: 0;
@@ -214,5 +216,4 @@
       right: 10px;
     }
   }
-  @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 </style>
