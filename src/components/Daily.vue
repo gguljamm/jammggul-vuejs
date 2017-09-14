@@ -143,8 +143,8 @@
           this.isAuth = false;
           return;
         }
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then((result) => {
+        const provider = new this.$firebase.auth.GoogleAuthProvider();
+        this.$firebase.auth().signInWithPopup(provider).then((result) => {
           if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
           } else {
@@ -198,7 +198,7 @@
       },
     },
     mounted() {
-      firebase.database().ref('/daily')
+      this.$firebase.database().ref('/daily')
         .orderByChild('date')
         .once('value')
         .then((data) => {

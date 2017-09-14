@@ -25,7 +25,7 @@
       },
       submitImage(file, resizedImage) {
         const name = `daily/${file.name}`;
-        const ref = firebase.storage().ref().child(name);
+        const ref = this.$firebase.storage().ref().child(name);
         ref.put(resizedImage).then((snapshot) => {
           this.upload(snapshot.downloadURL);
         });
@@ -85,7 +85,7 @@
         let dateString = newDate.getFullYear();
         dateString += this.zeros(parseInt(newDate.getMonth(), 10) + 1);
         dateString += this.zeros(newDate.getDate());
-        firebase.database().ref('/daily').push({
+        this.$firebase.database().ref('/daily').push({
           date: parseInt(dateString, 10),
           content: text,
           imgUrl: url,

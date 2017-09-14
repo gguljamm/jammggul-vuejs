@@ -1,40 +1,42 @@
 <template>
 <div id="Navigation" class="navigation">
   <span class="clamp"></span>
-  <ul>
-    <li
+  <span v-if="leftArrow" class="leftArrow"></span>
+  <span v-if="rightArrow" class="rightArrow"></span>
+  <ul @scroll="navScroll"
+  ><li
       v-bind:class="{active: activeTab == 'about'}"
       @click="navChange('about')">
       <div>
         <img src="../assets/images/mug.jpg" >
         <div>ABOUT</div>
       </div>
-    </li>
-    <li
+    </li
+    ><li
       v-bind:class="{active: activeTab == 'daily'}"
       @click="navChange('daily')">
       <div>
         <img src="../assets/images/icecoffee.jpg" >
         <div>DAILY</div>
       </div>
-    </li>
-    <li
+    </li
+    ><li
       v-bind:class="{active: activeTab == 'practice'}"
       @click="navChange('practice')">
       <div>
         <img src="../assets/images/donut.jpg" >
         <div>PRACTICE</div>
       </div>
-    </li>
-    <li
+    </li
+    ><li
       v-bind:class="{active: activeTab == 'devInfo'}"
       @click="navChange('devInfo')">
       <div>
         <img src="../assets/images/takeout.jpg" >
         <div>DEV INFO</div>
       </div>
-    </li>
-    <li
+    </li
+    ><li
       v-bind:class="{active: activeTab == 'travel'}"
       @click="navChange('travel')">
       <div>
@@ -53,9 +55,15 @@
     data() {
       return {
         activeTab: this.page,
+        leftArrow: false,
+        rightArrow: true,
       };
     },
     methods: {
+      navScroll(e) {
+        this.leftArrow = !(e.srcElement.scrollLeft === 0);
+        this.rightArrow = !(350 - e.srcElement.clientWidth - e.srcElement.scrollLeft === 0);
+      },
       navChange(page) {
         this.activeTab = page;
         this.$emit('transChange', page);
@@ -123,6 +131,32 @@
     -webkit-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
     -moz-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
     box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
+  }
+  .mobile .navigation .leftArrow{
+    position: absolute;
+    border-right: 5px solid #cecece;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    left: 15px;
+    top: 30px;
+    z-index: 1;
+    visibility: hidden;
+  }
+  .mobile .navigation .rightArrow{
+    position: absolute;
+    border-left: 5px solid #cecece;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    right: 15px;
+    top: 30px;
+    z-index: 1;
+    visibility: hidden;
+  }
+  .mobile .navigation.about .leftArrow{
+    border-right-color: #FFF;
+  }
+  .mobile .navigation.about .rightArrow{
+    border-left-color: #FFF;
   }
   .mobile .navigation ul{
     white-space: nowrap;
@@ -199,6 +233,14 @@
       width: 70px;
       font-size: 12px;
       bottom: 0;
+    }
+  }
+  @media all and (max-width: 390px){
+    .mobile .navigation .leftArrow{
+      visibility: visible;
+    }
+    .mobile .navigation .rightArrow{
+      visibility: visible;
     }
   }
 </style>
