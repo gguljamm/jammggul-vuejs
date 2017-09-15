@@ -49,7 +49,8 @@
                   <div><div v-for="line,key in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
                   <span class="icons">
                     <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
-                    <i v-if="item.imgUrl" class="fa fa-picture-o" aria-hidden="true"></i>
+                    <span class="img_gif" v-if="item.imgUrl && item.imgUrl.indexOf('.gif')>=0">.gif</span>
+                    <i class="fa fa-picture-o" aria-hidden="true" v-else-if="item.imgUrl"></i>
                   </span>
                   <div v-if="isLoaded(item.imgUrl, item.loaded)" class="imgLoader">
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
@@ -383,6 +384,10 @@
   .icons > i{
     margin-left: 10px;
   }
+  .img_gif{
+    font-size: 12px;
+    font-weight: bold;
+  }
   .selected .icons{
     background: none;
   }
@@ -409,7 +414,7 @@
   .more .selected .icons > i{
     visibility: hidden;
   }
-  .selected .icons > i{
+  .selected .icons > i, .selected .icons .img_gif {
     visibility: hidden;
   }
   .monthSelectorBack{

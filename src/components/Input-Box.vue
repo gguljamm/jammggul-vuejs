@@ -62,7 +62,7 @@
           canvas.width = width;
           canvas.height = height;
           canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg');
+          const dataUrl = canvas.toDataURL(settings.thisFile.type);
           this.submitImage(file, dataURItoBlob(dataUrl));
         };
 
