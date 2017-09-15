@@ -33,7 +33,7 @@
       @click="navChange('devInfo')">
       <div>
         <img src="../assets/images/takeout.jpg" >
-        <div>DEV INFO</div>
+        <div>IT INFO</div>
       </div>
     </li
     ><li

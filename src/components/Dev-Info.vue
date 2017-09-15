@@ -4,8 +4,8 @@
     <div>
       <div>
         <div>
-          <span>Development<br>Information</span><br>
-          <span>나만을 위한 개발팁과 노하우를 저장하는 공간</span>
+          <span>IT<br>Information</span><br>
+          <span>IT트랜드와 개발 이슈등을 저장하는 공간</span>
         </div>
       </div>
       <div>
