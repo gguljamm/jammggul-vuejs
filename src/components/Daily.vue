@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import InputBox from '../components/Input-Box';
+  import InputBox from '../components/Input-Daily';
 
   export default {
     name: 'daily',
@@ -144,16 +144,30 @@
           this.isAuth = false;
           return;
         }
-        const provider = new this.$firebase.auth.GoogleAuthProvider();
-        this.$firebase.auth().signInWithPopup(provider).then((result) => {
-          if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+        const firebase = this.$firebase;
+        const user = firebase.auth().currentUser;
+        if (user) {
+          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
           } else {
             alert('나만 글쓸거야!!'); // eslint-disable-line
           }
-        }).catch(() => {
-          alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
-        });
+        } else {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          firebase.auth().signInWithPopup(provider).then((result) => {
+            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+              this.isAuth = true;
+            } else {
+              alert('나만 글쓸거야!!'); // eslint-disable-line
+              const newUser = result.user;
+              let credential;
+              newUser.reauthenticate(credential).then(() => {
+              });
+            }
+          }).catch(() => {
+            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
+          });
+        }
       },
       filtering(opt) {
         this.itemsView = [];
@@ -253,7 +267,6 @@
     max-width: 1080px;
     width: 100%;
     margin: 0 auto;
-    padding-bottom: 50px;
   }
   .mainTitle{
     position: relative;
@@ -319,6 +332,9 @@
     -webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
     -moz-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
+  }
+  .dailyList li:last-child .dailyBox > div{
+    margin-bottom: 50px;
   }
   .title{
     font-size: 16px;
