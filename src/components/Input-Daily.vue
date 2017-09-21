@@ -2,7 +2,7 @@
   <div id="InputBox" class="inputBox">
     <div>
       <textarea id="TextArea"></textarea>
-      <input id="ImgArea" type="file"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+      <input id="ImgArea" type="file" v-bind:multiple="!isMobile"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
     </div>
   </div>
 </template>
@@ -10,29 +10,48 @@
 <script>
   export default {
     name: 'input-box',
+    data() {
+      return {
+        arrImgUrl: [],
+      };
+    },
+    props: ['isMobile'],
     methods: {
       submit() {
-        const file = document.getElementById('ImgArea').files[0];
+        const file = document.getElementById('ImgArea').files;
         if (file) {
-          const param = {
-            maxSize: 500,
-            thisFile: file,
-          };
-          this.resizeImage(param);
+          for (let x = 0; x < file.length; x += 1) {
+            this.arrImgUrl.push(null);
+            const param = {
+              maxSize: 1080,
+              thisFile: file[x],
+            };
+            this.resizeImage(param, x);
+          }
         } else {
-          this.upload('');
+          this.upload(false);
         }
       },
-      submitImage(file, resizedImage) {
+      submitImage(file, resizedImage, index) {
         const name = `daily/${file.name}`;
         const ref = this.$firebase.storage().ref().child(name);
         ref.put(resizedImage).then((snapshot) => {
-          this.upload(snapshot.downloadURL);
+          this.arrImgUrl[index] = snapshot.downloadURL;
+          let flag = true;
+          for (let x = 0; x < this.arrImgUrl.length; x += 1) {
+            if (!this.arrImgUrl[x]) {
+              flag = false;
+              break;
+            }
+          }
+          if (flag) {
+            this.upload(true);
+          }
         });
       },
-      resizeImage(settings) {
+      resizeImage(settings, index) {
         if (settings.thisFile.type === 'image/gif') {
-          this.submitImage(settings.thisFile, settings.thisFile);
+          this.submitImage(settings.thisFile, settings.thisFile, index);
           return false;
         }
         const file = settings.thisFile;
@@ -63,7 +82,7 @@
           canvas.height = height;
           canvas.getContext('2d').drawImage(image, 0, 0, width, height);
           const dataUrl = canvas.toDataURL(settings.thisFile.type);
-          this.submitImage(file, dataURItoBlob(dataUrl));
+          this.submitImage(file, dataURItoBlob(dataUrl), index);
         };
 
         return new Promise((ok) => {
@@ -88,7 +107,7 @@
         this.$firebase.database().ref('/daily').push({
           date: parseInt(dateString, 10),
           content: text,
-          imgUrl: url,
+          imgUrl: url ? this.arrImgUrl : '',
         }).then(() => {
           alert('포스팅 성공!'); // eslint-disable-line
         });

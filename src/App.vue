@@ -23,7 +23,7 @@
         v-if="mobNavOpen"
         @transChange="changePage"></navigation>
       <transition name="component-fade" mode="out-in">
-        <commponent v-bind:is="page"></commponent>
+        <commponent v-bind:is="page" v-bind:isMobile="isMobile"></commponent>
       </transition>
     </div>
     <div class="footer"></div>

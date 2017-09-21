@@ -32,7 +32,7 @@
       </button>
     </div>
   </div>
-  <input-box v-if="isAuth"></input-box>
+  <input-box v-if="isAuth" v-bind:isMobile="isMobile"></input-box>
   <loading v-if="!loaded"></loading>
   <ul class="dailyList">
     <transition-group tag="div" name="component-fade" mode="out-in">
@@ -56,9 +56,12 @@
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <transition name="component-fade" mode="out-in">
+                  <transition v-if="!Array.isArray(item.imgUrl)" name="component-fade" mode="out-in">
                     <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-bind:src="item.loaded?item.imgUrl:''">
                   </transition>
+                  <transition-group name="component-fade" mode="out-in" v-else>
+                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in item.imgUrl" v-bind:key="url" v-bind:src="item.loaded?url:''">
+                  </transition-group>
                 </div>
               </div>
             </div>
@@ -92,6 +95,7 @@
         arrMonth: [{ text: 'JAN', num: 0 }, { text: 'FEB', num: 0 }, { text: 'MAR', num: 0 }, { text: 'AFR', num: 0 }, { text: 'MAY', num: 0 }, { text: 'JUN', num: 0 }, { text: 'JUL', num: 0 }, { text: 'AUG', num: 0 }, { text: 'SEP', num: 0 }, { text: 'OCT', num: 0 }, { text: 'NOV', num: 0 }, { text: 'DEC', num: 0 }],
       };
     },
+    props: ['isMobile'],
     methods: {
       popClose() {
         this.filterOpen = false;
@@ -106,8 +110,25 @@
         };
         this.filtering(obj);
       },
-      listClick(event, item) {
+      promiseImg(item, url) {
         const thisItem = item;
+        return new Promise(() => {
+          const loadImg = new Image();
+          loadImg.src = url;
+          loadImg.onload = () => {
+            thisItem.loaded = true;
+          };
+        });
+      },
+      notPromiseImg(item, url) {
+        const thisItem = item;
+        const loadImg = new Image();
+        loadImg.src = url;
+        loadImg.onload = () => {
+          thisItem.loaded = true;
+        };
+      },
+      listClick(event, item) {
         for (let x = 0; x < event.path.length; x += 1) {
           if (event.path[x].localName === 'li') {
             if (event.path[x].className.indexOf('clickable') < 0) {
@@ -117,6 +138,7 @@
           }
         }
         const getEvent = event;
+        const thisItem = item;
         for (let x = 0; x < getEvent.path.length; x += 1) {
           if (getEvent.path[x].className === 'dailyBox') {
             const selected = document.getElementsByClassName('selected');
@@ -125,11 +147,17 @@
             }
             getEvent.path[x].className = 'dailyBox selected';
             if (item.imgUrl) {
-              const loadImg = new Image();
-              loadImg.src = item.imgUrl;
-              loadImg.onload = () => {
-                thisItem.loaded = true;
-              };
+              if (Array.isArray(item.imgUrl)) {
+                const arrPromise = [];
+                for (let y = 0; y < item.imgUrl.length; y += 1) {
+                  arrPromise.push(this.notPromiseImg(item, item.imgUrl[y]));
+                }
+                Promise.all(arrPromise).then(() => {
+                  thisItem.loaded = true;
+                });
+              } else {
+                this.promiseImg(item, item.imgUrl);
+              }
             }
             break;
           } else if (getEvent.path[x].className === 'dailyBox selected') {
