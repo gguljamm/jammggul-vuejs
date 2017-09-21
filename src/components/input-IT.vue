@@ -23,7 +23,7 @@
     methods: {
       submit() {
         const file = document.getElementById('ImgArea').files;
-        if (file) {
+        if (file && file.length > 0) {
           for (let x = 0; x < file.length; x += 1) {
             this.arrImgUrl.push(null);
             const param = {

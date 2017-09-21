@@ -19,7 +19,7 @@
     methods: {
       submit() {
         const file = document.getElementById('ImgArea').files;
-        if (file) {
+        if (file && file.length > 0) {
           for (let x = 0; x < file.length; x += 1) {
             this.arrImgUrl.push(null);
             const param = {
@@ -98,7 +98,7 @@
           reader.readAsDataURL(file);
         });
       },
-      upload(url) {
+      upload(isUrl) {
         const newDate = new Date();
         const text = document.getElementById('TextArea').value;
         let dateString = newDate.getFullYear();
@@ -107,7 +107,7 @@
         this.$firebase.database().ref('/daily').push({
           date: parseInt(dateString, 10),
           content: text,
-          imgUrl: url ? this.arrImgUrl : '',
+          imgUrl: isUrl ? this.arrImgUrl : '',
         }).then(() => {
           alert('포스팅 성공!'); // eslint-disable-line
         });
