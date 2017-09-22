@@ -21,9 +21,9 @@
         v-bind:class="[this.page]"
         :page="this.page"
         v-if="mobNavOpen"
-        @transChange="changePage"></navigation>
+        @transChange="navigate"></navigation>
       <transition name="component-fade" mode="out-in">
-        <commponent v-bind:is="page" v-bind:isMobile="isMobile"></commponent>
+        <commponent v-bind:is="page" v-bind:isMobile="mobFlag"></commponent>
       </transition>
     </div>
     <div class="footer"></div>
@@ -52,9 +52,6 @@
       pageReload() {
         location.reload();
       },
-      changePage(changePage) {
-        this.page = changePage;
-      },
       getWindowWidth() {
         const nowWidth = document.documentElement.clientWidth;
         this.windowWidth = nowWidth;
@@ -66,6 +63,17 @@
         } else {
           this.isMobile = false;
           this.mobNavOpen = true;
+        }
+        this.mobFlag = (nowWidth < 768);
+      },
+      navigate(url, popping) {
+        if (url) {
+          this.page = url;
+        } else {
+          this.page = 'about';
+        }
+        if (!popping) {
+          window.history.pushState({ hash: url }, '', url);
         }
       },
     },
@@ -81,9 +89,20 @@
         window.addEventListener('resize', this.getWindowWidth);
         this.getWindowWidth();
       });
+      window.addEventListener('popstate', (e) => {
+        if (!e.state || !e.state.hash) {
+          this.navigate('', true);
+          return;
+        }
+        this.navigate(e.state.hash, true);
+      });
+      if (location.pathname && location.pathname !== '/') {
+        this.page = location.pathname.split('/')[1];
+      }
     },
     data() {
       return {
+        mobFlag: false,
         page: 'about',
         windowWidth: 0,
         isMobile: false,

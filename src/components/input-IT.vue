@@ -1,13 +1,14 @@
 <template>
   <div id="InputBox" class="inputBox">
     <div>
+      <span class="desc">( 이미지 공간 #img# )</span>
       <select id="Category" title="category">
         <option value="it">IT</option>
         <option value="dev">dev</option>
         <option value="hardware">hardware</option>
       </select>
       <textarea title="textArea" id="TextArea"></textarea>
-      <input id="ImgArea" type="file" multiple> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+      <input id="ImgArea" type="file" v-bind:multiple="!isMobile"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
     </div>
   </div>
 </template>
@@ -20,6 +21,7 @@
         arrImgUrl: [],
       };
     },
+    props: ['isMobile'],
     methods: {
       submit() {
         const file = document.getElementById('ImgArea').files;
@@ -147,5 +149,12 @@
     height: 300px;
     margin-bottom: 10px;
     resize: none;
+  }
+  #Category{
+    height: 24px;
+    margin: 0 0 5px 5px;
+  }
+  .desc{
+    font-size: 14px;
   }
 </style>

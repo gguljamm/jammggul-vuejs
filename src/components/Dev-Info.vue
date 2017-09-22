@@ -3,7 +3,7 @@
   <div class="input">
     <button @click="authClick"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>Write</span></button>
   </div>
-  <input-it v-if="isAuth"></input-it>
+  <input-it v-if="isAuth" v-bind:isMobile="isMobile"></input-it>
   <div class="devWrapper">
     <div>
       <div>
@@ -13,21 +13,39 @@
         </div>
       </div>
       <div>
-        <div>
+        <div class="categoryBox">
           <p>카테고리</p>
-          <ul>
-            <li>RECENT 20</li>
-            <li>IT<span>({{categoryNum.it}})</span></li>
-            <li>웹개발<span>({{categoryNum.dev}})</span></li>
-            <li>하드웨어<span>({{categoryNum.hardware}})</span></li>
+          <ul class="category">
+            <li @click="changeIndex('recent')" v-bind:class="selectIndex==='recent'?'selected':''">RECENT 20</li>
+            <li @click="changeIndex('it')" v-bind:class="selectIndex==='it'?'selected':''">IT <span>({{objList.it.length}})</span></li>
+            <li @click="changeIndex('dev')" v-bind:class="selectIndex==='dev'?'selected':''">웹개발 <span>({{objList.dev.length}})</span></li>
+            <li @click="changeIndex('hardware')" v-bind:class="selectIndex==='hardware'?'selected':''">하드웨어 <span>({{objList.hardware.length}})</span></li>
           </ul>
         </div>
       </div>
     </div>
-    <ul><li v-for="list in list1">
-      <div v-for="(content, index) in list"><span v-if="index%2===0">{{ content }}</span><img v-else v-bind:src="content" @click="imgPop(content)"></div></li></ul>
-    <ul><li v-for="list in list2">
-      <div v-for="(content, index) in list"><span v-if="index%2===0">{{ content }}</span><img v-else v-bind:src="content" @click="imgPop(content)"></div></li></ul>
+    <div class="itList" v-if="!isMobile">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list1" v-bind:key="list[0][0]">
+        <div v-for="(content, index) in list">
+          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+        </div>
+      </li></transition-group></ul>
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list2" v-bind:key="list[0][0]">
+        <div v-for="(content, index) in list">
+          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+        </div>
+      </li></transition-group></ul>
+    </div>
+    <div class="itList" v-else>
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in mobList" v-bind:key="list[0][0]">
+        <div v-for="(content, index) in list">
+          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+        </div>
+      </li></transition-group></ul>
+    </div>
   </div>
   <div v-if="popFlag" @click="popFlag=false;" class="imgPop">
     <div>
@@ -45,21 +63,48 @@
     components: {
       inputIt,
     },
+    props: ['isMobile'],
     data() {
       return {
+        mobList: [],
         list1: [],
         list2: [],
-        categoryNum: {
-          it: 0,
-          dev: 0,
-          hardware: 0,
-        },
         popFlag: false,
         popImgSrc: '',
         isAuth: false,
+        objList: {
+          recent: [],
+          it: [],
+          dev: [],
+          hardware: [],
+        },
+        selectIndex: 'recent',
       };
     },
     methods: {
+      changeIndex(index) {
+        this.selectIndex = index;
+        const list = this.objList[index];
+        this.list1 = [];
+        this.list2 = [];
+        this.mobList = [];
+        for (let x = 0, leng = list.length; x < leng; x += 1) {
+          const arrContent = list[x].content.split('#img#');
+          const arrContentImg = [];
+          for (let y = 0; y < arrContent.length; y += 1) {
+            arrContentImg.push(arrContent[y].split('\n'));
+            if (y < (arrContent.length - 1)) {
+              arrContentImg.push(list[x].imgUrl[y]);
+            }
+          }
+          if (x % 2 === 0) {
+            this.list1.push(arrContentImg);
+          } else {
+            this.list2.push(arrContentImg);
+          }
+          this.mobList.push(arrContentImg);
+        }
+      },
       authClick() {
         const firebase = this.$firebase;
         if (this.isAuth) {
@@ -96,28 +141,20 @@
       },
     },
     mounted() {
-      for (let x = 0; x < 5; x += 1) {
-        this.list1.push([
-          'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2F151117_LGCNS_1.png?alt=media&token=57ecf425-4273-4426-a7ba-402dcb0962b1',
-          'Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2Fvuejs-logo.jpg?alt=media&token=cb3b61cf-43b6-4548-a19f-9a2887f889f7',
-          'Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2Fwebstorm_1280x800.png?alt=media&token=d73ed538-8ea1-49a6-b371-d105a30747b2',
-          'Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,',
-        ]);
-      }
-      for (let x = 0; x < 5; x += 1) {
-        this.list2.push([
-          'Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2Fvuejs-logo.jpg?alt=media&token=cb3b61cf-43b6-4548-a19f-9a2887f889f7',
-          'Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2Fwebstorm_1280x800.png?alt=media&token=d73ed538-8ea1-49a6-b371-d105a30747b2',
-          'Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum.',
-          'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/devInfo%2F151117_LGCNS_1.png?alt=media&token=57ecf425-4273-4426-a7ba-402dcb0962b1',
-          'Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,',
-        ]);
-      }
+      this.$firebase.database().ref('/it-info')
+        .once('value', (snap) => {
+          const list = snap.val();
+          Object.keys(list).reverse().forEach((x, index) => {
+            const content = { content: list[x].content, imgUrl: list[x].imgUrl };
+            if (this.objList[list[x].category]) {
+              this.objList[list[x].category].push(content);
+            }
+            if (index < 20) {
+              this.objList.recent.push(content);
+            }
+            this.changeIndex(this.selectIndex);
+          });
+        });
     },
   };
 </script>
@@ -157,11 +194,11 @@
     overflow: auto;
     margin-top: 10px;
   }
-  .devWrapper > ul, .devWrapper > div > div{
+  .devWrapper .itList > ul, .devWrapper > div > div{
     float:left;
     width: 50%;
   }
-  .devWrapper > ul > li, .devWrapper > div > div > div{
+  .devWrapper .itList > ul li, .devWrapper > div > div > div{
     margin: 0 10px 20px 10px;
     background-color: #FFF;
     padding: 30px;
@@ -185,11 +222,30 @@
     font-size: 20px;
     line-height: 40px;
   }
-  .devWrapper > ul > li{
+  .categoryBox p{
+    margin: 0;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: bold;
+  }
+  .category > li{
+    cursor: pointer;
+  }
+  .category > li.selected{
+    color: coral;
+  }
+  .category > li:not(.selected):hover{
+    color: coral;
+    opacity: .8;
+  }
+  .devWrapper .itList > ul li{
     line-height: 24px;
   }
-  .devWrapper > ul > li img{
-    width: 100%;
+  .imgCont{
+    text-align: center;
+  }
+  .devWrapper .itList > ul li img{
+    max-width: 100%;
     margin: 10px 0;
     cursor: zoom-in;
   }
@@ -204,7 +260,7 @@
     cursor: zoom-out;
   }
   .imgPop > div{
-    width: 1080px;
+    max-width: 1080px;
     margin: 0 auto;
     text-align: center;
     height: 100%;
@@ -228,9 +284,24 @@
     }
   }
   @media all and (max-width: 768px){
-    .devWrapper > ul, .devWrapper > div > div{
+    .devWrapper .itList > ul, .devWrapper > div > div{
       width: 100%;
       float: none;
+    }
+    .devWrapper > div > div:first-child > div{
+      padding: 10px;
+      min-height: inherit;
+    }
+    .devWrapper > div > div > div > span:first-child{
+      font-size: 30px;
+      line-height: 20px
+    }
+    .devWrapper > div > div > div > span:last-child{
+      font-size: 16px;
+      line-height: 16px;
+    }
+    .devWrapper > div > div > div.categoryBox{
+      min-height: inherit;
     }
   }
 </style>
