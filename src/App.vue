@@ -67,13 +67,17 @@
         this.mobFlag = (nowWidth < 768);
       },
       navigate(url, popping) {
-        if (url) {
-          this.page = url;
+        let turl = url;
+        if (turl.indexOf('#') >= 0) {
+          turl = turl.replace('#', '');
+        }
+        if (turl) {
+          this.page = turl;
         } else {
           this.page = 'about';
         }
         if (!popping) {
-          window.history.pushState({ hash: url }, '', url);
+          window.history.pushState({ hash: `#${turl}` }, '', `#${turl}`);
         }
       },
     },
@@ -96,8 +100,8 @@
         }
         this.navigate(e.state.hash, true);
       });
-      if (location.pathname && location.pathname !== '/') {
-        this.page = location.pathname.split('/')[1];
+      if (location.hash.indexOf('#') >= 0) {
+        this.page = location.hash.replace('#', '');
       }
     },
     data() {

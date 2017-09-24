@@ -138,7 +138,6 @@
           }
         }
         const getEvent = event;
-        const thisItem = item;
         for (let x = 0; x < getEvent.path.length; x += 1) {
           if (getEvent.path[x].className === 'dailyBox') {
             const selected = document.getElementsByClassName('selected');
@@ -152,9 +151,6 @@
                 for (let y = 0; y < item.imgUrl.length; y += 1) {
                   arrPromise.push(this.notPromiseImg(item, item.imgUrl[y]));
                 }
-                Promise.all(arrPromise).then(() => {
-                  thisItem.loaded = true;
-                });
               } else {
                 this.promiseImg(item, item.imgUrl);
               }
@@ -165,7 +161,6 @@
             break;
           }
         }
-        // event.target.setAttribute('class', 'selected');
       },
       authClick() {
         if (this.isAuth) {
@@ -537,6 +532,7 @@
   .monthSelector ul{
     padding: 9px;
     padding-bottom: 10px;
+    width: 378px;
   }
   .monthSelector ul li{
     height: 50px;
