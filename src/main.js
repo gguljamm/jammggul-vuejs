@@ -2,11 +2,13 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import * as Firebase from 'firebase';
+import VueLazyload from 'vue-lazyload';
 import App from './App';
 import Loading from './components/Loading';
 
 Vue.config.productionTip = false;
 Vue.use(Firebase);
+Vue.use(VueLazyload);
 Vue.component('loading', Loading);
 
 const config = {

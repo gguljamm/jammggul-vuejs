@@ -158,6 +158,10 @@
   .mobile .navigation.about .rightArrow{
     border-left-color: #FFF;
   }
+  .mobile .navigation.travel{
+    position: absolute;
+    width: 100%;
+  }
   .mobile .navigation ul{
     white-space: nowrap;
     overflow-x: auto;

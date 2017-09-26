@@ -28,13 +28,13 @@
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list1" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
-          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list2" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
-          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
     </div>
@@ -42,7 +42,7 @@
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in mobList" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
-          <div v-else class="imgCont"><img v-bind:src="content" @click="imgPop(content)"></div>
+          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
     </div>

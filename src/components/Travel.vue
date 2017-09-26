@@ -1,5 +1,5 @@
 <template>
-<div id="Travel">
+<div id="Travel" v-bind:class="isMobile?'mob':''">
   <div class="topImg">
     <img src="../assets/images/burano.jpg">
   </div>
@@ -70,14 +70,32 @@
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
   }
-  .travelWrapper{
+  .mob .topImg{
+    background-color: transparent;
     position: relative;
+    margin-top: -50px;
+    height: auto;
+    font-size: 0;
+  }
+  .mob .topImg > img{
+    width: 150%;
+    height: auto;
+    position: relative;
+  }
+  .travelWrapper{
+    position: absolute;
     max-width: 1080px;
-    margin: 0 auto;
+    width: 100%;
     background-color: #FFF;
     height: 1500px;
     z-index: 1;
-    margin-top: 400px;
+    top: 470px;
+    transform: translateX(-50%);
+    left: 50%;
+  }
+  .mob .travelWrapper{
+    position: relative;
+    top: 0;
   }
   #TravelWrite{
     position: fixed;
@@ -99,6 +117,10 @@
     -webkit-box-shadow: 1px 1px 2px 1px rgba(0,0,0,.2);
     -moz-box-shadow: 1px 1px 2px 1px rgba(0,0,0,.2);
     box-shadow: 1px 1px 2px 1px rgba(0,0,0,.2);
+  }
+  .mob #TravelWrite{
+    bottom: 30px;
+    left: 30px;
   }
   #TravelWrite i{
     transition: .5s ease;
@@ -122,6 +144,10 @@
     box-shadow: 1px 1px 2px 1px rgba(0,0,0,.2);
     width: 150px;
     padding: 10px;
+  }
+  .mob .travelButtonPop{
+    left: 30px;
+    bottom: 92px;
   }
   .travelButtonPop ul{
     white-space: nowrap;
