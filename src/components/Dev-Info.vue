@@ -56,6 +56,7 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
   import inputIt from '../components/input-IT';
 
   export default {
@@ -119,8 +120,8 @@
             alert('나만 글쓸거야!!'); // eslint-disable-line
           }
         } else {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          firebase.auth().signInWithPopup(provider).then((result) => {
+          const provider = Firebase.auth.GoogleAuthProvider();
+          Firebase.auth().signInWithPopup(provider).then((result) => {
             if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
               this.isAuth = true;
             } else {
@@ -228,8 +229,14 @@
     line-height: 24px;
     font-weight: bold;
   }
+  .category{
+    padding: 10px;
+  }
   .category > li{
     cursor: pointer;
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+    margin-top: 10px;
   }
   .category > li.selected{
     color: coral;
@@ -240,6 +247,12 @@
   }
   .devWrapper .itList > ul li{
     line-height: 24px;
+    -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
+    -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
+    box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
   }
   .imgCont{
     text-align: center;

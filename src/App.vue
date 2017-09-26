@@ -84,7 +84,7 @@
     computed: {
       backColor() {
         return {
-          backColor: this.page !== 'about',
+          backColor: this.page !== 'about' && this.page !== 'travel',
         };
       },
     },

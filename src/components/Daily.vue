@@ -74,6 +74,7 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
   import InputBox from '../components/Input-Daily';
 
   export default {
@@ -173,19 +174,17 @@
           if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
           } else {
+            this.$firebase.auth().signOut();
             alert('나만 글쓸거야!!'); // eslint-disable-line
           }
         } else {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          firebase.auth().signInWithPopup(provider).then((result) => {
+          const provider = new Firebase.auth.GoogleAuthProvider();
+          Firebase.auth().signInWithPopup(provider).then((result) => {
             if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
               this.isAuth = true;
             } else {
+              this.$firebase.auth().signOut();
               alert('나만 글쓸거야!!'); // eslint-disable-line
-              const newUser = result.user;
-              let credential;
-              newUser.reauthenticate(credential).then(() => {
-              });
             }
           }).catch(() => {
             alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
