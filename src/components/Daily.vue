@@ -39,16 +39,16 @@
       <li
         v-for="item, index in itemsView"
         v-bind:key="`${item.date}-${index}`"
-        v-bind:class="item.imgUrl?'clickable':''"
+        v-bind:class="item.isMore?'clickable':''"
         v-getHeight="{ item }">
-          <div class="dailyBox" @click="listClick($event, item)">
+          <div class="dailyBox" v-bind:class="item.viewMore?'selected':''" @click="item.isMore?listClick(item):''">
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
                 <div>
                   <div><div v-for="line,key in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
                   <span class="icons">
-                    <i class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
+                    <i v-if="item.isMore&&item.isMore.indexOf('more')>=0" class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
                     <span class="img_gif" v-if="item.imgUrl && item.imgUrl.indexOf('.gif')>=0">.gif</span>
                     <i class="fa fa-picture-o" aria-hidden="true" v-else-if="item.imgUrl"></i>
                   </span>
@@ -129,39 +129,24 @@
           thisItem.loaded = true;
         };
       },
-      listClick(event, item) {
-        for (let x = 0; x < event.path.length; x += 1) {
-          if (event.path[x].localName === 'li') {
-            if (event.path[x].className.indexOf('clickable') < 0) {
-              return;
-            }
-            break;
+      listClick(item) {
+        if (!item.viewMore) {
+          for (let x = 0, leng = this.itemsView.length; x < leng; x += 1) {
+            this.itemsView[x].viewMore = false;
           }
-        }
-        const getEvent = event;
-        for (let x = 0; x < getEvent.path.length; x += 1) {
-          if (getEvent.path[x].className === 'dailyBox') {
-            const selected = document.getElementsByClassName('selected');
-            if (selected.length > 0) {
-              selected[0].setAttribute('class', 'dailyBox');
-            }
-            getEvent.path[x].className = 'dailyBox selected';
-            if (item.imgUrl) {
-              if (Array.isArray(item.imgUrl)) {
-                const arrPromise = [];
-                for (let y = 0; y < item.imgUrl.length; y += 1) {
-                  arrPromise.push(this.notPromiseImg(item, item.imgUrl[y]));
-                }
-              } else {
-                this.promiseImg(item, item.imgUrl);
+          if (item.imgUrl) {
+            if (Array.isArray(item.imgUrl)) {
+              const arrPromise = [];
+              for (let y = 0; y < item.imgUrl.length; y += 1) {
+                arrPromise.push(this.notPromiseImg(item, item.imgUrl[y]));
               }
+            } else {
+              this.promiseImg(item, item.imgUrl);
             }
-            break;
-          } else if (getEvent.path[x].className === 'dailyBox selected') {
-            getEvent.path[x].className = 'dailyBox';
-            break;
           }
         }
+        const item2 = item;
+        item2.viewMore = !item2.viewMore;
       },
       authClick() {
         if (this.isAuth) {
@@ -249,6 +234,12 @@
             newDate += getDate.slice(6, 8);
             resp.date = newDate;
             resp.loaded = false;
+            if (resp.imgUrl) {
+              resp.isMore = 'img';
+            } else {
+              resp.isMore = false;
+            }
+            resp.viewMore = false;
             this.items.push(resp);
             const year = resp.date.slice(0, 4);
             const month = parseInt(resp.date.slice(5, 7), 10);
@@ -269,13 +260,15 @@
     },
     directives: {
       getHeight: {
-        inserted: (item) => {
-          if (item.className.indexOf('clickable') > 0) {
-            return;
-          }
-          const height = item.querySelector('.content > div > div').offsetHeight;
+        inserted: (ele, value) => {
+          const val = value.value;
+          const height = ele.querySelector('.content > div > div').offsetHeight;
           if (height > 120) {
-            item.setAttribute('class', `clickable more ${item.className}`);
+            if (val.item.isMore) {
+              val.item.isMore = 'img more';
+            } else {
+              val.item.isMore = 'more';
+            }
           }
         },
       },
@@ -351,17 +344,19 @@
     box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
   }
   .dailyList li .dailyBox.selected > div{
-    -webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
-    -moz-box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
-    box-shadow: 2px 2px 2px 2px rgba(0,0,0,.3);
+    -webkit-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
+    -moz-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
+    box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
   }
   .dailyList li:last-child .dailyBox > div{
     margin-bottom: 50px;
   }
   .title{
     font-size: 16px;
-    line-height: 30px;
+    border: 1px solid #a7d2cb;
+    border-bottom: 0;
     height: 30px;
+    line-height: 29px;
     text-align: center;
     background-color: #a7d2cb;
     color: #FFF;
@@ -390,6 +385,9 @@
     position: relative;
     font-family: 'Noto Sans KR', sans-serif;
   }
+  .dailyList li.clickable .dailyBox:hover .title, .dailyList li.clickable .dailyBox:hover .content{
+    border-color: #f2d388;
+  }
   .content > div{
     height: 120px;
     overflow-y: hidden;
@@ -417,7 +415,6 @@
     right: 10px;
     bottom: 10px;
     color: #c98474;
-    background-color: #FFF;
   }
   .icons > i{
     margin-left: 10px;
@@ -428,12 +425,6 @@
   }
   .selected .icons{
     background: none;
-  }
-  .icons .moreIcon{
-    visibility: hidden;
-  }
-  .more .icons .moreIcon{
-    visibility: visible;
   }
   .selected{
     position: relative;
