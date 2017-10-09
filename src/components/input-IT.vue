@@ -1,7 +1,7 @@
 <template>
   <div id="InputBox" class="inputBox">
     <div>
-      <span class="desc">( 이미지 공간 #img# )</span>
+      <span class="desc">( a태그 공간 #url#유알엘#url#설명#url# 이미지 공간 #img# )</span>
       <select id="Category" title="category">
         <option value="it">IT</option>
         <option value="dev">dev</option>

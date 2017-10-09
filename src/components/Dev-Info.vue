@@ -27,13 +27,27 @@
     <div class="itList" v-if="!isMobile">
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list1" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-if="index%2===0"><div v-for="text in content">
+            <template v-if="Array.isArray(text)">
+              <span>{{ text[0] }}</span>
+              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
+              <span>{{ text[3] }}</span>
+            </template>
+            <template v-else>{{ text?text:'&nbsp;' }}</template>
+          </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list2" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-if="index%2===0"><div v-for="text in content">
+            <template v-if="Array.isArray(text)">
+              <span>{{ text[0] }}</span>
+              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
+              <span>{{ text[3] }}</span>
+            </template>
+            <template v-else>{{ text?text:'&nbsp;' }}</template>
+          </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
@@ -41,7 +55,14 @@
     <div class="itList" v-else>
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in mobList" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">{{ text?text:'&nbsp;' }}</div></div>
+          <div v-if="index%2===0"><div v-for="text in content">
+            <template v-if="Array.isArray(text)">
+              <span>{{ text[0] }}</span>
+              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
+              <span>{{ text[3] }}</span>
+            </template>
+            <template v-else>{{ text?text:'&nbsp;' }}</template>
+          </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
@@ -93,7 +114,14 @@
           const arrContent = list[x].content.split('#img#');
           const arrContentImg = [];
           for (let y = 0; y < arrContent.length; y += 1) {
-            arrContentImg.push(arrContent[y].split('\n'));
+            const text = arrContent[y].split('\n');
+            for (let z = 0, leng2 = text.length; z < leng2; z += 1) {
+              const urlMatch = text[z].match(/#url#/g);
+              if (urlMatch && urlMatch.length >= 3) {
+                text[z] = text[z].split('#url#');
+              }
+            }
+            arrContentImg.push(text);
             if (y < (arrContent.length - 1)) {
               arrContentImg.push(list[x].imgUrl[y]);
             }
@@ -153,8 +181,8 @@
             if (index < 20) {
               this.objList.recent.push(content);
             }
-            this.changeIndex(this.selectIndex);
           });
+          this.changeIndex(this.selectIndex);
         });
     },
   };
