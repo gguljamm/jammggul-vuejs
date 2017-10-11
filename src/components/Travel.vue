@@ -7,7 +7,7 @@
     <ul class="travelList">
       <li @click="travelPopClick">
         <div>
-          <img src="../assets/images/thumbnail.jpg">
+          <img src="/static/thumbnail.jpg">
         </div>
         <div>
           <div class="county">중국 <span class="dates">( 2017-03-04 ~ 2017-03-07 )</span></div>
@@ -17,7 +17,7 @@
       </li>
       <li @click="travelPopClick">
         <div>
-          <img src="../assets/images/thumbnail.jpg">
+          <img src="/static/thumbnail.jpg">
         </div>
         <div>
           <div class="county">홍콩 <span class="dates">( 2016-05-30 ~ 2016-06-05 )</span></div>

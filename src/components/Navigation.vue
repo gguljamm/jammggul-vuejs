@@ -21,11 +21,11 @@
       </div>
     </li
     ><li
-      v-bind:class="{active: activeTab == 'practice'}"
-      @click="navChange('practice')">
+      v-bind:class="{active: activeTab == 'portfolio'}"
+      @click="navChange('portfolio')">
       <div>
         <img src="../assets/images/donut.jpg" >
-        <div>PRACTICE</div>
+        <div>Portfolio</div>
       </div>
     </li
     ><li

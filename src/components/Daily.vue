@@ -342,14 +342,12 @@
     -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
     -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
     box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
+    margin-bottom: 50px;
   }
   .dailyList li .dailyBox.selected > div{
     -webkit-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
     -moz-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
     box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
-  }
-  .dailyList li:last-child .dailyBox > div{
-    margin-bottom: 50px;
   }
   .title{
     font-size: 16px;
