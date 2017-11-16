@@ -75,7 +75,7 @@
 
 <script>
   import Firebase from 'firebase';
-  import InputBox from '../components/Input-Daily';
+  import InputBox from '../components/Input/Input-Daily';
 
   export default {
     name: 'daily',
@@ -153,13 +153,12 @@
           this.isAuth = false;
           return;
         }
-        const firebase = this.$firebase;
-        const user = firebase.auth().currentUser;
+        const user = Firebase.auth().currentUser;
         if (user) {
           if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
           } else {
-            this.$firebase.auth().signOut();
+            Firebase.auth().signOut();
             alert('나만 글쓸거야!!'); // eslint-disable-line
           }
         } else {
@@ -168,7 +167,7 @@
             if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
               this.isAuth = true;
             } else {
-              this.$firebase.auth().signOut();
+              Firebase.auth().signOut();
               alert('나만 글쓸거야!!'); // eslint-disable-line
             }
           }).catch(() => {
@@ -220,7 +219,7 @@
       },
     },
     mounted() {
-      this.$firebase.database().ref('/daily')
+      Firebase.database().ref('/daily')
         .orderByChild('date')
         .once('value')
         .then((data) => {
@@ -577,7 +576,7 @@
     .dailyList li{
       width: 100%;
     }
-    .monthSelector > div{
+    .monthSelector > div, .monthSelector ul{
       width: 100%;
     }
     .monthSelector ul li{

@@ -14,8 +14,7 @@
         </ul>
         <div class="hover">
           <div>
-            <button class="demo" v-if="temp.url.demo" @click="urlClick(temp.url.demo)"><span>DEMO</span></button>
-            <button class="web" v-if="temp.url.website" @click="urlClick(temp.url.website)"><span>WEBSITE</span></button>
+            <button v-for="button in temp.url"@click="urlClick(button.clickEvent)"><span>{{ button.name }}</span></button>
           </div>
         </div>
       </div>
@@ -59,10 +58,16 @@
             title: 'For European Traveler, BringPrice',
             thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_europe.jpg?alt=media&token=860a45d9-71f8-4535-8a99-1ecc2828243b',
             spec: ['HTML5', 'CSS3', 'Vue.js'],
-            url: {
-              demo: 'https://europe-project-88861.firebaseapp.com/',
-              website: 'http://europe.bringprice.com',
-            },
+            url: [
+              {
+                name: 'DEMO',
+                clickEvent: 'https://europe-project-88861.firebaseapp.com/',
+              },
+              {
+                name: 'SITE',
+                clickEvent: 'http://europe.bringprice.com',
+              },
+            ],
             participate: [
               { title: '화면설계', rate: 90, width: 0 },
               { title: '디자인', rate: 100, width: 0 },
@@ -70,30 +75,74 @@
             ],
           },
           {
-            title: 'Example',
-            thumbnail: '',
-            spec: ['HTML5', 'CSS3', 'Vue.js'],
-            url: {
-              demo: () => { this.openPop('for europe'); },
-              website: 'http://europe.bringprice.com',
-            },
+            title: '여행박사 - 다구간 일정 추천 (웹, 모바일)',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Ftourbaksa.jpg?alt=media&token=92b9d5d9-d73e-40c2-b34f-e5a89cf9b149',
+            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
+            url: [
+              {
+                name: 'WEB',
+                clickEvent: 'http://air2.tourbaksa.com',
+              },
+              {
+                name: 'MOBILE',
+                clickEvent: 'http://air2.tourbaksa.com/mobile',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 10, width: 0 },
+              { title: '디자인', rate: 90, width: 0 },
+              { title: '프론트개발', rate: 100, width: 0 },
+              { title: '백앤드개발', rate: 10, width: 0 },
+            ],
           },
           {
-            title: 'Example',
+            title: '브링프라이스 어플리케이션',
             thumbnail: '',
-            spec: ['HTML5', 'CSS3', 'Vue.js'],
-            url: {
-              demo: 'https://europe-project-88861.firebaseapp.com/',
-              website: 'http://europe.bringprice.com',
-            },
+            spec: ['Hybrid App', 'Corbova', 'Phonegap', 'JQuery Mobile'],
+            url: [
+              {
+                name: 'DOWNLOAD',
+                clickEvent: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_0.0.3.apk?alt=media&token=dbc1a99d-04ae-4e37-9345-0d30803b43de',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 100, width: 0 },
+              { title: '디자인', rate: 100, width: 0 },
+              { title: '프론트개발', rate: 100, width: 0 },
+            ],
           },
           {
-            title: 'Example',
-            thumbnail: '',
-            spec: ['HTML5', 'CSS3', 'Vue.js', 'JQuery', 'React.js'],
-            url: {
-              demo: 'https://europe-project-88861.firebaseapp.com/',
-            },
+            title: 'BringPrice Web',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice.jpg?alt=media&token=52daa116-5453-41e6-a7e6-ed179f26d5cc',
+            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
+            url: [
+              {
+                name: 'SITE',
+                clickEvent: 'https://bringprice.com',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 10, width: 0 },
+              { title: '디자인', rate: 20, width: 0 },
+              { title: '프론트개발', rate: 90, width: 0 },
+              { title: '백앤드개발', rate: 10, width: 0 },
+            ],
+          },
+          {
+            title: 'BringPrice Mobile',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_mobile.jpg?alt=media&token=5b49e4fc-b2fc-43f7-a6e1-8ffc03b925f7',
+            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
+            url: [
+              {
+                name: 'SITE',
+                clickEvent: 'https://m.bringprice.com',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 90, width: 0 },
+              { title: '디자인', rate: 100, width: 0 },
+              { title: '프론트개발', rate: 100, width: 0 },
+            ],
           },
         ],
       };
@@ -124,19 +173,18 @@
     clear: both;
   }
   .ulPrac > li > div{
+    background-color: #FFF;
     border: 1px solid #e1e3e5;
-    padding: 10px;
     -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
     -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
     box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
     position: relative;
   }
   .ulPrac > li .contImg{
-
+    padding: 5px;
   }
   .ulPrac > li .contImg > img{
     width: 100%;
-    border: 1px solid #e1e3e5;
   }
   .ulPrac > li .contTitle{
     font-size: 20px;
@@ -148,6 +196,7 @@
   .ulPrac > li .contSpec{
     text-align: center;
     padding-bottom: 10px;
+    line-height: 32px;
   }
   .ulPrac > li .contSpec > span{
     background-color: skyblue;
@@ -170,6 +219,7 @@
     width: 90%;
     margin: 0 auto;
     border: 1px solid #a7d2cb;
+    margin-bottom: 30px;
   }
   .ulPrac > li .contPart > li{
     height: 30px;
@@ -237,7 +287,7 @@
     opacity: 1;
     background-color: transparent;
     position: relative;
-    margin-top: 10px;
+    margin-bottom: 10px;
   }
   .ulPrac > li > div .hover > div{
     position: relative;
@@ -279,10 +329,10 @@
     z-index:1;
     background-color: rgba(0,0,0,.2);
   }
-  .ulPrac > li > div .hover button.demo{
+  .ulPrac > li > div .hover button:nth-child(1){
     background-color: #f2d388;
   }
-  .ulPrac > li > div .hover button.web{
+  .ulPrac > li > div .hover button:nth-child(2){
     background-color: #a7d2cb;
   }
   .ulPrac > li > div .hover button:last-child{

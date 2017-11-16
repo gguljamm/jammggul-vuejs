@@ -37,6 +37,7 @@
   import DevInfo from './components/Dev-Info';
   import Travel from './components/Travel';
   import Daily from './components/Daily';
+  import Review from './components/Review';
 
   export default {
     name: 'app',
@@ -45,12 +46,13 @@
       About,
       Daily,
       Portfolio,
+      Review,
       DevInfo,
       Travel,
     },
     methods: {
       pageReload() {
-        location.reload();
+        location.href = '/';
       },
       getWindowWidth() {
         const nowWidth = document.documentElement.clientWidth;
@@ -123,6 +125,7 @@
   @import './assets/lib/normalize.css';
   @import url(https://fonts.googleapis.com/css?family=Open+Sans:800);
   @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
+  @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan');
   html, body {
     width: 100%;
     height: 100%;

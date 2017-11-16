@@ -78,7 +78,7 @@
 
 <script>
   import Firebase from 'firebase';
-  import inputIt from '../components/input-IT';
+  import inputIt from '../components/Input/Input-Dev';
 
   export default {
     name: 'devInfo',
@@ -135,12 +135,11 @@
         }
       },
       authClick() {
-        const firebase = this.$firebase;
         if (this.isAuth) {
           this.isAuth = false;
           return;
         }
-        const user = firebase.auth().currentUser;
+        const user = Firebase.auth().currentUser;
         if (user) {
           if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             this.isAuth = true;
@@ -170,7 +169,7 @@
       },
     },
     mounted() {
-      this.$firebase.database().ref('/it-info')
+      Firebase.database().ref('/it-info')
         .once('value', (snap) => {
           const list = snap.val();
           Object.keys(list).reverse().forEach((x, index) => {

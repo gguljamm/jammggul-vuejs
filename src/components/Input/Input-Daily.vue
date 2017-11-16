@@ -8,6 +8,8 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
+
   export default {
     name: 'input-box',
     data() {
@@ -34,7 +36,7 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `daily/${file.name}`;
-        const ref = this.$firebase.storage().ref().child(name);
+        const ref = Firebase.storage().ref().child(name);
         ref.put(resizedImage).then((snapshot) => {
           this.arrImgUrl[index] = snapshot.downloadURL;
           let flag = true;
@@ -104,7 +106,7 @@
         let dateString = newDate.getFullYear();
         dateString += this.zeros(parseInt(newDate.getMonth(), 10) + 1);
         dateString += this.zeros(newDate.getDate());
-        this.$firebase.database().ref('/daily').push({
+        Firebase.database().ref('/daily').push({
           date: parseInt(dateString, 10),
           content: text,
           imgUrl: isUrl ? this.arrImgUrl : '',

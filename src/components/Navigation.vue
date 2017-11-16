@@ -3,40 +3,48 @@
   <span class="clamp"></span>
   <span v-if="leftArrow" class="leftArrow"></span>
   <span v-if="rightArrow" class="rightArrow"></span>
-  <ul @scroll="navScroll"
-  ><li
+  <ul @scroll="navScroll">
+    <li
       v-bind:class="{active: activeTab == 'about'}"
       @click="navChange('about')">
       <div>
         <img src="../assets/images/mug.jpg" >
         <div>ABOUT</div>
       </div>
-    </li
-    ><li
+    </li>
+    <li
       v-bind:class="{active: activeTab == 'daily'}"
       @click="navChange('daily')">
       <div>
         <img src="../assets/images/icecoffee.jpg" >
         <div>DAILY</div>
       </div>
-    </li
-    ><li
+    </li>
+    <li
       v-bind:class="{active: activeTab == 'portfolio'}"
       @click="navChange('portfolio')">
       <div>
         <img src="../assets/images/donut.jpg" >
-        <div>Portfolio</div>
+        <div>PORTFOLIO</div>
       </div>
-    </li
-    ><li
+    </li>
+    <li
+      v-bind:class="{active: activeTab == 'review'}"
+      @click="navChange('review')">
+      <div>
+        <img src="../assets/images/cream.jpg" >
+        <div>REVIEW</div>
+      </div>
+    </li>
+    <li
       v-bind:class="{active: activeTab == 'devInfo'}"
       @click="navChange('devInfo')">
       <div>
         <img src="../assets/images/takeout.jpg" >
         <div>IT INFO</div>
       </div>
-    </li
-    ><li
+    </li>
+    <li
       v-bind:class="{active: activeTab == 'travel'}"
       @click="navChange('travel')">
       <div>
@@ -74,7 +82,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan');
   .navigation{
     z-index: 1;
   }
@@ -220,7 +227,7 @@
   @media all and (max-height: 470px){
     .web .navigation{
       position: absolute;
-      top: 0;
+      top: 74px;
       margin-top: 0;
     }
   }

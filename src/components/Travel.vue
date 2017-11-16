@@ -5,24 +5,19 @@
   </div>
   <div class="travelWrapper">
     <ul class="travelList">
-      <li @click="travelPopClick">
+      <li v-for="list in travelArray" @click="travelPopClick">
         <div>
-          <img src="/static/thumbnail.jpg">
+          <img v-bind:src="list.thumbnail || 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/thumbnail.jpg?alt=media&token=e46035b1-12c7-445e-9a89-6af32e90daa2'">
         </div>
         <div>
-          <div class="county">중국 <span class="dates">( 2017-03-04 ~ 2017-03-07 )</span></div>
-          <div class="cities"><span>웨이하이</span><span>옌타이</span><span>펑라이</span><span>칭따오</span></div>
-          <div class="description">주진이랑 겨울 중국 여행<br>친절한 사람들과 거센 바람과 역류하는 파도<br>여행의 꽃은 음식이라 했던가</div>
-        </div>
-      </li>
-      <li @click="travelPopClick">
-        <div>
-          <img src="/static/thumbnail.jpg">
-        </div>
-        <div>
-          <div class="county">홍콩 <span class="dates">( 2016-05-30 ~ 2016-06-05 )</span></div>
-          <div class="cities"><span>RISE 2016</span><span>침사추이</span><span>소호거리</span><span>리펄스베이</span></div>
-          <div class="description">출장을 핑계삼아 사리사욕을 챙긴다.<br>6박 7일의 홍콩 탐방 시간</div>
+          <div class="county">{{ list.country }} <span class="dates">( {{ list.dates }} )</span></div>
+          <div class="tags"><span v-for="tag in list.tags">{{ tag }}</span></div>
+          <div class="description">
+            <div v-for="desc in list.description.split('\n')">
+              <span v-if="desc">{{ desc }}</span>
+              <br v-else>
+            </div>
+          </div>
         </div>
       </li>
     </ul>
@@ -31,12 +26,7 @@
     <div class="pop" v-if="popOpen" @click="popOpen = false">
       <div @click.stop>
         <div class="head"><button @click="popOpen = false"><i class="fa fa-times-circle" aria-hidden="true"></i></button></div>
-        <div v-if="popFlag==='addTravel'">
-          <div>여행지 <input title="country"></div>
-          <div>도시 리스트 <input title="cities" type="text" ></div>
-          <div>여행일자 <input title="dates" type="text"></div>
-          <div>설명 <textarea title="description"></textarea></div>
-        </div>
+        <input-travel v-if="popFlag==='addTravel'"/>
         <div v-else-if="popFlag==='appendList'"></div>
         <div v-else-if="popFlag==='travelPop'"></div>
       </div>
@@ -48,7 +38,7 @@
   <transition name="showSlideLeft" mode="out-in">
     <div v-if="buttonPop" class="travelButtonPop">
       <ul>
-        <li @click="writePopOpen('addTravel')">새로운 여행 추가</li>
+        <li @click="authClick('addTravel')">새로운 여행 추가</li>
         <li @click="writePopOpen('appendList')">여행 일정 추가</li>
       </ul>
       <div class="clamp"></div>
@@ -58,10 +48,46 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
+  import InputTravel from '../components/Input/Input-Travel';
+
   export default {
+    components: {
+      InputTravel,
+    },
     props: ['isMobile'],
     name: 'travel',
     methods: {
+      authClick(tag) {
+        if (this.isAuth) {
+          this.isAuth = false;
+          return;
+        }
+        const user = Firebase.auth().currentUser;
+        if (user) {
+          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+            this.isAuth = true;
+            this.writePopOpen(tag);
+          } else {
+            Firebase.auth().signOut();
+            alert('나만 글쓸거야!!'); // eslint-disable-line
+          }
+        } else {
+          const provider = new Firebase.auth.GoogleAuthProvider();
+          const vmThis = this;
+          Firebase.auth().signInWithPopup(provider).then((result) => {
+            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+              vmThis.isAuth = true;
+              vmThis.writePopOpen(tag);
+            } else {
+              Firebase.auth().signOut();
+              alert('나만 글쓸거야!!'); // eslint-disable-line
+            }
+          }).catch(() => {
+            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
+          });
+        }
+      },
       writePopOpen(flag) {
         this.popOpen = true;
         this.buttonPop = false;
@@ -77,7 +103,26 @@
         buttonPop: false,
         popOpen: false,
         popFlag: '',
+        travelArray: [],
+        isAuth: false,
       };
+    },
+    mounted() {
+      const vmThis = this;
+      Firebase.database().ref('/travel')
+        .once('value', (snap) => {
+          const list = snap.val();
+          Object.keys(list).reverse().forEach((x) => {
+            const content = {
+              country: list[x].country,
+              tags: list[x].tags.split(','),
+              dates: list[x].dates,
+              description: list[x].description,
+              thumbnail: list[x].thumbnail,
+            };
+            vmThis.travelArray.push(content);
+          });
+        });
     },
   };
 </script>
@@ -169,7 +214,6 @@
     max-width: 1080px;
     width: 100%;
     background-color: #FFF;
-    min-height: 500px;
     z-index: 1;
     top: 470px;
     transform: translateX(-50%);
@@ -236,15 +280,15 @@
     color: #874c62;
     font-size: 24px;
   }
-  .travelList > li > div .cities{
+  .travelList > li > div .tags{
     margin-top: 5px;
   }
-  .travelList > li > div .cities:after{
+  .travelList > li > div .tags:after{
     content: '';
     display: block;
     clear: both;
   }
-  .travelList > li > div .cities > span{
+  .travelList > li > div .tags > span{
     float:left;
     background-color: #a7d2cb;
     color: #FFF;
@@ -370,7 +414,6 @@
   @media all and (max-width: 1080px) {
     .travelList > li > div .description{
       height: auto;
-      max-height: 216px;
     }
   }
 </style>

@@ -14,6 +14,8 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
+
   export default {
     name: 'input-it',
     data() {
@@ -40,7 +42,7 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `it-info/${file.name}`;
-        const ref = this.$firebase.storage().ref().child(name);
+        const ref = Firebase.storage().ref().child(name);
         ref.put(resizedImage).then((snapshot) => {
           this.arrImgUrl[index] = snapshot.downloadURL;
           let flag = true;
@@ -107,7 +109,7 @@
       upload(url) {
         const text = document.getElementById('TextArea').value;
         const thisCategory = document.getElementById('Category').value;
-        this.$firebase.database().ref('/it-info').push({
+        Firebase.database().ref('/it-info').push({
           category: thisCategory,
           content: text,
           imgUrl: url ? this.arrImgUrl : '',
