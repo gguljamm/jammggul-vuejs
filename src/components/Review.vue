@@ -19,7 +19,8 @@
         <ul>
           <li
             v-for="(cont, index) in returnViewList(reviewInfo[viewCategory])"
-            @click="changeContent(index)"
+            v-bind:class="selectedCategory === viewCategory && selectedNum === index + ((viewSubPaging - 1) * 10) ? 'selected' : ''"
+            @click="changeContent(index + ((viewSubPaging - 1) * 10))"
           >{{ cont.title }}</li>
         </ul>
         <div class="paging">
@@ -120,6 +121,7 @@
             vmThis.reviewInfo[list[x].category].push(content);
             if (x === latestKey) {
               vmThis.selectedCategory = list[x].category;
+              vmThis.viewCategory = list[x].category;
               vmThis.selectedNum = vmThis.reviewInfo[list[x].category].length - 1;
             }
           });
@@ -207,6 +209,9 @@
     -moz-border-radius: 10px;
     border-radius: 10px;
   }
+  .categoryContent > ul > li.selected{
+    color: cornflowerblue;
+  }
   .categoryContent > ul > li:hover{
     background-color: #f2d388;
     color: #FFF;
@@ -224,10 +229,11 @@
     padding: 0 5px;
   }
   .paging > span:hover{
-    color: orangered;
+    color: #f2d388;
+    opacity: 0.8;
   }
   .paging > span.selected{
-    color: red;
+    color: #f2d388;
   }
   .reviewContent{
     background-color: #FFF;
