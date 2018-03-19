@@ -13,7 +13,7 @@
         <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">게임</button>
         <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">영화&드라마</button>
         <button @click="changeCategory('book')" v-bind:class="viewCategory==='book'?'selected':''">책&음악</button>
-        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">ETC</button>
+        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">지름신</button>
       </div>
       <div class="categoryContent">
         <ul>

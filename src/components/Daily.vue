@@ -7,14 +7,23 @@
         <div class="monthSelector" @click.stop><div>
           <span></span>
           <div class="year">
-            <i class="disabled fa fa-chevron-circle-left" aria-hidden="true"></i>
+            <i class="fa fa-chevron-circle-left" aria-hidden="true"
+              v-bind:class="selectedYear > 2017 ? '' : 'disabled'"
+              @click="selectedYear > 2017 ? changeYear(false) : ''"
+            ></i>
             {{ selectedYear }}
-            <i class="disabled fa fa-chevron-circle-right" aria-hidden="true"></i>
+            <i class="fa fa-chevron-circle-right" aria-hidden="true" 
+              v-bind:class="selectedYear < nowYear ? '' : 'disabled'"
+              @click="selectedYear < nowYear ? changeYear(true) : ''"
+            ></i>
           </div>
           <ul>
             <li
               v-for="(month, index) in arrMonth"
-              v-bind:class="month.num > 0?'':'nonSelectable'"
+              v-bind:class="{
+                nonSelectable: month.num === 0,
+                selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
+              }"
               @click="month.num > 0?monthClick(index):null"
               >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span></li>
           </ul>
@@ -98,6 +107,14 @@
     },
     props: ['isMobile'],
     methods: {
+      changeYear(flag) {
+        if (flag) {
+          this.selectedYear += 1;
+        } else {
+          this.selectedYear -= 1;
+        }
+        this.changeMonthNum();
+      },
       popClose() {
         this.filterOpen = false;
       },
@@ -505,6 +522,7 @@
     width: 60px;
     height: 49px;
     line-height: 49px;
+    color: #a7d2cb;
   }
   .monthSelector .year i.disabled{
     opacity: 0.5;
@@ -527,6 +545,9 @@
     cursor: pointer;
     width: 120px;
     display: inline-block;
+  }
+  .monthSelector ul li.selected{
+    box-shadow: 0 0 0 2px #f2d388 inset
   }
   .monthSelector ul li.nonSelectable{
     cursor: default;
