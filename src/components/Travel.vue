@@ -123,6 +123,7 @@
             vmThis.travelArray.push(content);
           });
         });
+      console.log(vmThis.travelArray);
     },
   };
 </script>
@@ -241,6 +242,7 @@
     -moz-box-shadow: 0 0 10px 5px rgba(0,0,0,.1);
     box-shadow: 0 0 10px 5px rgba(0,0,0,.1);
     transition: background .3s ease;
+    display: table;
   }
   .travelList > li:hover{
     background-color: aliceblue;
@@ -249,7 +251,8 @@
     margin-bottom: 0;
   }
   .travelList > li > div{
-    float: left;
+    display: table-cell;
+    vertical-align: middle;
     width: 50%;
     padding: 20px;
     font-family: "Noto Sans KR", sans-serif;
@@ -260,9 +263,10 @@
   .mob .travelList > li{
     padding: 10px;
     margin-bottom: 10px;
+    display: block;
   }
   .mob .travelList > li > div{
-    float: none;
+    display: block;
     width: 100%;
     padding: 10px 10px 0 10px;
   }

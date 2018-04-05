@@ -317,6 +317,7 @@
   .imgPop > div > img{
     position: relative;
     max-width: 100%;
+    box-shadow: 0 0 10px 2px rgba(0,0,0,.3);
   }
   .imgPop.over > div > img{
     margin: 40px 0;
