@@ -68,9 +68,9 @@
       </li></transition-group></ul>
     </div>
   </div>
-  <div v-if="popFlag" @click="popFlag=false;" class="imgPop">
+  <div v-if="popFlag" @click="popFlag=false;" class="imgPop" v-bind:class="imgHeightOver?'over':''">
     <div>
-      <img v-bind:src="popImgSrc">
+      <img v-bind:src="popImgSrc" ref="popImg">
     </div>
   </div>
 </div>
@@ -101,6 +101,7 @@
           hardware: [],
         },
         selectIndex: 'recent',
+        imgHeightOver: false,
       };
     },
     methods: {
@@ -166,6 +167,11 @@
       imgPop(src) {
         this.popFlag = true;
         this.popImgSrc = src;
+        setTimeout(() => {
+          const imgHeight = this.$refs.popImg.height;
+          const windowHeight = window.innerHeight;
+          this.imgHeightOver = (imgHeight > windowHeight);
+        }, 100);
       },
     },
     mounted() {
@@ -299,6 +305,9 @@
     background-color: rgba(0,0,0,.3);
     cursor: zoom-out;
   }
+  .imgPop.over{
+    overflow: auto;
+  }
   .imgPop > div{
     max-width: 1080px;
     margin: 0 auto;
@@ -307,13 +316,18 @@
   }
   .imgPop > div > img{
     position: relative;
+    max-width: 100%;
+  }
+  .imgPop.over > div > img{
+    margin: 40px 0;
+  }
+  .imgPop:not(.over) > div > img{
     top: 50%;
     -webkit-transform: translateY(-50%);
     -moz-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     -o-transform: translateY(-50%);
     transform: translateY(-50%);
-    max-width: 100%;
   }
   @media all and (max-width: 940px){
     .devWrapper > div > div > div > span:first-child{
