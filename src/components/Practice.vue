@@ -97,7 +97,7 @@
           },
           {
             title: '브링프라이스 어플리케이션',
-            thumbnail: '',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbp_app.png?alt=media&token=e7b14407-d17a-43ae-8312-d6ce7862220f',
             spec: ['Hybrid App', 'Corbova', 'Phonegap', 'JQuery Mobile'],
             url: [
               {
