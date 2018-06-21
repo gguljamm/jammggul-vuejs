@@ -25,10 +25,11 @@
                 selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
               }"
               @click="month.num > 0?monthClick(index):null"
-              >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span></li>
+              >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span>
+            </li>
           </ul>
           <div class="recent">
-            <button @click="filtering('recent')">Recently 20</button>
+            <button @click="filtering('recent')">Recently 20<i v-if="'Recent' === filterOption" class="fa fa-check"></i></button>
           </div>
         </div></div>
         <div class="monthSelectorBack" @click="popClose"></div>
@@ -547,7 +548,7 @@
     display: inline-block;
   }
   .monthSelector ul li.selected{
-    box-shadow: 0 0 0 2px #f2d388 inset
+    box-shadow: 0 0 0 2px #ff4e50 inset
   }
   .monthSelector ul li.nonSelectable{
     cursor: default;
@@ -587,6 +588,11 @@
   }
   .monthSelector .recent > button:hover{
     opacity: 0.8;
+  }
+  .monthSelector .recent > button > i{
+    position: absolute;
+    color: #ff4e50;
+    margin-left: 4px;
   }
   @media all and (max-width: 768px){
     .dailyList li{
