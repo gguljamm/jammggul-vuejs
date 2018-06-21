@@ -548,7 +548,7 @@
     display: inline-block;
   }
   .monthSelector ul li.selected{
-    box-shadow: 0 0 0 2px #ff4e50 inset
+    box-shadow: 0 0 0 2px #ff4e50 inset;
   }
   .monthSelector ul li.nonSelectable{
     cursor: default;
