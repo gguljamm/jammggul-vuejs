@@ -208,6 +208,9 @@
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .categoryContent > ul > li.selected{
     color: cornflowerblue;

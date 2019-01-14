@@ -55,6 +55,42 @@
       return {
         list: [
           {
+            title: 'BringPrice renewal with nuxt.js',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbp_nuxt.jpg?alt=media&token=0c95cfb6-cffc-4adc-8f0c-beeb1d2e3c00',
+            spec: ['HTML5', 'SCSS', 'nuxt.js', 'Vue.js'],
+            url: [
+              {
+                name: 'SITE',
+                clickEvent: 'https://bringprice.com',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 30, width: 0 },
+              { title: '디자인', rate: 20, width: 0 },
+              { title: '프론트개발', rate: 80, width: 0 },
+            ],
+          },
+          {
+            title: 'WeMakePrice Hotel Meta Search',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fwmp.jpg?alt=media&token=67562e26-9ba4-4b38-8cc0-4470a7a01ed2',
+            spec: ['HTML5', 'CSS3', 'Vue.js'],
+            url: [
+              {
+                name: 'DEMO',
+                clickEvent: 'https://wmp-hotel.firebaseapp.com',
+              },
+              {
+                name: 'SITE',
+                clickEvent: 'https://mhotel.wonders.app',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 10, width: 0 },
+              { title: '디자인', rate: 10, width: 0 },
+              { title: '프론트개발', rate: 100, width: 0 },
+            ],
+          },
+          {
             title: 'For European Traveler, BringPrice',
             thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_europe.jpg?alt=media&token=860a45d9-71f8-4535-8a99-1ecc2828243b',
             spec: ['HTML5', 'CSS3', 'Vue.js'],
