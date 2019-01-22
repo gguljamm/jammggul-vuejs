@@ -57,7 +57,10 @@
     name: 'Review',
     methods: {
       closePop() {
-        this.writeOpen = false;
+        const temp = confirm('정말 그만쓸거야?');
+        if (temp) {
+          this.writeOpen = false;
+        }
       },
       clickWrite() {
         this.writeOpen = true;
