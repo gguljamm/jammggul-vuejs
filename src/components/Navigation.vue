@@ -1,9 +1,9 @@
 <template>
 <div id="Navigation" class="navigation">
   <span class="clamp"></span>
-  <span v-if="leftArrow" class="leftArrow"></span>
-  <span v-if="rightArrow" class="rightArrow"></span>
-  <ul @scroll="navScroll">
+  <span class="leftArrow" :style="{opacity: leftArrow ? .8 : 0}"></span>
+  <span class="rightArrow" :style="{opacity: rightArrow ? .8 : 0}"></span>
+  <ul @scroll="navScroll" ref="navigator">
     <li
       v-bind:class="{active: activeTab == 'about'}"
       @click="navChange('about')">
@@ -70,7 +70,7 @@
     methods: {
       navScroll(e) {
         this.leftArrow = !(e.srcElement.scrollLeft === 0);
-        this.rightArrow = !(350 - e.srcElement.clientWidth - e.srcElement.scrollLeft === 0);
+        this.rightArrow = (this.$refs.navigator.childElementCount * 70) !== e.srcElement.clientWidth + e.srcElement.scrollLeft;
       },
       navChange(page) {
         this.activeTab = page;
@@ -141,23 +141,27 @@
   }
   .mobile .navigation .leftArrow{
     position: absolute;
-    border-right: 5px solid #cecece;
+    border-right: 5px solid #aaa;
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     left: 15px;
     top: 30px;
     z-index: 1;
     visibility: hidden;
+    opacity: .8;
+    transition: opacity .3s ease;
   }
   .mobile .navigation .rightArrow{
     position: absolute;
-    border-left: 5px solid #cecece;
+    border-left: 5px solid #aaa;
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     right: 15px;
     top: 30px;
     z-index: 1;
     visibility: hidden;
+    opacity: .8;
+    transition: opacity .3s ease;
   }
   .mobile .navigation.about .leftArrow{
     border-right-color: #FFF;
@@ -188,6 +192,9 @@
     -webkit-border-radius: 45px;
     -moz-border-radius: 45px;
     border-radius: 45px;
+  }
+  .mobile .navigation ul{
+    font-size: 0;
   }
   .mobile .navigation ul li{
     display: inline-block;

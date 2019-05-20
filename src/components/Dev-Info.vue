@@ -27,26 +27,32 @@
     <div class="itList" v-if="!isMobile">
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list1" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">
-            <template v-if="Array.isArray(text)">
-              <span>{{ text[0] }}</span>
-              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
-              <span>{{ text[3] }}</span>
+          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
+            <template v-if="text && text.type === 'img'">
+              <span>{{ text.value[0] }}</span>
+              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
+              <span>{{ text.value[3] }}</span>
             </template>
-            <template v-else>{{ text?text:'&nbsp;' }}</template>
+            <template v-else-if="text && text.type === 'code'">
+              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+            </template>
+            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list2" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">
-            <template v-if="Array.isArray(text)">
-              <span>{{ text[0] }}</span>
-              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
-              <span>{{ text[3] }}</span>
+          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
+            <template v-if="text && text.type === 'img'">
+              <span>{{ text.value[0] }}</span>
+              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
+              <span>{{ text.value[3] }}</span>
             </template>
-            <template v-else>{{ text?text:'&nbsp;' }}</template>
+            <template v-else-if="text && text.type === 'code'">
+              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+            </template>
+            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
@@ -55,13 +61,16 @@
     <div class="itList" v-else>
       <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in mobList" v-bind:key="list[0][0]">
         <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content">
-            <template v-if="Array.isArray(text)">
-              <span>{{ text[0] }}</span>
-              <a v-bind:href="text[1]" target="_blank">{{ text[2] }}</a>
-              <span>{{ text[3] }}</span>
+          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
+            <template v-if="text && text.type === 'img'">
+              <span>{{ text.value[0] }}</span>
+              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
+              <span>{{ text.value[3] }}</span>
             </template>
-            <template v-else>{{ text?text:'&nbsp;' }}</template>
+            <template v-else-if="text && text.type === 'code'">
+              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+            </template>
+            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
@@ -116,10 +125,35 @@
           const arrContentImg = [];
           for (let y = 0; y < arrContent.length; y += 1) {
             const text = arrContent[y].split('\n');
+            let procCode = false;
             for (let z = 0, leng2 = text.length; z < leng2; z += 1) {
-              const urlMatch = text[z].match(/#url#/g);
-              if (urlMatch && urlMatch.length >= 3) {
-                text[z] = text[z].split('#url#');
+              if (!procCode) {
+                const urlMatch = text[z].match(/#url#/g);
+                if (urlMatch && urlMatch.length >= 3) {
+                  text[z] = {
+                    type: 'img',
+                    value: text[z].split('#url#'),
+                  };
+                } else if (text[z].indexOf('<code>') >= 0) {
+                  text[z] = {
+                    type: 'code',
+                    value: [
+                      text[z].split('<code>')[1],
+                    ],
+                  };
+                  if (text[z].value[0].indexOf('</code>') >= 0) {
+                    text[z].value[0] = text[z].value[0].replace('</code>', '');
+                  } else {
+                    procCode = text[z];
+                  }
+                }
+              } else if (text[z].indexOf('</code>') >= 0) {
+                procCode.value.push(text[z].split('</code>')[0]);
+                text[z] = 'delete';
+                procCode = false;
+              } else {
+                procCode.value.push(text[z]);
+                text[z] = 'delete';
               }
             }
             arrContentImg.push(text);
@@ -286,6 +320,13 @@
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+  }
+  .devWrapper .itList > ul li .code{
+    background-color: #3a3b3c;
+    color: #FFF;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 10px;
   }
   .imgCont{
     text-align: center;
