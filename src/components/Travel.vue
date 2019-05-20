@@ -23,9 +23,9 @@
     </ul>
   </div>
   <transition name="fade" mode="out-in">
-    <div class="pop" v-if="popOpen" @click="popOpen = false">
+    <div class="pop" v-if="popOpen" @click="closePop()">
       <div @click.stop>
-        <div class="head"><button @click="popOpen = false"><i class="fa fa-times-circle" aria-hidden="true"></i></button></div>
+        <div class="head"><button @click="closePop('direct')"><i class="fa fa-times-circle" aria-hidden="true"></i></button></div>
         <input-travel v-if="popFlag==='addTravel'"/>
         <div v-else-if="popFlag==='appendList'"></div>
         <div v-else-if="popFlag==='travelPop'"></div>
@@ -39,7 +39,7 @@
     <div v-if="buttonPop" class="travelButtonPop">
       <ul>
         <li @click="authClick('addTravel')">새로운 여행 추가</li>
-        <li @click="writePopOpen('appendList')">여행 일정 추가</li>
+        <li @click="authClick('appendList')">여행 일정 추가</li>
       </ul>
       <div class="clamp"></div>
     </div>
@@ -58,6 +58,12 @@
     props: ['isMobile'],
     name: 'travel',
     methods: {
+      closePop(flag) {
+        if (flag === 'direct' || confirm('정말 그만쓸거야?')) {
+          this.popOpen = false;
+          this.isAuth = false;
+        }
+      },
       authClick(tag) {
         if (this.isAuth) {
           this.isAuth = false;
