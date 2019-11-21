@@ -25,6 +25,7 @@
 
 <script>
   import Firebase from 'firebase';
+  import LoadImage from 'blueimp-load-image';
 
   export default {
     data() {
@@ -44,11 +45,7 @@
         });
       },
       imgUpload() {
-        const param = {
-          maxSize: 1080,
-          thisFile: this.$refs.url.files[0],
-        };
-        this.resizeImage(param);
+        this.resizeImage(this.$refs.url.files[0]);
       },
       submitImage(file, resizedImage) {
         const name = `review/${file.name}`;
@@ -59,16 +56,13 @@
           this.$refs.url.value = '';
         });
       },
-      resizeImage(settings) {
-        if (settings.thisFile.type === 'image/gif') {
-          this.submitImage(settings.thisFile, settings.thisFile);
+      resizeImage(file) {
+        if (file.type === 'image/gif') {
+          this.submitImage(file, file);
           return false;
         }
-        const file = settings.thisFile;
-        const maxSize = settings.maxSize;
         const reader = new FileReader();
         const image = new Image();
-        const canvas = document.createElement('canvas');
         const dataURItoBlob = (dataURI) => {
           const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
             atob(dataURI.split(',')[1]) :
@@ -80,19 +74,16 @@
           return new Blob([ia], { type: mime });
         };
         const resize = () => {
-          let width = image.width;
-          let height = image.height;
-
-          if (width > maxSize) {
-            height *= maxSize / width;
-            width = maxSize;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL(settings.thisFile.type);
-          this.submitImage(file, dataURItoBlob(dataUrl));
+          LoadImage.parseMetaData(file, (data) => {
+            let orientation = 0;
+            if (data.exif) {
+              orientation = data.exif.get('Orientation');
+            }
+            LoadImage(file, (canvas) => {
+              const dataUrl = canvas.toDataURL(file.type);
+              this.submitImage(file, dataURItoBlob(dataUrl));
+            }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
+          });
         };
 
         return new Promise((ok) => {
