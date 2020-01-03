@@ -271,6 +271,10 @@
               this.itemsLength[year][month] = [resp];
             }
           });
+          if (!this.itemsLength[this.nowYear]) {
+            this.nowYear -= 1;
+            this.selectedYear -= 1;
+          }
           this.filtering('recent');
           this.loaded = true;
         });
