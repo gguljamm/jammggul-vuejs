@@ -2,7 +2,7 @@
 <div id="About">
   <div class="catchphrase">Dazzling Day, Sunny Day</div>
   <img id="CloudBack" src="../assets/images/cloud2.png">
-  <img id="UpIcon" src="../assets/images/up.png">
+  <img id="UpIcon" src="../assets/images/up.png" @click="logout()">
   <img id="Cloud1" class="movingCloud" src="../assets/images/cloud1.png">
   <img id="Cloud2" class="movingCloud" src="../assets/images/cloud3.png">
   <img id="Cloud3" class="movingCloud" src="../assets/images/cloud1.png">
@@ -14,11 +14,11 @@
 <script>
   export default {
     name: 'about',
-//  methods: {
-//    dateClick() {
-//      this.$emit('p-input-click');
-//    },
-//  },
+    methods: {
+      logout() {
+        this.$firebase.logout();
+      },
+    },
   };
 </script>
 

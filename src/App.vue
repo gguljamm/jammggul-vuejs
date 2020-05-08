@@ -33,7 +33,7 @@
 <script>
   import Navigation from './components/Navigation';
   import About from './components/About';
-  import Portfolio from './components/Practice';
+  import Portfolio from './components/Portfolio';
   import DevInfo from './components/Dev-Info';
   import Travel from './components/Travel';
   import Daily from './components/Daily';

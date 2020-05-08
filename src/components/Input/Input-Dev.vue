@@ -14,7 +14,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import LoadImage from 'blueimp-load-image';
 
   export default {
@@ -39,8 +38,7 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `it-info/${file.name}`;
-        const ref = Firebase.storage().ref().child(name);
-        ref.put(resizedImage).then((snapshot) => {
+        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
           this.arrImgUrl[index] = snapshot.downloadURL;
           let flag = true;
           for (let x = 0; x < this.arrImgUrl.length; x += 1) {
@@ -100,12 +98,13 @@
       upload(url) {
         const text = document.getElementById('TextArea').value;
         const thisCategory = document.getElementById('Category').value;
-        Firebase.database().ref('/it-info').push({
+        this.$firebase.database('/it-info').push({
           category: thisCategory,
           content: text,
           imgUrl: url ? this.arrImgUrl : '',
         }).then(() => {
           alert('포스팅 성공!'); // eslint-disable-line
+          this.$emit('reload');
         });
       },
     },

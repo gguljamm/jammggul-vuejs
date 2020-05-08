@@ -26,7 +26,7 @@
     <div class="pop" v-if="popOpen" @click="closePop()">
       <div @click.stop>
         <div class="head"><button @click="closePop('direct')"><i class="fa fa-times-circle" aria-hidden="true"></i></button></div>
-        <input-travel v-if="popFlag==='addTravel'"/>
+        <input-travel v-if="popFlag==='addTravel'" @reload="getData"/>
         <div v-else-if="popFlag==='appendList'"></div>
         <div v-else-if="popFlag==='travelPop'"></div>
       </div>
@@ -48,7 +48,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import InputTravel from '../components/Input/Input-Travel';
 
   export default {
@@ -69,29 +68,9 @@
           this.isAuth = false;
           return;
         }
-        const user = Firebase.auth().currentUser;
-        if (user) {
-          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-            this.isAuth = true;
-            this.writePopOpen(tag);
-          } else {
-            Firebase.auth().signOut();
-            alert('나만 글쓸거야!!'); // eslint-disable-line
-          }
-        } else {
-          const provider = new Firebase.auth.GoogleAuthProvider();
-          const vmThis = this;
-          Firebase.auth().signInWithPopup(provider).then((result) => {
-            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-              vmThis.isAuth = true;
-              vmThis.writePopOpen(tag);
-            } else {
-              Firebase.auth().signOut();
-              alert('나만 글쓸거야!!'); // eslint-disable-line
-            }
-          }).catch(() => {
-            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
-          });
+        this.isAuth = this.$firebase.login();
+        if (this.isAuth) {
+          this.writePopOpen(tag);
         }
       },
       writePopOpen(flag) {
@@ -102,6 +81,22 @@
       travelPopClick() {
         this.popOpen = true;
         this.popFlag = 'travelPop';
+      },
+      getData() {
+        this.closePop('direct');
+        this.$firebase.database('/travel').once('value', (snap) => {
+          const list = snap.val();
+          Object.keys(list).reverse().forEach((x) => {
+            const content = {
+              country: list[x].country,
+              tags: list[x].tags.split(','),
+              dates: list[x].dates,
+              description: list[x].description,
+              thumbnail: list[x].thumbnail,
+            };
+            this.travelArray.push(content);
+          });
+        });
       },
     },
     data() {
@@ -114,22 +109,7 @@
       };
     },
     mounted() {
-      const vmThis = this;
-      Firebase.database().ref('/travel')
-        .once('value', (snap) => {
-          const list = snap.val();
-          Object.keys(list).reverse().forEach((x) => {
-            const content = {
-              country: list[x].country,
-              tags: list[x].tags.split(','),
-              dates: list[x].dates,
-              description: list[x].description,
-              thumbnail: list[x].thumbnail,
-            };
-            vmThis.travelArray.push(content);
-          });
-        });
-      console.log(vmThis.travelArray);
+      this.getData();
     },
   };
 </script>

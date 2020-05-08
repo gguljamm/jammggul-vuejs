@@ -3,9 +3,12 @@
   <ul class="ulPrac">
     <li v-for="temp in list">
       <div>
-        <div class="contImg"><img v-bind:src="temp.thumbnail?temp.thumbnail:'/static/thumbnail.jpg'"></div>
-        <div class="contTitle">{{ temp.title }}</div>
+        <div class="contImg"><div :style="{
+          backgroundImage: `url(${temp.thumbnail?temp.thumbnail:'/static/thumbnail.jpg'})`
+        }"></div></div>
+        <div class="contTitle" v-html="temp.title"></div>
         <div class="contSpec"><span v-for="spec in temp.spec">{{ spec }}</span></div>
+        <div class="contDate" v-if="temp.date">[{{ temp.date.join(' ~ ') }}]</div>
         <ul v-if="temp.participate" class="contPart">
           <li v-for="part in temp.participate">
             <div class="partTitle">{{ part.title }}</div>
@@ -55,6 +58,31 @@
       return {
         list: [
           {
+            title: '슝 크루용 앱',
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fshoong_crew.png?alt=media&token=ca820b0b-4982-46fe-a448-673f52c440d8',
+            spec: ['Hybrid App', 'Corbova', 'nuxt.js'],
+            url: [
+              {
+                name: 'DOWNLOAD',
+                clickEvent: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fshoong_crew.apk?alt=media&token=51d87880-03f9-4e11-8e2f-7c692a3b126f',
+              },
+            ],
+            participate: [
+              { title: '화면설계', rate: 100, width: 0 },
+              { title: '디자인', rate: 100, width: 0 },
+              { title: '프론트개발', rate: 100, width: 0 },
+            ],
+          },
+          {
+            title: '하나투어 차세대 프로젝트 - 항공 제휴<br>지마켓, 지9, 옥션, 티몬, 11번가',
+            date: ['2019-05', '2019-11'],
+            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2F0000018445_001_20190401223607349.png?alt=media&token=5b21346a-4747-466d-aa94-de0cbd7ce1cb',
+            spec: ['HTML5', 'SCSS', 'nuxt.js', 'Vue.js'],
+            participate: [
+              { title: '프론트개발', rate: 90, width: 0 },
+            ],
+          },
+          {
             title: 'BringPrice renewal with nuxt.js',
             thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbp_nuxt.jpg?alt=media&token=0c95cfb6-cffc-4adc-8f0c-beeb1d2e3c00',
             spec: ['HTML5', 'SCSS', 'nuxt.js', 'Vue.js'],
@@ -72,6 +100,7 @@
           },
           {
             title: 'WeMakePrice Hotel Meta Search',
+            date: ['2018-06', '2018-08'],
             thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fwmp.jpg?alt=media&token=67562e26-9ba4-4b38-8cc0-4470a7a01ed2',
             spec: ['HTML5', 'CSS3', 'Vue.js'],
             url: [
@@ -112,6 +141,7 @@
           },
           {
             title: '여행박사 - 다구간 일정 추천 (웹, 모바일)',
+            date: ['2017-03', '2017-08'],
             thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Ftourbaksa.jpg?alt=media&token=92b9d5d9-d73e-40c2-b34f-e5a89cf9b149',
             spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
             url: [
@@ -219,8 +249,12 @@
   .ulPrac > li .contImg{
     padding: 5px;
   }
-  .ulPrac > li .contImg > img{
+  .ulPrac > li .contImg > div{
     width: 100%;
+    padding-bottom: 60%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
   }
   .ulPrac > li .contTitle{
     font-size: 20px;
@@ -230,6 +264,11 @@
     text-align: center;
   }
   .ulPrac > li .contSpec{
+    text-align: center;
+    padding-bottom: 10px;
+    line-height: 32px;
+  }
+  .ulPrac > li .contDate{
     text-align: center;
     padding-bottom: 10px;
     line-height: 32px;

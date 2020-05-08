@@ -5,9 +5,9 @@ import * as Firebase from 'firebase';
 import VueLazyload from 'vue-lazyload';
 import App from './App';
 import Loading from './components/Loading';
+import firebase from './assets/lib/plugin-firebase';
 
 Vue.config.productionTip = false;
-Vue.use(Firebase);
 Vue.use(VueLazyload);
 Vue.component('loading', Loading);
 
@@ -19,7 +19,9 @@ const config = {
   storageBucket: 'jammggul.appspot.com',
   messagingSenderId: '1013193559148',
 };
-Vue.prototype.$firebase = Firebase.initializeApp(config);
+
+Firebase.initializeApp(config);
+Vue.use(firebase);
 
 /* eslint-disable no-new */
 new Vue({

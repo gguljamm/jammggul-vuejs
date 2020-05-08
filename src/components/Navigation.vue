@@ -69,8 +69,8 @@
     },
     methods: {
       navScroll(e) {
-        this.leftArrow = !(e.srcElement.scrollLeft === 0);
-        this.rightArrow = (this.$refs.navigator.childElementCount * 70) !== e.srcElement.clientWidth + e.srcElement.scrollLeft;
+        this.leftArrow = e.target.scrollLeft > 0;
+        this.rightArrow = (this.$refs.navigator.childElementCount * 70) > e.target.clientWidth + e.target.scrollLeft;
       },
       navChange(page) {
         this.activeTab = page;

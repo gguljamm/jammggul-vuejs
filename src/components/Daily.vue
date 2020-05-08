@@ -12,7 +12,7 @@
               @click="selectedYear > 2017 ? changeYear(false) : ''"
             ></i>
             {{ selectedYear }}
-            <i class="fa fa-chevron-circle-right" aria-hidden="true" 
+            <i class="fa fa-chevron-circle-right" aria-hidden="true"
               v-bind:class="selectedYear < nowYear ? '' : 'disabled'"
               @click="selectedYear < nowYear ? changeYear(true) : ''"
             ></i>
@@ -42,7 +42,7 @@
       </button>
     </div>
   </div>
-  <input-box v-if="isAuth" v-bind:isMobile="isMobile"></input-box>
+  <input-box v-if="isAuth" v-bind:isMobile="isMobile" @reload="getData"></input-box>
   <loading v-if="!loaded"></loading>
   <ul class="dailyList">
     <transition-group tag="div" name="component-fade" mode="out-in">
@@ -84,7 +84,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import InputBox from '../components/Input/Input-Daily';
 
   export default {
@@ -171,27 +170,7 @@
           this.isAuth = false;
           return;
         }
-        const user = Firebase.auth().currentUser;
-        if (user) {
-          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-            this.isAuth = true;
-          } else {
-            Firebase.auth().signOut();
-            alert('나만 글쓸거야!!'); // eslint-disable-line
-          }
-        } else {
-          const provider = new Firebase.auth.GoogleAuthProvider();
-          Firebase.auth().signInWithPopup(provider).then((result) => {
-            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-              this.isAuth = true;
-            } else {
-              Firebase.auth().signOut();
-              alert('나만 글쓸거야!!'); // eslint-disable-line
-            }
-          }).catch(() => {
-            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
-          });
-        }
+        this.isAuth = this.$firebase.login();
       },
       filtering(opt) {
         this.itemsView = [];
@@ -235,49 +214,53 @@
         }
         return zero + newN;
       },
-    },
-    mounted() {
-      Firebase.database().ref('/daily')
-        .orderByChild('date')
-        .once('value')
-        .then((data) => {
-          data.forEach((key) => {
-            const resp = key.val();
-            const getDate = resp.date.toString();
-            let newDate = getDate.slice(0, 4);
-            newDate += '-';
-            newDate += getDate.slice(4, 6);
-            newDate += '-';
-            newDate += getDate.slice(6, 8);
-            resp.date = newDate;
-            resp.loaded = false;
-            if (resp.imgUrl) {
-              resp.isMore = 'img';
-            } else {
-              resp.isMore = false;
-            }
-            resp.viewMore = false;
-            this.items.push(resp);
-            const year = resp.date.slice(0, 4);
-            const month = parseInt(resp.date.slice(5, 7), 10);
-            if (this.itemsLength[year]) {
-              if (this.itemsLength[year][month]) {
-                this.itemsLength[year][month].push(resp);
+      getData() {
+        this.isAuth = false;
+        this.$firebase.database('/daily')
+          .orderByChild('date')
+          .once('value')
+          .then((data) => {
+            data.forEach((key) => {
+              const resp = key.val();
+              const getDate = resp.date.toString();
+              let newDate = getDate.slice(0, 4);
+              newDate += '-';
+              newDate += getDate.slice(4, 6);
+              newDate += '-';
+              newDate += getDate.slice(6, 8);
+              resp.date = newDate;
+              resp.loaded = false;
+              if (resp.imgUrl) {
+                resp.isMore = 'img';
               } else {
+                resp.isMore = false;
+              }
+              resp.viewMore = false;
+              this.items.push(resp);
+              const year = resp.date.slice(0, 4);
+              const month = parseInt(resp.date.slice(5, 7), 10);
+              if (this.itemsLength[year]) {
+                if (this.itemsLength[year][month]) {
+                  this.itemsLength[year][month].push(resp);
+                } else {
+                  this.itemsLength[year][month] = [resp];
+                }
+              } else {
+                this.itemsLength[year] = {};
                 this.itemsLength[year][month] = [resp];
               }
-            } else {
-              this.itemsLength[year] = {};
-              this.itemsLength[year][month] = [resp];
+            });
+            if (!this.itemsLength[this.nowYear]) {
+              this.nowYear -= 1;
+              this.selectedYear -= 1;
             }
+            this.filtering('recent');
+            this.loaded = true;
           });
-          if (!this.itemsLength[this.nowYear]) {
-            this.nowYear -= 1;
-            this.selectedYear -= 1;
-          }
-          this.filtering('recent');
-          this.loaded = true;
-        });
+      },
+    },
+    mounted() {
+      this.getData();
     },
     directives: {
       getHeight: {

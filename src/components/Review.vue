@@ -1,11 +1,12 @@
 <template>
   <div id="Review" v-bind:class="isMobile?'mob':''">
     <input-review
-      v-if="writeOpen"
+      v-if="isAuth"
       @close-pop="closePop"
+      @reload="getData"
     ></input-review>
     <div class="reviewHead">
-      <button @click="clickWrite">글쓰기</button>
+      <button @click="authClick()">글쓰기</button>
       <button @click="categoryOpen=!categoryOpen">{{ categoryOpen?'목록 닫기':'목록 열기' }}</button>
     </div>
     <div class="category" v-bind:class="categoryOpen?'opened':''">
@@ -46,7 +47,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import inputReview from '../components/Input/Input-Review';
 
   export default {
@@ -59,35 +59,15 @@
       closePop() {
         const temp = confirm('정말 그만쓸거야?');
         if (temp) {
-          this.writeOpen = false;
+          this.isAuth = false;
         }
       },
-      clickWrite() {
-        if (this.writeOpen) {
-          this.writeOpen = false;
+      authClick() {
+        if (this.isAuth) {
+          this.isAuth = false;
           return;
         }
-        const user = Firebase.auth().currentUser;
-        if (user) {
-          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-            this.writeOpen = true;
-          } else {
-            Firebase.auth().signOut();
-            alert('나만 글쓸거야!!'); // eslint-disable-line
-          }
-        } else {
-          const provider = new Firebase.auth.GoogleAuthProvider();
-          Firebase.auth().signInWithPopup(provider).then((result) => {
-            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-              this.writeOpen = true;
-            } else {
-              Firebase.auth().signOut();
-              alert('나만 글쓸거야!!'); // eslint-disable-line
-            }
-          }).catch(() => {
-            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
-          });
-        }
+        this.isAuth = this.$firebase.login();
       },
       changeCategory(index) {
         this.viewCategory = index;
@@ -114,6 +94,27 @@
         }
         return numList;
       },
+      getData() {
+        this.isAuth = false;
+        this.$firebase.database('/review').once('value', (snap) => {
+          const list = snap.val();
+          const keys = Object.keys(list);
+          const latestKey = keys[keys.length - 1];
+          keys.reverse().forEach((x) => {
+            const content = {
+              content: list[x].content,
+              title: list[x].title,
+              imgUrl: list[x].imgUrl,
+            };
+            this.reviewInfo[list[x].category].push(content);
+            if (x === latestKey) {
+              this.selectedCategory = list[x].category;
+              this.viewCategory = list[x].category;
+              this.selectedNum = this.reviewInfo[list[x].category].length - 1;
+            }
+          });
+        });
+      },
     },
     data() {
       return {
@@ -129,30 +130,11 @@
         },
         viewSubPaging: 1,
         viewList: [],
-        writeOpen: false,
+        isAuth: false,
       };
     },
     mounted() {
-      const vmThis = this;
-      Firebase.database().ref('/review')
-        .once('value', (snap) => {
-          const list = snap.val();
-          const keys = Object.keys(list);
-          const latestKey = keys[keys.length - 1];
-          keys.reverse().forEach((x) => {
-            const content = {
-              content: list[x].content,
-              title: list[x].title,
-              imgUrl: list[x].imgUrl,
-            };
-            vmThis.reviewInfo[list[x].category].push(content);
-            if (x === latestKey) {
-              vmThis.selectedCategory = list[x].category;
-              vmThis.viewCategory = list[x].category;
-              vmThis.selectedNum = vmThis.reviewInfo[list[x].category].length - 1;
-            }
-          });
-        });
+      this.getData();
     },
   };
 </script>

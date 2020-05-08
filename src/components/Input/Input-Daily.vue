@@ -8,7 +8,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import LoadImage from 'blueimp-load-image';
 
   export default {
@@ -33,8 +32,7 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `daily/${file.name}`;
-        const ref = Firebase.storage().ref().child(name);
-        ref.put(resizedImage).then((snapshot) => {
+        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
           this.arrImgUrl[index] = snapshot.downloadURL;
           let flag = true;
           for (let x = 0; x < this.arrImgUrl.length; x += 1) {
@@ -97,12 +95,13 @@
         let dateString = newDate.getFullYear();
         dateString += this.zeros(parseInt(newDate.getMonth(), 10) + 1);
         dateString += this.zeros(newDate.getDate());
-        Firebase.database().ref('/daily').push({
+        this.$firebase.database('/daily').push({
           date: parseInt(dateString, 10),
           content: text,
           imgUrl: isUrl ? this.arrImgUrl : '',
         }).then(() => {
-          alert('포스팅 성공! v.1234'); // eslint-disable-line
+          alert('포스팅 성공!'); // eslint-disable-line
+          this.$emit('reload');
         });
       },
       zeros(n) {

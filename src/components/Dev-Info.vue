@@ -3,7 +3,7 @@
   <div class="input">
     <button @click="authClick"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>Write</span></button>
   </div>
-  <input-it v-if="isAuth" v-bind:isMobile="isMobile"></input-it>
+  <input-it v-if="isAuth" v-bind:isMobile="isMobile" @reload="getData"></input-it>
   <div class="devWrapper">
     <div>
       <div>
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="itList" v-if="!isMobile">
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list1" v-bind:key="list[0][0]">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in evenArray" :key="idx">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
@@ -41,7 +41,7 @@
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in list2" v-bind:key="list[0][0]">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in oddArray" :key="idx">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
@@ -59,7 +59,7 @@
       </li></transition-group></ul>
     </div>
     <div class="itList" v-else>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="list in mobList" v-bind:key="list[0][0]">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in mobList" v-bind:key="idx">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
@@ -77,7 +77,7 @@
       </li></transition-group></ul>
     </div>
   </div>
-  <div v-if="popFlag" @click="popFlag=false;" class="imgPop" v-bind:class="imgHeightOver?'over':''">
+  <div v-if="popFlag" @click="popFlag = false" class="imgPop" v-bind:class="imgHeightOver?'over':''">
     <div>
       <img v-bind:src="popImgSrc" ref="popImg">
     </div>
@@ -86,7 +86,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import inputIt from '../components/Input/Input-Dev';
 
   export default {
@@ -98,8 +97,6 @@
     data() {
       return {
         mobList: [],
-        list1: [],
-        list2: [],
         popFlag: false,
         popImgSrc: '',
         isAuth: false,
@@ -113,12 +110,30 @@
         imgHeightOver: false,
       };
     },
+    computed: {
+      oddArray() {
+        const arr = [];
+        for (let x = 0; x < this.mobList.length; x += 1) {
+          if (x % 2 === 1) {
+            arr.push(this.mobList[x]);
+          }
+        }
+        return arr;
+      },
+      evenArray() {
+        const arr = [];
+        for (let x = 0; x < this.mobList.length; x += 1) {
+          if (x % 2 === 0) {
+            arr.push(this.mobList[x]);
+          }
+        }
+        return arr;
+      },
+    },
     methods: {
       changeIndex(index) {
         this.selectIndex = index;
         const list = this.objList[index];
-        this.list1 = [];
-        this.list2 = [];
         this.mobList = [];
         for (let x = 0, leng = list.length; x < leng; x += 1) {
           const arrContent = list[x].content.split('#img#');
@@ -161,11 +176,6 @@
               arrContentImg.push(list[x].imgUrl[y]);
             }
           }
-          if (x % 2 === 0) {
-            this.list1.push(arrContentImg);
-          } else {
-            this.list2.push(arrContentImg);
-          }
           this.mobList.push(arrContentImg);
         }
       },
@@ -174,29 +184,7 @@
           this.isAuth = false;
           return;
         }
-        const user = Firebase.auth().currentUser;
-        if (user) {
-          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-            this.isAuth = true;
-          } else {
-            alert('나만 글쓸거야!!'); // eslint-disable-line
-          }
-        } else {
-          const provider = Firebase.auth.GoogleAuthProvider();
-          Firebase.auth().signInWithPopup(provider).then((result) => {
-            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-              this.isAuth = true;
-            } else {
-              alert('나만 글쓸거야!!'); // eslint-disable-line
-              const newUser = result.user;
-              let credential;
-              newUser.reauthenticate(credential).then(() => {
-              });
-            }
-          }).catch(() => {
-            alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
-          });
-        }
+        this.isAuth = this.$firebase.login();
       },
       imgPop(src) {
         this.popFlag = true;
@@ -207,22 +195,26 @@
           this.imgHeightOver = (imgHeight > windowHeight);
         }, 100);
       },
+      getData() {
+        this.isAuth = false;
+        this.$firebase.database('/it-info')
+          .once('value', (snap) => {
+            const list = snap.val();
+            Object.keys(list).reverse().forEach((x, index) => {
+              const content = { content: list[x].content, imgUrl: list[x].imgUrl };
+              if (this.objList[list[x].category]) {
+                this.objList[list[x].category].push(content);
+              }
+              if (index < 20) {
+                this.objList.recent.push(content);
+              }
+            });
+            this.changeIndex(this.selectIndex);
+          });
+      },
     },
     mounted() {
-      Firebase.database().ref('/it-info')
-        .once('value', (snap) => {
-          const list = snap.val();
-          Object.keys(list).reverse().forEach((x, index) => {
-            const content = { content: list[x].content, imgUrl: list[x].imgUrl };
-            if (this.objList[list[x].category]) {
-              this.objList[list[x].category].push(content);
-            }
-            if (index < 20) {
-              this.objList.recent.push(content);
-            }
-          });
-          this.changeIndex(this.selectIndex);
-        });
+      this.getData();
     },
   };
 </script>

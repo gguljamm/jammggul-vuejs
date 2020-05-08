@@ -24,7 +24,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import LoadImage from 'blueimp-load-image';
 
   export default {
@@ -35,13 +34,14 @@
     },
     methods: {
       submit() {
-        Firebase.database().ref('/review').push({
+        this.$firebase.database('/review').push({
           category: this.$refs.category.value,
           title: this.$refs.title.value,
           content: this.$refs.content.value,
           imgUrl: this.arrImg,
         }).then(() => {
           alert('포스팅 성공!'); // eslint-disable-line
+          this.$emit('reload');
         });
       },
       imgUpload() {
@@ -49,8 +49,7 @@
       },
       submitImage(file, resizedImage) {
         const name = `review/${file.name}`;
-        const ref = Firebase.storage().ref().child(name);
-        ref.put(resizedImage).then((snapshot) => {
+        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
           this.arrImg.push(snapshot.downloadURL);
           this.$refs.content.value += `#img${this.arrImg.length - 1}#\n`;
           this.$refs.url.value = '';

@@ -12,7 +12,6 @@
 </template>
 
 <script>
-  import Firebase from 'firebase';
   import LoadImage from 'blueimp-load-image';
 
   export default {
@@ -34,8 +33,7 @@
       },
       submitImage(file, resizedImage) {
         const name = `travel/${file.name}`;
-        const ref = Firebase.storage().ref().child(name);
-        ref.put(resizedImage).then((snapshot) => {
+        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
           this.arrImgUrl = snapshot.downloadURL;
           this.upload(true);
         });
@@ -84,7 +82,7 @@
         });
       },
       upload(url) {
-        Firebase.database().ref('/travel').push({
+        this.$firebase.database('/travel').push({
           country: this.$refs.country.value,
           tags: this.$refs.tags.value,
           dates: this.$refs.dates.value,
@@ -92,6 +90,7 @@
           thumbnail: url ? this.arrImgUrl : '',
         }).then(() => {
           alert('포스팅 성공!'); // eslint-disable-line
+          this.$emit('reload');
         });
       },
     },
