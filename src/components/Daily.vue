@@ -66,11 +66,8 @@
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <transition v-if="!Array.isArray(item.imgUrl)" name="component-fade" mode="out-in">
-                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-bind:src="item.loaded?item.imgUrl:''">
-                  </transition>
-                  <transition-group name="component-fade" mode="out-in" v-else>
-                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in item.imgUrl" v-bind:key="url" v-bind:src="item.loaded?url:''">
+                  <transition-group name="component-fade" mode="out-in">
+                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in itemList(item.imgUrl)" v-bind:key="url" v-bind:src="item.loaded?url:''">
                   </transition-group>
                 </div>
               </div>
@@ -107,6 +104,12 @@
     },
     props: ['isMobile'],
     methods: {
+      itemList(i) {
+        if (!Array.isArray(i)) {
+          return [i];
+        }
+        return i;
+      },
       changeYear(flag) {
         if (flag) {
           this.selectedYear += 1;

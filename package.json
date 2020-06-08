@@ -11,7 +11,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
-    "blueimp-load-image": "^2.24.0",
+    "blueimp-load-image": "^5.12.0",
     "firebase": "^4.3.0",
     "vue": "^2.3.3",
     "vue-lazyload": "^1.1.3"
