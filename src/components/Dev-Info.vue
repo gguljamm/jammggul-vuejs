@@ -34,7 +34,9 @@
               <span>{{ text.value[3] }}</span>
             </template>
             <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+              <div v-for="(text2, index2) in text.value"
+                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
+              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
             </template>
             <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
@@ -50,7 +52,9 @@
               <span>{{ text.value[3] }}</span>
             </template>
             <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+              <div v-for="(text2, index2) in text.value"
+                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
+              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
             </template>
             <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
@@ -68,7 +72,9 @@
               <span>{{ text.value[3] }}</span>
             </template>
             <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value">{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
+              <div v-for="(text2, index2) in text.value"
+                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
+              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
             </template>
             <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
           </div></div>
@@ -319,6 +325,8 @@
     font-size: 14px;
     padding: 12px;
     border-radius: 10px;
+    white-space: nowrap;
+    overflow: auto;
   }
   .imgCont{
     text-align: center;
