@@ -6,8 +6,14 @@
       @reload="getData"
     ></input-review>
     <div class="reviewHead">
-      <button @click="authClick()">글쓰기</button>
-      <button @click="categoryOpen=!categoryOpen">{{ categoryOpen?'목록 닫기':'목록 열기' }}</button>
+      <button @click="authClick()">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        <span>Write</span>
+      </button>
+      <button @click="categoryOpen=!categoryOpen">
+        <i class="fa fa-list" aria-hidden="true"></i>
+        <span>{{ categoryOpen?'목록 닫기':'목록 열기' }}</span>
+      </button>
     </div>
     <div class="category" v-bind:class="categoryOpen?'opened':''">
       <div class="categoryHead">
@@ -62,12 +68,12 @@
           this.isAuth = false;
         }
       },
-      authClick() {
+      async authClick() {
         if (this.isAuth) {
           this.isAuth = false;
           return;
         }
-        this.isAuth = this.$firebase.login();
+        this.isAuth = await this.$firebase.login();
       },
       changeCategory(index) {
         this.viewCategory = index;
@@ -144,27 +150,40 @@
     max-width: 1080px;
     margin: 0 auto;
     font-family: 'Noto Sans KR', sans-serif;
+    padding: 0 10px;
   }
   .reviewHead{
-    height: 40px;
+    height: 35px;
     width: 100%;
     margin-bottom: 10px;
+    margin-top: 10px;
   }
   .reviewHead > button{
-    height: 30px;
-    margin-top: 10px;
-    background-color: #FFF;
-    border: 1px solid #eee;
-    -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-    -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-    box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
+    height: 35px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    padding: 0 20px;
     cursor: pointer;
+    font-size: 14px;
+  }
+  .reviewHead > button{
+    border: 0;
+    color: #FFF;
+    background-color: #c98474;
+    left: 10px;
+  }
+  .reviewHead i{
+    margin-right: 5px;
   }
   .reviewHead > button:first-child{
     float: left;
   }
   .reviewHead > button:last-child{
     float: right;
+    border: 1px solid #a7d2cb;
+    background-color: #FFF;
+    color: black;
   }
   .category{
     opacity: 0;

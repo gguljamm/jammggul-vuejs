@@ -185,12 +185,12 @@
           this.mobList.push(arrContentImg);
         }
       },
-      authClick() {
+      async authClick() {
         if (this.isAuth) {
           this.isAuth = false;
           return;
         }
-        this.isAuth = this.$firebase.login();
+        this.isAuth = await this.$firebase.login();
       },
       imgPop(src) {
         this.popFlag = true;

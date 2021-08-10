@@ -23,7 +23,7 @@ export default {
           }
         } else {
           const provider = new Firebase.auth.GoogleAuthProvider();
-          Firebase.auth().signInWithPopup(provider).then((result) => {
+          await Firebase.auth().signInWithPopup(provider).then((result) => {
             if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
               flag = true;
             } else {

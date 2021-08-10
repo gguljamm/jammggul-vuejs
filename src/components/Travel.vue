@@ -63,12 +63,12 @@
           this.isAuth = false;
         }
       },
-      authClick(tag) {
+      async authClick(tag) {
         if (this.isAuth) {
           this.isAuth = false;
           return;
         }
-        this.isAuth = this.$firebase.login();
+        this.isAuth = await this.$firebase.login();
         if (this.isAuth) {
           this.writePopOpen(tag);
         }
@@ -271,7 +271,7 @@
     font-size: 24px;
   }
   .travelList > li > div .tags{
-    margin-top: 5px;
+    margin-top: 15px;
   }
   .travelList > li > div .tags:after{
     content: '';

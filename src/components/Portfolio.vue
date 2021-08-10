@@ -1,5 +1,16 @@
 <template>
 <div id="Practice" v-bind:class="isMobile?'mob':''">
+  <div class="portfolioHead">
+    <button @click="authClick()">
+      <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+      <span>Write</span>
+    </button>
+  </div>
+  <input-portfolio
+    v-if="isAuth"
+    @close-pop="closePop"
+    @reload="getData"
+  ></input-portfolio>
   <ul class="ulPrac">
     <li v-for="temp in list">
       <div>
@@ -8,7 +19,7 @@
         }"></div></div>
         <div class="contTitle" v-html="temp.title"></div>
         <div class="contSpec"><span v-for="spec in temp.spec">{{ spec }}</span></div>
-        <div class="contDate" v-if="temp.date">[{{ temp.date.join(' ~ ') }}]</div>
+        <div class="contDate" v-if="temp.date">[{{ temp.date }}]</div>
         <ul v-if="temp.participate" class="contPart">
           <li v-for="part in temp.participate">
             <div class="partTitle">{{ part.title }}</div>
@@ -28,10 +39,22 @@
 </template>
 
 <script>
+  import inputPortfolio from '../components/Input/Input-Portfolio';
+
   export default {
+    components: {
+      inputPortfolio,
+    },
     name: 'practice',
     props: ['isMobile'],
     methods: {
+      async authClick() {
+        if (this.isAuth) {
+          this.isAuth = false;
+          return;
+        }
+        this.isAuth = await this.$firebase.login();
+      },
       urlClick(url) {
         if (typeof url === 'function') {
           url();
@@ -39,178 +62,55 @@
           window.open(url, '_blank');
         }
       },
-      openPop(param) {
-        console.log(param); // eslint-disable-line
+      closePop() {
+        const temp = confirm('정말 그만쓸거야?');
+        if (temp) {
+          this.isAuth = false;
+        }
+      },
+      getData() {
+        this.list = [];
+        this.isAuth = false;
+        this.$firebase.database('/portfolio').once('value', (snap) => {
+          const list = snap.val();
+          const keys = Object.values(list);
+          keys.reverse().forEach((x) => {
+            const content = {
+              title: x.title,
+              thumbnail: x.thumbnail,
+              spec: x.spec,
+              date: x.date,
+              url: x.operate ? x.operate.map(v => ({
+                name: v.name,
+                clickEvent: v.url,
+              })) : [],
+              participate: x.contribute ? x.contribute.map(v => ({
+                title: v.name,
+                width: 0,
+                rate: v.percent,
+              })) : [],
+            };
+            this.list.push(content);
+          });
+          setTimeout(() => {
+            for (let x = 0; x < this.list.length; x += 1) {
+              if (this.list[x].participate) {
+                for (let y = 0; y < this.list[x].participate.length; y += 1) {
+                  this.list[x].participate[y].width = `${this.list[x].participate[y].rate}%`;
+                }
+              }
+            }
+          }, 1000);
+        });
       },
     },
     mounted() {
-      setTimeout(() => {
-        for (let x = 0; x < this.list.length; x += 1) {
-          if (this.list[x].participate) {
-            for (let y = 0; y < this.list[x].participate.length; y += 1) {
-              this.list[x].participate[y].width = `${this.list[x].participate[y].rate}%`;
-            }
-          }
-        }
-      }, 1000);
+      this.getData();
     },
     data() {
       return {
-        list: [
-          {
-            title: '슝 크루용 앱',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fshoong_crew.png?alt=media&token=ca820b0b-4982-46fe-a448-673f52c440d8',
-            spec: ['Hybrid App', 'Corbova', 'nuxt.js'],
-            url: [
-              {
-                name: 'DOWNLOAD',
-                clickEvent: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fshoong_crew.apk?alt=media&token=51d87880-03f9-4e11-8e2f-7c692a3b126f',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 100, width: 0 },
-              { title: '디자인', rate: 100, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-            ],
-          },
-          {
-            title: '하나투어 차세대 프로젝트 - 항공 제휴<br>지마켓, 지9, 옥션, 티몬, 11번가',
-            date: ['2019-05', '2019-11'],
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2F0000018445_001_20190401223607349.png?alt=media&token=5b21346a-4747-466d-aa94-de0cbd7ce1cb',
-            spec: ['HTML5', 'SCSS', 'nuxt.js', 'Vue.js'],
-            participate: [
-              { title: '프론트개발', rate: 90, width: 0 },
-            ],
-          },
-          {
-            title: 'BringPrice renewal with nuxt.js',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbp_nuxt.jpg?alt=media&token=0c95cfb6-cffc-4adc-8f0c-beeb1d2e3c00',
-            spec: ['HTML5', 'SCSS', 'nuxt.js', 'Vue.js'],
-            url: [
-              {
-                name: 'SITE',
-                clickEvent: 'https://bringprice.com',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 30, width: 0 },
-              { title: '디자인', rate: 20, width: 0 },
-              { title: '프론트개발', rate: 80, width: 0 },
-            ],
-          },
-          {
-            title: 'WeMakePrice Hotel Meta Search',
-            date: ['2018-06', '2018-08'],
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fwmp.jpg?alt=media&token=67562e26-9ba4-4b38-8cc0-4470a7a01ed2',
-            spec: ['HTML5', 'CSS3', 'Vue.js'],
-            url: [
-              {
-                name: 'DEMO',
-                clickEvent: 'https://wmp-hotel.firebaseapp.com',
-              },
-              {
-                name: 'SITE',
-                clickEvent: 'https://mhotel.wonders.app',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 10, width: 0 },
-              { title: '디자인', rate: 10, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-            ],
-          },
-          {
-            title: 'For European Traveler, BringPrice',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_europe.jpg?alt=media&token=860a45d9-71f8-4535-8a99-1ecc2828243b',
-            spec: ['HTML5', 'CSS3', 'Vue.js'],
-            url: [
-              {
-                name: 'DEMO',
-                clickEvent: 'https://europe-project-88861.firebaseapp.com/',
-              },
-              {
-                name: 'SITE',
-                clickEvent: 'http://europe.bringprice.com',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 90, width: 0 },
-              { title: '디자인', rate: 100, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-            ],
-          },
-          {
-            title: '여행박사 - 다구간 일정 추천 (웹, 모바일)',
-            date: ['2017-03', '2017-08'],
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Ftourbaksa.jpg?alt=media&token=92b9d5d9-d73e-40c2-b34f-e5a89cf9b149',
-            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
-            url: [
-              {
-                name: 'WEB',
-                clickEvent: 'http://air2.tourbaksa.com',
-              },
-              {
-                name: 'MOBILE',
-                clickEvent: 'http://air2.tourbaksa.com/mobile',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 10, width: 0 },
-              { title: '디자인', rate: 90, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-              { title: '백앤드개발', rate: 10, width: 0 },
-            ],
-          },
-          {
-            title: '브링프라이스 어플리케이션',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbp_app.png?alt=media&token=e7b14407-d17a-43ae-8312-d6ce7862220f',
-            spec: ['Hybrid App', 'Corbova', 'Phonegap', 'JQuery Mobile'],
-            url: [
-              {
-                name: 'DOWNLOAD',
-                clickEvent: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_0.0.3.apk?alt=media&token=dbc1a99d-04ae-4e37-9345-0d30803b43de',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 100, width: 0 },
-              { title: '디자인', rate: 100, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-            ],
-          },
-          {
-            title: 'BringPrice Web',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice.jpg?alt=media&token=52daa116-5453-41e6-a7e6-ed179f26d5cc',
-            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
-            url: [
-              {
-                name: 'SITE',
-                clickEvent: 'https://bringprice.com',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 10, width: 0 },
-              { title: '디자인', rate: 20, width: 0 },
-              { title: '프론트개발', rate: 90, width: 0 },
-              { title: '백앤드개발', rate: 10, width: 0 },
-            ],
-          },
-          {
-            title: 'BringPrice Mobile',
-            thumbnail: 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/practice%2Fbringprice_mobile.jpg?alt=media&token=5b49e4fc-b2fc-43f7-a6e1-8ffc03b925f7',
-            spec: ['HTML5', 'CSS3', 'JQuery', 'JsRender/JsViews'],
-            url: [
-              {
-                name: 'SITE',
-                clickEvent: 'https://m.bringprice.com',
-              },
-            ],
-            participate: [
-              { title: '화면설계', rate: 90, width: 0 },
-              { title: '디자인', rate: 100, width: 0 },
-              { title: '프론트개발', rate: 100, width: 0 },
-            ],
-          },
-        ],
+        isAuth: false,
+        list: [],
       };
     },
   };
@@ -218,6 +118,27 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .portfolioHead{
+    height: 55px;
+    padding: 10px;
+  }
+  .portfolioHead > button{
+    height: 35px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    padding: 0 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border: 0;
+    color: #FFF;
+    background-color: #c98474;
+    left: 10px;
+    float: left;
+  }
+  .portfolioHead i{
+    margin-right: 5px;
+  }
   #Practice{
     max-width: 1080px;
     width: 100%;
@@ -227,7 +148,7 @@
   }
   .ulPrac{
     overflow: auto;
-    margin: 20px 0;
+    margin: 0;
   }
   .ulPrac > li{
     width: 50%;

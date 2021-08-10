@@ -168,12 +168,12 @@
         const item2 = item;
         item2.viewMore = !item2.viewMore;
       },
-      authClick() {
+      async authClick() {
         if (this.isAuth) {
           this.isAuth = false;
           return;
         }
-        this.isAuth = this.$firebase.login();
+        this.isAuth = await this.$firebase.login();
       },
       filtering(opt) {
         this.itemsView = [];
