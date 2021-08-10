@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="itList" v-if="!isMobile">
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in evenArray" :key="idx">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in evenArray" :key="`even_${idx}`">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
@@ -43,7 +43,7 @@
           <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
         </div>
       </li></transition-group></ul>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in oddArray" :key="idx">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in oddArray" :key="`odd_${idx}`">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
@@ -63,7 +63,7 @@
       </li></transition-group></ul>
     </div>
     <div class="itList" v-else>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in mobList" v-bind:key="idx">
+      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in mobList" v-bind:key="`mob_${idx}`">
         <div v-for="(content, index) in list">
           <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
             <template v-if="text && text.type === 'img'">
