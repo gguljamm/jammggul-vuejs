@@ -1,4 +1,7 @@
-import Firebase from 'firebase';
+import Firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+import 'firebase/storage';
 
 /* eslint-disable */
 
@@ -18,7 +21,7 @@ export default {
           if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
             flag = true;
           } else {
-            Firebase.auth().signOut();
+            await Firebase.auth().signOut();
             alert('나만 글쓸거야!!'); // eslint-disable-line
           }
         } else {

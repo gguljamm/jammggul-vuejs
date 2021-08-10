@@ -69,17 +69,13 @@
         this.mobFlag = (nowWidth < 768);
       },
       navigate(url, popping) {
-        let turl = url;
-        if (turl.indexOf('#') >= 0) {
-          turl = turl.replace('#', '');
-        }
-        if (turl) {
-          this.page = turl;
+        if (url) {
+          this.page = url;
         } else {
           this.page = 'about';
         }
         if (!popping) {
-          window.history.pushState({ hash: `#${turl}` }, '', `#${turl}`);
+          window.history.pushState({ hash: '' }, '', `/${url}`);
         }
       },
     },
@@ -95,15 +91,11 @@
         window.addEventListener('resize', this.getWindowWidth);
         this.getWindowWidth();
       });
-      window.addEventListener('popstate', (e) => {
-        if (!e.state || !e.state.hash) {
-          this.navigate('', true);
-          return;
-        }
-        this.navigate(e.state.hash, true);
+      window.addEventListener('popstate', () => {
+        this.navigate(location.pathname.replace('/', ''), true);
       });
-      if (location.hash.indexOf('#') >= 0) {
-        this.page = location.hash.replace('#', '');
+      if (location.pathname && location.pathname !== '/') {
+        this.page = location.pathname.replace('/', '');
       }
     },
     data() {
