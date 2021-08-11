@@ -297,12 +297,11 @@
   }
   .travelList > li > div .description{
     border: 1px solid #e1e3e5;
-    height: 221px;
+    height: auto;
     padding: 10px;
     margin-top: 10px;
     line-height: 24px;
     background-color: rgba(255, 255, 255, .8);
-    overflow-y: auto;
   }
   #TravelWrite{
     position: fixed;

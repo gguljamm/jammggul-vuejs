@@ -1,7 +1,6 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 import Firebase from 'firebase/app';
 import VueLazyload from 'vue-lazyload';
 import App from './App';
@@ -10,7 +9,6 @@ import firebase from './assets/lib/plugin-firebase';
 
 Vue.config.productionTip = false;
 Vue.use(VueLazyload);
-Vue.use(VueRouter);
 Vue.component('loading', Loading);
 
 const config = {
@@ -28,9 +26,6 @@ Vue.use(firebase);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  data: {
-    currentRoute: window.location.pathname,
-  },
   template: '<App/>',
   components: { App },
 });

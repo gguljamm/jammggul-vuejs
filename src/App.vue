@@ -75,7 +75,7 @@
           this.page = 'about';
         }
         if (!popping) {
-          window.history.pushState({ hash: '' }, '', `/${url}`);
+          window.history.pushState({ hash: '' }, '', `/${url === 'about' ? '' : url}`);
         }
       },
     },
