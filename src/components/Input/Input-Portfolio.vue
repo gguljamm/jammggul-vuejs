@@ -71,8 +71,9 @@ export default {
     },
     submitImage(file, resizedImage) {
       const name = `travel/${file.name}`;
-      this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
-        this.arrImgUrl = snapshot.downloadURL;
+      this.$firebase.storage(name).put(resizedImage).then(async () => {
+        const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
+        this.arrImgUrl = downloadUrl;
         this.upload(true);
       });
     },

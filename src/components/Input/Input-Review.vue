@@ -49,8 +49,9 @@
       },
       submitImage(file, resizedImage) {
         const name = `review/${file.name}`;
-        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
-          this.arrImg.push(snapshot.downloadURL);
+        this.$firebase.storage(name).put(resizedImage).then(async () => {
+          const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
+          this.arrImg.push(downloadUrl);
           this.$refs.content.value += `#img${this.arrImg.length - 1}#\n`;
           this.$refs.url.value = '';
         });

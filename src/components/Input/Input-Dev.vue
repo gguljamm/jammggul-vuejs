@@ -38,18 +38,21 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `it-info/${file.name}`;
-        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
-          this.arrImgUrl[index] = snapshot.downloadURL;
-          let flag = true;
-          for (let x = 0; x < this.arrImgUrl.length; x += 1) {
-            if (!this.arrImgUrl[x]) {
-              flag = false;
-              break;
+        const uploadTask = this.$firebase.storage(name).put(resizedImage);
+        uploadTask.on('state_changed', () => {}, () => {}, () => {
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            this.arrImgUrl[index] = downloadURL;
+            let flag = true;
+            for (let x = 0; x < this.arrImgUrl.length; x += 1) {
+              if (!this.arrImgUrl[x]) {
+                flag = false;
+                break;
+              }
             }
-          }
-          if (flag) {
-            this.upload(true);
-          }
+            if (flag) {
+              this.upload(true);
+            }
+          });
         });
       },
       resizeImage(file, index) {

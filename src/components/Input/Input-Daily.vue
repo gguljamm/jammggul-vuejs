@@ -32,8 +32,9 @@
       },
       submitImage(file, resizedImage, index) {
         const name = `daily/${file.name}`;
-        this.$firebase.storage(name).put(resizedImage).then((snapshot) => {
-          this.arrImgUrl[index] = snapshot.downloadURL;
+        this.$firebase.storage(name).put(resizedImage).then(async () => {
+          const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
+          this.arrImgUrl[index] = downloadUrl;
           let flag = true;
           for (let x = 0; x < this.arrImgUrl.length; x += 1) {
             if (!this.arrImgUrl[x]) {
