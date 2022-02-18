@@ -17,13 +17,8 @@ export default {
       login: async () => {
         const user = Firebase.auth().currentUser;
         let flag = false;
-        if (user) {
-          if (user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
-            flag = true;
-          } else {
-            await Firebase.auth().signOut();
-            alert('나만 글쓸거야!!'); // eslint-disable-line
-          }
+        if (user && user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+          flag = true;
         } else {
           const provider = new Firebase.auth.GoogleAuthProvider();
           await Firebase.auth().signInWithPopup(provider).then((result) => {
@@ -33,7 +28,7 @@ export default {
               alert('나만 글쓸거야!!'); // eslint-disable-line
               Firebase.auth().signOut();
             }
-          }).catch(() => {
+          }).catch((e) => {
             alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
           });
         }
@@ -45,6 +40,13 @@ export default {
       logout: () => {
         Firebase.auth().signOut().then(() => {
           alert('로그아웃');
+        });
+      },
+      anonymouslyLogin: async () => {
+        Firebase.auth().onAuthStateChanged((user) => {
+          if (!user) {
+            Firebase.auth().signInAnonymously();
+          }
         });
       }
     };

@@ -97,6 +97,7 @@
       if (location.pathname && location.pathname !== '/') {
         this.page = location.pathname.replace('/', '');
       }
+      this.$firebase.anonymouslyLogin();
     },
     data() {
       return {
