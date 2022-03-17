@@ -66,7 +66,7 @@
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <transition-group name="component-fade" mode="out-in">
+                  <transition-group name="component-fade" mode="out-in" tag="div" class="images">
                     <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in itemList(item.imgUrl)" v-bind:key="url" v-bind:src="item.loaded?url:''">
                   </transition-group>
                 </div>
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import InputBox from '../components/Input/Input-Daily';
+  import InputBox from './Input/Input-Daily.vue';
 
   export default {
     name: 'daily',
@@ -346,52 +346,46 @@
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
-    -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
-    box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
     margin-bottom: 50px;
   }
   .dailyList li .dailyBox.selected > div{
-    -webkit-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
-    -moz-box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
-    box-shadow: 1px 1px 10px 2px rgba(0,0,0,.3);
+    -webkit-box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
+    -moz-box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
   }
   .title{
-    font-size: 16px;
+    font-size: 18px;
     border: 1px solid #a7d2cb;
     border-bottom: 0;
-    height: 30px;
-    line-height: 29px;
+    height: 40px;
+    line-height: 39px;
     text-align: center;
     background-color: #a7d2cb;
     color: #FFF;
     font-family: 'Open Sans', sans-serif;
-    -webkit-border-top-left-radius: 10px;
-    -moz-border-radius-topleft: 10px;
-    border-top-left-radius: 10px;
-    -webkit-border-top-right-radius: 10px;
-    -moz-border-radius-topright: 10px;
-    border-top-right-radius: 10px;
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-right-radius: 8px;
   }
   .content{
-    border: 1px solid #ececec;
+    border: 1px solid #c2c2c2;
     background-color: #FFF;
     border-top: 0;
     height: 160px;
     padding: 10px;
     padding-bottom: 9px;
     line-height: 20px;
-    -webkit-border-bottom-left-radius: 10px;
-    -moz-border-radius-bottomleft: 10px;
-    border-bottom-left-radius: 10px;
-    -webkit-border-bottom-right-radius: 10px;
-    -moz-border-radius-bottomright: 10px;
-    border-bottom-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     position: relative;
     font-family: 'Noto Sans KR', sans-serif;
-  }
-  .dailyList li.clickable .dailyBox:hover .title, .dailyList li.clickable .dailyBox:hover .content{
-    border-color: #f2d388;
   }
   .content > div{
     height: 120px;
@@ -405,6 +399,11 @@
     max-width: 100%;
     width: 100%;
     margin-top: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .content .images{
+    padding: 0 10px 10px;
   }
   .content .imgLoader{
     width: 100%;

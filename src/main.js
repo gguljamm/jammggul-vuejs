@@ -1,15 +1,18 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import Firebase from 'firebase/app';
-import VueLazyload from 'vue-lazyload';
-import App from './App';
-import Loading from './components/Loading';
-import firebase from './assets/lib/plugin-firebase';
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import Firebase from 'firebase/compat/app';
+import VueLazyload from 'vue3-lazyload';
+import App from './App.vue';
+import Loading from './components/Loading.vue';
+import firebase from './assets/lib/plugin-firebase.js';
 
-Vue.config.productionTip = false;
-Vue.use(VueLazyload);
-Vue.component('loading', Loading);
+const app = createApp(App)
+
+app.use(VueLazyload);
+app.use(createPinia())
+app.component('loading', Loading);
 
 const config = {
   apiKey: 'AIzaSyAqlLiycvD34mzlTSQN4aL_kaF9eXSITSk',
@@ -21,11 +24,6 @@ const config = {
 };
 
 Firebase.initializeApp(config);
-Vue.use(firebase);
+app.use(firebase);
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  template: '<App/>',
-  components: { App },
-});
+app.mount('#app')

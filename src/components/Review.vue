@@ -53,7 +53,7 @@
 </template>
 
 <script>
-  import inputReview from '../components/Input/Input-Review';
+  import inputReview from './Input/Input-Review.vue';
 
   export default {
     components: {

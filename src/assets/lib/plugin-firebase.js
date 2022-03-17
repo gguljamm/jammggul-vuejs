@@ -1,13 +1,13 @@
-import Firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/storage';
+import Firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
+import 'firebase/compat/storage';
 
 /* eslint-disable */
 
 export default {
   install (Vue) {
-    Vue.prototype.$firebase = {
+    Vue.config.globalProperties.$firebase = {
       database: (path) => {
         return Firebase.database().ref(path);
       },

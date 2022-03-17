@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import inputPortfolio from '../Input/Input-Portfolio';
-import PortfolioItem from './PortfolioItem';
+import inputPortfolio from '../Input/Input-Portfolio.vue';
+import PortfolioItem from './PortfolioItem.vue';
 
 export default {
   components: {

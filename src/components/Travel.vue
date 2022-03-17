@@ -48,7 +48,7 @@
 </template>
 
 <script>
-  import InputTravel from '../components/Input/Input-Travel';
+  import InputTravel from './Input/Input-Travel.vue';
 
   export default {
     components: {

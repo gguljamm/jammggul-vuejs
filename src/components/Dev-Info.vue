@@ -92,7 +92,7 @@
 </template>
 
 <script>
-  import inputIt from '../components/Input/Input-Dev';
+  import inputIt from './Input/Input-Dev.vue';
 
   export default {
     name: 'devInfo',

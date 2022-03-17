@@ -1,7 +1,9 @@
 <template>
 <div id="About">
   <div class="catchphrase">Dazzling Day, Sunny Day</div>
-  <img id="CloudBack" src="../assets/images/cloud2.png">
+  <div id="CloudBack">
+    <img src="../assets/images/cloud2.png">
+  </div>
   <img id="UpIcon" src="../assets/images/up.png" @click="logout()">
   <img id="Cloud1" class="movingCloud" src="../assets/images/cloud1.png">
   <img id="Cloud2" class="movingCloud" src="../assets/images/cloud3.png">
@@ -25,11 +27,10 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   #About{
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    height: 100vh;
     z-index: 0;
     background: lightskyblue; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(cornflowerblue, #a7d2cb); /* For Safari 5.1 to 6.0 */
@@ -66,10 +67,14 @@
     z-index:3;
   }
   #CloudBack{
+    animation: cloudMainX 20s linear infinite;
+  }
+  #CloudBack > img{
     position: absolute;
     width: 80%;
-    right: 0;
-    top: 0;
+    right: -80%;
+    top: 20px;
+    animation: cloudMainY 10s linear infinite;
   }
   #Cloud1{
     bottom: 40px;
@@ -140,6 +145,31 @@
       -webkit-transform: rotate3d(0, 0, 1, 5deg);
       transform: rotate3d(0, 0, 1, 5deg);
       margin-bottom: 0;
+    }
+  }
+  @keyframes cloudMainX {
+    from{
+      transform: translateX(0);
+    }
+    To{
+      transform: translateX(calc(-100% - 100vw));
+    }
+  }
+  @keyframes cloudMainY {
+    from{
+      transform: translateY(0);
+    }
+    25%{
+      transform: translateY(-25px);
+    }
+    50%{
+      transform: translateY(0px);
+    }
+    75%{
+      transform: translateY(25px);
+    }
+    to{
+      transform: translateY(0px);
     }
   }
   @keyframes cloud1{

@@ -2,7 +2,7 @@
   <li class="portfolioItem" ref="item" v-bind:class="isMobile?'mob':''">
     <div>
       <div class="contImg"><div :style="{
-          backgroundImage: `url(${item.thumbnail?item.thumbnail:'/static/thumbnail.jpg'})`
+          backgroundImage: `url(${item.thumbnail?item.thumbnail:'/public/thumbnail.jpg'})`
         }"></div></div>
       <div class="contTitle" v-html="item.title"></div>
       <div class="contSpec"><span v-for="spec in item.spec">{{ spec }}</span></div>
@@ -15,7 +15,7 @@
       </ul>
       <div class="hover">
         <div>
-          <button v-for="button in item.url"@click="urlClick(button.clickEvent)"><span>{{ button.name }}</span></button>
+          <button v-for="button in item.url" @click="urlClick(button.clickEvent)"><span>{{ button.name }}</span></button>
         </div>
       </div>
     </div>
