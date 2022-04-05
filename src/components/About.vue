@@ -1,66 +1,113 @@
 <template>
-<div id="About">
-  <div class="catchphrase">Dazzling Day, Sunny Day</div>
-  <div id="CloudBack">
-    <img src="../assets/images/cloud2.png">
+  <div class="aboutWrapper" :class="sun ? 'day' : 'night'" :style="{ height: `${ height }px` }">
+    <div class="catchphrase">
+      <div v-html="arrCatchphrase[random].content"></div>
+      <div>- {{ arrCatchphrase[random].name }} -</div>
+    </div>
+    <div id="CloudBack" class="cloud">
+      <img src="../assets/images/cloud1.png">
+    </div>
+    <div id="UpIcon">
+      <img src="../assets/images/up.png" @click="logout()">
+    </div>
+    <img id="Cloud1" class="movingCloud cloud" src="../assets/images/cloud4.png">
+    <img id="Cloud2" class="movingCloud cloud" src="../assets/images/cloud3.png">
+    <img id="Cloud3" class="movingCloud cloud" src="../assets/images/cloud5.png">
+    <img id="Cloud4" class="movingCloud cloud" src="../assets/images/cloud2.png">
+    <img id="Cloud5" class="movingCloud cloud" src="../assets/images/cloud3.png">
   </div>
-  <img id="UpIcon" src="../assets/images/up.png" @click="logout()">
-  <img id="Cloud1" class="movingCloud" src="../assets/images/cloud1.png">
-  <img id="Cloud2" class="movingCloud" src="../assets/images/cloud3.png">
-  <img id="Cloud3" class="movingCloud" src="../assets/images/cloud1.png">
-  <img id="Cloud4" class="movingCloud" src="../assets/images/cloud2.png">
-  <img id="Cloud5" class="movingCloud" src="../assets/images/cloud3.png">
-</div>
 </template>
 
 <script>
-  export default {
-    name: 'about',
-    methods: {
-      logout() {
-        this.$firebase.logout();
-      },
+import {
+  onMounted, nextTick, ref, defineComponent,
+} from 'vue';
+
+export default {
+  name: 'about',
+  props: ['sun'],
+  methods: {
+    logout() {
+      this.$firebase.logout();
     },
-  };
+  },
+  setup() {
+    const arrCatchphrase = [
+      // { content: '너는 머뭇거릴 수 있지만,<br>시간은 그렇지 않다.', name: '벤자민 프랭클린' },
+      // { content: '웃음이 없는 하루는<br>버린 하루다.', name: '찰리 채플린' },
+      // { content: '나만이 내 인생을 바꿀 수 있다.<br>아무도 날 대신해 해줄 수 없다.', name: '캐럴 버넷' },
+      // { content: '매일 행복하진 않지만,<br>행복한 일은 매일있어.', name: '곰돌이 푸' },
+      { content: '내안에 빛이 있으면<br>스스로 빛나는 법이다.', name: '알버트 슈바이처' },
+    ];
+    const random = ref(Math.floor(Math.random() * arrCatchphrase.length));
+    // onMounted(() => {
+    //   setInterval(() => {
+    //     for(;;) {
+    //       const v = Math.floor(Math.random() * arrCatchphrase.length);
+    //       if (v !== random.value) {
+    //         random.value = v;
+    //         break;
+    //       }
+    //     }
+    //   }, 10000);
+    // });
+    return {
+      arrCatchphrase,
+      random,
+      height: window.innerHeight || window.outerHeight,
+    };
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-  #About{
+<style scoped lang="scss">
+  .aboutWrapper{
     position: relative;
-    top: 0;
-    left: 0;
-    height: 100vh;
+    width: 100%;
     z-index: 0;
-    background: lightskyblue; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(cornflowerblue, #a7d2cb); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(cornflowerblue, #a7d2cb); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(cornflowerblue, #a7d2cb); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(cornflowerblue, #a7d2cb); /* Standard syntax */
     overflow: hidden;
+    &.day{
+      background: lightskyblue; /* For browsers that do not support gradients */
+      background: linear-gradient(cornflowerblue, #a7d2cb);
+    }
+    &.night{
+      background: lightskyblue; /* For browsers that do not support gradients */
+      background: linear-gradient(#041e33, #141f3e);
+      .cloud{
+        opacity: .3 !important;
+      }
+    }
   }
   .catchphrase{
     width: 100%;
     text-align: center;
-    text-shadow: 1px 1px 1px rgba(0,0,0,.8);
-    font-weight: 800;
-    font-family: 'Open Sans';
-    font-size: 48px;
+    text-shadow: 1px 1px 10px rgba(0,0,0,.3);
     color: #FFF;
     position: absolute;
     z-index: 10;
-    line-height: 50px;
-    height: 50px;
     top: 30%;
+    > div:first-of-type{
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 40px;
+      white-space: nowrap;
+    }
+    > div:nth-of-type(2) {
+      font-size: 16px;
+      margin-top: 20px;
+    }
   }
   #UpIcon{
+    animation: moveShake 6s ease-in-out infinite;
+    bottom: 20px;
+    left: 10px;
     position: absolute;
-    width: 100px;
-    height: 120px;
-    bottom: 50px;
-    left: 50px;
-    animation: moveUp 5s ease-in-out infinite;
     z-index: 4;
+  }
+  #UpIcon > img{
+    height: 200px;
+    animation: moveUp 5s ease-in-out infinite;
   }
   .movingCloud{
     position: absolute;
@@ -73,13 +120,15 @@
     position: absolute;
     width: 80%;
     right: -80%;
-    top: 20px;
+    top: 40px;
     animation: cloudMainY 10s linear infinite;
+    opacity: .9;
   }
   #Cloud1{
     bottom: 40px;
     animation: cloud1 30s linear infinite;
     width: 410px;
+    opacity: .8;
   }
   #Cloud2{
     bottom: 80px;
@@ -105,46 +154,29 @@
     animation: cloud3 30s linear infinite;
     animation-delay: -24s;
   }
-  @-webkit-keyframes moveUp {
-    from {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
-      transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 0;
-    }
-    25%, 75%{
-      -webkit-transform: rotate3d(0, 0, 1, -20deg);
-      transform: rotate3d(0, 0, 1, -15deg);
-    }
-    50% {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
-      transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 50px;
-    }
-    to {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
-      transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 0;
-    }
-  }
   @keyframes moveUp {
     from {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-50px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes moveShake{
+    from {
       transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 0;
     }
     25%, 75%{
-      -webkit-transform: rotate3d(0, 0, 1, -20deg);
       transform: rotate3d(0, 0, 1, -15deg);
     }
     50% {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
       transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 50px;
     }
     to {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
       transform: rotate3d(0, 0, 1, 5deg);
-      margin-bottom: 0;
     }
   }
   @keyframes cloudMainX {
@@ -152,7 +184,7 @@
       transform: translateX(0);
     }
     To{
-      transform: translateX(calc(-100% - 100vw));
+      transform: translateX(calc(-100% - 80vw));
     }
   }
   @keyframes cloudMainY {
@@ -221,70 +253,6 @@
     }
   }
   @keyframes cloud4 {
-    from{
-      right: -310px;
-      margin-bottom: 30px;
-    }
-    to{
-      right: 100%;
-      margin-bottom: 30px;
-    }
-    50%{
-      margin-bottom: 30px;
-    }
-    25%, 75%{
-      margin-bottom: -30px;
-    }
-  }
-  @-webkit-keyframes cloud1{
-    from{
-      right: -410px;
-      margin-bottom: 25px;
-    }
-    to{
-      right: 100%;
-      margin-bottom: 25px;
-    }
-    50%{
-      margin-bottom: 25px;
-    }
-    25%, 75%{
-      margin-bottom: -25px;
-    }
-  }
-  @-webkit-keyframes cloud2 {
-    from{
-      right: -300px;
-      margin-bottom: 40px;
-    }
-    to{
-      right: 100%;
-      margin-bottom: 40px;
-    }
-    50%{
-      margin-bottom: 40px;
-    }
-    25%, 75%{
-      margin-bottom: -40px;
-    }
-  }
-  @-webkit-keyframes cloud3 {
-    from{
-      right: -320px;
-      margin-bottom: 20px;
-    }
-    to{
-      right: 100%;
-      margin-bottom: 20px;
-    }
-    50%{
-      margin-bottom: 20px;
-    }
-    25%, 75%{
-      margin-bottom: -20px;
-    }
-  }
-  @-webkit-keyframes cloud4 {
     from{
       right: -310px;
       margin-bottom: 30px;

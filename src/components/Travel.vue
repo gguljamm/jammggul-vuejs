@@ -117,7 +117,7 @@
 <style scoped>
   .pop{
     position: fixed;
-    z-index: 6;
+    z-index: 200;
     top: 0;
     left: 0;
     right: 0;
@@ -129,8 +129,6 @@
     padding: 30px;
     max-height: 100%;
     top: 50%;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
     transform: translateY(-50%);
     position: relative;
     margin: 0 auto;
@@ -159,79 +157,42 @@
     font-size: 24px;
     color: #c98474;
   }
-  .pop > div > div.head > button:hover{
-    opacity: .8;
-  }
   .topImg{
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 0;
-    text-align: center;
-    width: 100%;
-    background-color: rgb(133, 179, 229);
-    background: -moz-linear-gradient(left, rgb(143, 189, 239) 0%, rgb(129, 175, 228) 100%);
-    background: -webkit-linear-gradient(left, rgb(143, 189, 239) 0%, rgb(129, 175, 228) 100%);
-    background: linear-gradient(to right, rgb(143, 189, 239) 0%, rgb(129, 175, 228) 100%);
-    height: 520px;
     overflow: hidden;
+    display: unset;
   }
   .topImg > img {
-    height: 520px;
-    position: absolute;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
-  }
-  .mob .topImg{
-    background-color: transparent;
-    position: relative;
-    margin-top: -50px;
-    height: auto;
-    font-size: 0;
-  }
-  .mob .topImg > img{
-    width: 150%;
-    height: auto;
-    position: relative;
+    top: 0;
+    left: 0;
+    position: sticky;
+    z-index: -1;
+    display: block;
+    width: 100%;
+    max-height: 520px;
+    min-height: 200px;
   }
   .travelWrapper{
-    position: absolute;
+    margin: 0 auto 50px;
     max-width: 1080px;
     width: 100%;
-    background-color: #FFF;
-    z-index: 1;
-    top: 470px;
-    transform: translateX(-50%);
-    left: 50%;
-    margin-bottom: 50px;
-  }
-  .mob .travelWrapper{
-    position: relative;
-    top: 0;
   }
   .travelList{
     padding: 30px;
+    padding-bottom: 60px;
+    margin-top: -60px;
   }
   .travelList > li{
     width: 100%;
-    padding: 20px;
     margin-bottom: 20px;
-    border: 1px solid #a7d2cb;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    overflow: auto;
+    border-radius: 8px;
+    overflow: hidden;
     cursor: pointer;
-    -webkit-box-shadow: 0 0 10px 5px rgba(0,0,0,.1);
-    -moz-box-shadow: 0 0 10px 5px rgba(0,0,0,.1);
-    box-shadow: 0 0 10px 5px rgba(0,0,0,.1);
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
     transition: background .3s ease;
     display: table;
-  }
-  .travelList > li:hover{
-    background-color: aliceblue;
+    background-color: #FFF;
+    position: relative;
+    z-index: 1;
   }
   .travelList > li:last-child{
     margin-bottom: 0;
@@ -240,31 +201,38 @@
     display: table-cell;
     vertical-align: middle;
     width: 50%;
-    padding: 20px;
     font-family: "Noto Sans KR", sans-serif;
   }
   .mob .travelList{
     padding: 10px;
+    padding-bottom: 60px;
+    margin-top: -30px;
   }
   .mob .travelList > li{
-    padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: block;
   }
   .mob .travelList > li > div{
     display: block;
     width: 100%;
-    padding: 10px 10px 0 10px;
   }
   .mob .travelList > li > div:first-child{
     text-align: center;
   }
+  .travelList > li > div:last-child{
+    padding: 40px 40px 40px 0;
+  }
   .mob .travelList > li > div:last-child{
-    padding-bottom: 10px;
+    padding: 20px;
+    border: 1px solid #d7d8d9;
+    border-top: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
   .travelList > li > div img{
     width: 100%;
     max-width: 450px;
+    display: block;
   }
   .travelList > li > div .county{
     color: #874c62;
@@ -296,12 +264,9 @@
     font-size: 14px;
   }
   .travelList > li > div .description{
-    border: 1px solid #e1e3e5;
     height: auto;
-    padding: 10px;
-    margin-top: 10px;
+    margin-top: 40px;
     line-height: 24px;
-    background-color: rgba(255, 255, 255, .8);
   }
   #TravelWrite{
     position: fixed;
@@ -365,10 +330,6 @@
     font-size: 14px;
     text-align: center;
     width: 130px;
-  }
-  .travelButtonPop ul > li:hover{
-    background-color: rgba(242, 211, 136, .9);
-    color: #FFF;
   }
   .travelButtonPop .clamp{
     bottom: -14px;

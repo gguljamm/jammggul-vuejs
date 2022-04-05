@@ -1,238 +1,255 @@
 <template>
-  <div id="app" v-bind:class="[isMobile?'mobile':'web']">
-    <div class="wrapper">
-      <div id="GNB" v-bind:class="backColor">
+  <div>
+    <div class="mainWrap">
+      <div class="header" :class="{ main: page === 'about' || page === 'travel', isScrolled: !isScrollTop, isNight: !sun }" :style="{ transform: isNavOpen ? 'translateX(-150px)' : '' }">
         <div>
           <img
+            v-if="sun"
             @click="pageReload"
-            src="./assets/images/jamm-resize.png" alt="jammggul" >
-          <transition name="fade">
-            <button id="MobMenu"
-              v-if="isMobile"
-              v-bind:key="mobNavOpen"
-              @click="mobNavOpen=!mobNavOpen">
-              <i aria-hidden="true"
-                v-bind:class="[mobNavOpen?'fa fa-times':'fa fa-bars']"></i>
-            </button>
-          </transition>
+            src="./assets/images/jammggul_logo.png" alt="jammggul"
+          />
+          <img
+            v-else-if="page === 'about'"
+            @click="pageReload"
+            src="./assets/images/jammggul_logo_night.png" alt="jammggul"
+          />
+          <img
+            v-else
+            @click="pageReload"
+            src="./assets/images/jammggul_logo_night2.png" alt="jammggul"
+          />
+          <button
+            @click="isNavOpen = true">
+            <i aria-hidden="true" class="fa fa-bars"></i>
+          </button>
         </div>
       </div>
-      <navigation
-        v-bind:class="[this.page]"
-        :page="this.page"
-        v-if="mobNavOpen"
-        @transChange="navigate"></navigation>
-      <transition name="component-fade" mode="out-in">
-        <component :is="page" :isMobile="mobFlag"></component>
-      </transition>
+      <div :style="{ transform: isNavOpen ? 'translate3d(-150px, 0, 0)' : '' }" style="transition: transform .3s ease; position: relative">
+        <component :is="componentName" :isMobile="isMobile" :sun="sun" :key="page"></component>
+      </div>
     </div>
-    <div class="footer"></div>
+    <Transition>
+      <navigation
+        :page="page"
+        v-if="isNavOpen"
+        @transChange="navigate">
+      </navigation>
+    </Transition>
+    <Transition name="fade">
+      <div class="popupBack" @click="isNavOpen = false" v-show="isNavOpen"></div>
+    </Transition>
   </div>
 </template>
 
 <script>
-  import Navigation from './components/Navigation.vue';
-  import About from './components/About.vue';
-  import Portfolio from './components/Portfolio/index.vue';
-  import DevInfo from './components/Dev-Info.vue';
-  import Travel from './components/Travel.vue';
-  import Daily from './components/Daily.vue';
-  import Review from './components/Review.vue';
+import {
+  onMounted, nextTick, ref, defineComponent, onUnmounted, computed,
+} from 'vue';
+import Navigation from './components/Navigation.vue';
+import About from './components/About.vue';
+import Portfolio from './components/Portfolio/index.vue';
+import DevBlog from './components/Dev/Blog.vue';
+import DevRetrospect from './components/Dev/Retrospect.vue';
+import Travel from './components/Travel.vue';
+import Daily from './components/Daily.vue';
+import Review from './components/Review.vue';
+import './assets/lib/sun.js';
 
-  export default {
-    name: 'app',
-    components: {
-      Navigation,
-      About,
-      Daily,
-      Portfolio,
-      Review,
-      DevInfo,
-      Travel,
+export default {
+  name: 'app',
+  components: {
+    Navigation,
+    About,
+    Daily,
+    Portfolio,
+    Review,
+    DevBlog,
+    DevRetrospect,
+    Travel,
+  },
+  setup() {
+    const now = new Date();
+    const sunset = new Date().sunset(37.5666805, 126.9784147);
+    const sunrise = new Date().sunrise(37.5666805, 126.9784147);
+    const sun = !(now > sunset && now < sunrise);
+    const isScrollTop = ref(true);
+    const page = ref('about');
+    const scroll = () => {
+      isScrollTop.value = window.scrollY <= 0;
+    };
+    const componentName = computed(() => {
+      let name = page.value.indexOf('review') >= 0 ? 'review' : page.value;
+      return name.replace('/', '-');
+    });
+    onMounted(() => {
+      window.addEventListener('scroll', scroll);
+    });
+    onUnmounted(() => {
+      window.removeEventListener('scroll', scroll);
+    });
+    return {
+      componentName,
+      page,
+      sun,
+      isScrollTop: isScrollTop,
+    };
+  },
+  data() {
+    return {
+      isMobile: false,
+      isNavOpen: false,
+      resize: null,
+    };
+  },
+  methods: {
+    pageReload() {
+      location.href = '/';
     },
-    methods: {
-      pageReload() {
-        location.href = '/';
-      },
-      getWindowWidth() {
-        const nowWidth = document.documentElement.clientWidth;
-        this.windowWidth = nowWidth;
-        if (nowWidth < 1270) {
-          if (!this.isMobile) {
-            this.isMobile = true;
-            this.mobNavOpen = false;
-          }
-        } else {
-          this.isMobile = false;
-          this.mobNavOpen = true;
-        }
-        this.mobFlag = (nowWidth < 768);
-      },
-      navigate(url, popping) {
-        if (url) {
-          this.page = url;
-        } else {
-          this.page = 'about';
-        }
-        if (!popping) {
-          window.history.pushState({ hash: '' }, '', `/${url === 'about' ? '' : url}`);
-        }
-      },
-    },
-    computed: {
-      backColor() {
-        return {
-          backColor: this.page !== 'about' && this.page !== 'travel',
-        };
-      },
-    },
-    mounted() {
-      this.$nextTick(function catchResize() {
-        window.addEventListener('resize', this.getWindowWidth);
-        this.getWindowWidth();
-      });
-      window.addEventListener('popstate', () => {
-        this.navigate(location.pathname.replace('/', ''), true);
-      });
-      if (location.pathname && location.pathname !== '/') {
-        this.page = location.pathname.replace('/', '');
+    navigate(url, popping) {
+      this.isNavOpen = false;
+      if (url) {
+        this.page = url;
+      } else {
+        this.page = 'about';
       }
-      this.$firebase.anonymouslyLogin();
+      if (!popping) {
+        window.history.pushState({ hash: '' }, '', `/${url === 'about' ? '' : url}`);
+      }
     },
-    data() {
-      return {
-        mobFlag: false,
-        page: 'about',
-        windowWidth: 0,
-        isMobile: false,
-        mobNavOpen: false,
-      };
-    },
-    beforeDestroy() {
-      window.removeEventListener('resize', this.getWindowWidth);
-    },
-  };
+  },
+  computed: {
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.resize = new ResizeObserver(() => {
+        this.isMobile = (window.outerWidth || window.innerWidth) < 768;
+      });
+      this.resize.observe(window.document.body);
+    });
+    window.addEventListener('popstate', () => {
+      this.isNavOpen = false;
+      this.navigate(location.pathname.replace('/', ''), true);
+    });
+    if (location.pathname && location.pathname !== '/') {
+      this.page = location.pathname.replace('/', '');
+    }
+    this.$firebase.anonymouslyLogin();
+    window.addEventListener('scroll', () => {
+
+    })
+  },
+  beforeDestroy() {
+  },
+};
 </script>
 
-<style>
+<style lang="scss">
   @import './assets/lib/normalize.css';
-  @import url(https://fonts.googleapis.com/css?family=Open+Sans:800);
-  @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
   @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan');
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
   html, body {
     width: 100%;
     height: 100%;
   }
+
+  body.popup{
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+
   ul, ol, li {
     padding: 0;
     margin: 0;
     list-style: none;
   }
   #app {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     color: #2c3e50;
-    overflow: hidden;
+    font-size: 16px;
   }
   #app *{
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
-  .wrapper{
-    position: absolute;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  .header {
+    width: 100%;
+    height: 50px;
+    text-align: center;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 10px;
-    background-color: #f6f6f6;
-    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
-    -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.3);
-    box-shadow: 1px 1px 1px rgba(0,0,0,.3);
-  }
-  #GNB {
-    width: 100%;
-    height: 70px;
-    text-align: center;
-    text-shadow: 1px 1px 1px #000;
-  }
-  #GNB.backColor{
-    background-color: cornflowerblue;
-  }
-  #GNB > div {
-    position: relative;
-    margin: 0 auto;
-    z-index: 1;
-  }
-  #GNB > div > img {
-    margin: 5px;
-    height: 60px;
-    padding: 5px;
-    cursor: pointer;
+    z-index: 99;
+    position: sticky;
     background-color: #FFF;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.15);
-    -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.15);
-    box-shadow: 1px 1px 1px rgba(0,0,0,.15);
+    transition: .3s ease;
+    &.isScrolled{
+      box-shadow: 0 0 4px 2px rgba(0, 0, 0, .1);
+    }
+    &.main{
+      position: fixed;
+      background-color: transparent;
+      > div > button{
+        transition: color .3s ease;
+        color: #FFF;
+      }
+    }
+    &.main.isScrolled{
+      background-color: #FFF;
+      > div > button{
+        color: #2c3e50;
+      }
+    }
+    > div {
+      position: relative;
+      padding: 5px 0;
+      max-width: 1080px;
+      margin: 0 auto;
+      > img {
+        height: 40px;
+        display: block;
+        margin: 0 auto;
+      }
+      > button{
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        top: 0;
+        border: none;
+        right: 0;
+        font-size: 24px;
+        background-color: transparent;
+        cursor: pointer;
+      }
+    }
   }
-  #MobMenu{
-    position: absolute;
-    z-index: 10;
-    width: 40px;
-    height: 40px;
-    margin-top: 15px;
-    border: none;
-    right: 15px;
-    font-size: 24px;
-    color: #FFF;
-    background-color: transparent;
-    cursor: pointer;
-  }
-  .footer{
-    background-color: #aabbcc;
-    height: 10px;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
+  .popupBack{
+    z-index: 998;
+    position: fixed;
+    top: 0;
+    right: 0;
     left: 0;
-    z-index: -1;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, .3);
   }
-  .component-fade-enter-active, .component-fade-leave-active {
-    transition: opacity .2s ease;
+  .v-enter-active,
+  .v-leave-active {
+    transition: transform .3s ease;
   }
-  .component-fade-enter, .component-fade-leave-to
-    /* .component-fade-leave-active below version 2.1.8 */ {
+  .v-enter-from,
+  .v-leave-to {
+    transform: translateX(300px);
+  }
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .3s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
     opacity: 0;
-  }
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .2s
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0
   }
   .clear{
     clear: both;
-  }
-  @media all and (max-width: 768px){
-    #GNB {
-      height: 50px;
-    }
-    #GNB > div > img {
-      margin: 5px;
-      height: 40px;
-      padding: 5px;
-    }
-    #MobMenu{
-      margin-top: 5px;
-      right: 10px;
-    }
   }
 </style>

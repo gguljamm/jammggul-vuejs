@@ -92,7 +92,7 @@
 </template>
 
 <script>
-  import inputIt from './Input/Input-Dev.vue';
+  import inputIt from '../Input/Input-Dev.vue';
 
   export default {
     name: 'devInfo',
@@ -237,9 +237,7 @@
   }
   .input > button{
     height: 35px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 0 20px;
     cursor: pointer;
     font-size: 14px;
@@ -257,7 +255,6 @@
     font-family: "Noto Sans KR", sans-serif;
   }
   .devWrapper, .devWrapper > div{
-    overflow: auto;
     margin-top: 10px;
   }
   .devWrapper .itList > ul, .devWrapper > div > div{
@@ -312,12 +309,9 @@
   }
   .devWrapper .itList > ul li{
     line-height: 24px;
-    -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
-    -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
-    box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+    border: 1px solid #c2c2c2;
+    border-radius: 8px;
   }
   .devWrapper .itList > ul li .code{
     background-color: #3a3b3c;
@@ -358,7 +352,7 @@
   .imgPop > div > img{
     position: relative;
     max-width: 100%;
-    box-shadow: 0 0 10px 2px rgba(0,0,0,.3);
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
   }
   .imgPop.over > div > img{
     margin: 40px 0;

@@ -1,264 +1,119 @@
 <template>
-<div id="Navigation" class="navigation">
-  <span class="clamp"></span>
-  <span class="leftArrow" :style="{opacity: leftArrow ? .8 : 0}"></span>
-  <span class="rightArrow" :style="{opacity: rightArrow ? .8 : 0}"></span>
-  <ul @scroll="navScroll" ref="navigator">
-    <li
-      v-bind:class="{active: activeTab == 'about'}"
-      @click="navChange('about')">
-      <div>
-        <img src="../assets/images/mug.jpg" >
-        <div>ABOUT</div>
-      </div>
-    </li>
-    <li
-      v-bind:class="{active: activeTab == 'daily'}"
-      @click="navChange('daily')">
-      <div>
-        <img src="../assets/images/icecoffee.jpg" >
-        <div>DAILY</div>
-      </div>
-    </li>
-    <li
-      v-bind:class="{active: activeTab == 'portfolio'}"
-      @click="navChange('portfolio')">
-      <div>
-        <img src="../assets/images/donut.jpg" >
-        <div>PORTFOLIO</div>
-      </div>
-    </li>
-    <li
-      v-bind:class="{active: activeTab == 'review'}"
-      @click="navChange('review')">
-      <div>
-        <img src="../assets/images/cream.jpg" >
-        <div>REVIEW</div>
-      </div>
-    </li>
-    <li
-      v-bind:class="{active: activeTab == 'devInfo'}"
-      @click="navChange('devInfo')">
-      <div>
-        <img src="../assets/images/takeout.jpg" >
-        <div>IT INFO</div>
-      </div>
-    </li>
-    <li
-      v-bind:class="{active: activeTab == 'travel'}"
-      @click="navChange('travel')">
-      <div>
-        <img src="../assets/images/muffin.jpg" >
-        <div>TRAVEL</div>
-      </div>
-    </li>
-  </ul>
-</div>
+  <div class="navigationWrap">
+    <img src="../assets/images/sign.png">
+    <ul>
+      <li>
+        <p :class="{ active: page === 'about' }" @click="navChange('about')">home.</p>
+      </li>
+      <li>
+        <p :class="{ active: page === 'daily' }" @click="navChange('daily')">diary.</p>
+      </li>
+      <li>
+        <p>develop.</p>
+        <div>
+          <div :class="{ active: page === 'portfolio' }" @click="navChange('portfolio')">portfolio</div>
+          <div :class="{ active: page === 'dev/blog' }" @click="navChange('dev/blog')">blog</div>
+          <div :class="{ active: page === 'dev/retrospect' }" @click="navChange('dev/retrospect')">retrospect</div>
+        </div>
+      </li>
+      <li>
+        <p>review.</p>
+        <div>
+          <div :class="{ active: page === 'review/game' }" @click="navChange('review/game')">game</div>
+          <div :class="{ active: page === 'review/culture' }" @click="navChange('review/culture')">culture</div>
+          <div :class="{ active: page === 'review/unboxing' }" @click="navChange('review/unboxing')">unboxing</div>
+        </div>
+      </li>
+      <li>
+        <p :class="{ active: page === 'travel' }" @click="navChange('travel')">travel.</p>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
-  export default {
-    name: 'navigation',
-    props: ['page'],
-    data() {
-      return {
-        activeTab: this.page,
-        leftArrow: false,
-        rightArrow: true,
-      };
-    },
-    methods: {
-      navScroll(e) {
-        this.leftArrow = e.target.scrollLeft > 0;
-        this.rightArrow = (this.$refs.navigator.childElementCount * 70) > e.target.clientWidth + e.target.scrollLeft;
-      },
-      navChange(page) {
-        this.activeTab = page;
-        this.$emit('transChange', page);
-      },
-    },
-  };
+import {
+  onMounted, nextTick, ref, defineComponent, onUnmounted,
+} from 'vue';
+
+export default {
+  name: 'navigation',
+  props: ['page'],
+  setup(props, ctx) {
+    let scrollPosition = 0;
+    onMounted(() => {
+      scrollPosition = window.pageYOffset;
+      window.document.body.classList.add('popup');
+      window.document.body.style.top = `-${scrollPosition}px`;
+    });
+    onUnmounted(() => {
+      window.document.body.classList.remove('popup');
+      window.document.body.style.removeProperty('top');
+      window.scrollTo(0, scrollPosition);
+    });
+    return {
+      navChange: (page) => {
+        ctx.emit('transChange', page);
+      }
+    };
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-  .navigation{
-    z-index: 1;
-  }
-  .web .navigation{
+<style scoped lang="scss">
+  .navigationWrap {
+    z-index: 999;
     position: fixed;
-    -webkit-box-shadow: 1px 1px 5px rgba(0,0,0,.15);
-    -moz-box-shadow: 1px 1px 5px rgba(0,0,0,.15);
-    box-shadow: 1px 1px 5px rgba(0,0,0,.15);
-    right: 20px;
-    top: 50%;
-    margin-top: -235px;
-    border: 1px solid #f1f2f3;
-    z-index: 1;
-    background-color: #FFF;
-  }
-  .web .navigation ul{
-    padding: 10px 0;
-  }
-  .mobile .navigation .clamp{
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    right: 22px;
-    top: -20px;
-    overflow: hidden;
-  }
-  .mobile .navigation .clamp:before{
-    content: '';
-    position: absolute;
+    top: 0;
+    right: 0;
     bottom: 0;
-    left: 2px;
-    border-bottom: 15px solid #FFF;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    width: 0;
-    height: 0;
-    -webkit-filter: drop-shadow(1px 1px 2px rgba(0,0,0,.5));
-    filter: drop-shadow(1px 1px 2px rgba(0,0,0,.5));
-  }
-  .mobile .navigation.about .clamp:before{
-    -webkit-filter: none;
-    filter: none;
-    border-bottom-color: rgba(255,255,255,.5);
-  }
-  .mobile .navigation{
-    position: relative;
-    padding: 5px 10px 0 10px;
-  }
-  .mobile .navigation.about ul{
-    background-color: rgba(255,255,255,.5);
-  }
-  .mobile .navigation ul{
-    background-color: #FFF;
-    -webkit-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
-    -moz-box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
-    box-shadow: 1px 1px 2px 2px rgba(0,0,0,.15);
-  }
-  .mobile .navigation .leftArrow{
-    position: absolute;
-    border-right: 5px solid #aaa;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    left: 15px;
-    top: 30px;
-    z-index: 1;
-    visibility: hidden;
-    opacity: .8;
-    transition: opacity .3s ease;
-  }
-  .mobile .navigation .rightArrow{
-    position: absolute;
-    border-left: 5px solid #aaa;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    right: 15px;
-    top: 30px;
-    z-index: 1;
-    visibility: hidden;
-    opacity: .8;
-    transition: opacity .3s ease;
-  }
-  .mobile .navigation.about .leftArrow{
-    border-right-color: #FFF;
-  }
-  .mobile .navigation.about .rightArrow{
-    border-left-color: #FFF;
-  }
-  .mobile .navigation.travel{
-    position: absolute;
-    width: 100%;
-  }
-  .mobile .navigation ul{
-    white-space: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    text-align: center;
-  }
-  .navigation ul li{
-    padding: 0 5px;
-    position: relative;
-  }
-  .navigation ul li > div{
-    width: 80px;
-    height: 80px;
-    padding: 10px 15px 10px 15px;
-    text-align: center;
-    cursor: pointer;
-    -webkit-border-radius: 45px;
-    -moz-border-radius: 45px;
-    border-radius: 45px;
-  }
-  .mobile .navigation ul{
-    font-size: 0;
-  }
-  .mobile .navigation ul li{
-    display: inline-block;
-  }
-  .navigation ul li:not(.active):hover > div{
-    border: 1px solid #a7d2cb;
-    padding: 9px 14px;
-  }
-  .navigation ul li.active > div{
-    background-color: rgba(167, 210, 203, .3);
-  }
-  .mobile .navigation.about ul li.active > div{
-    background-color: rgb(167, 210, 203);
-  }
-  .navigation ul li img{
-    width: 40px;
-    height: 40px;
-    -webkit-border-radius: 25px;
-    -moz-border-radius: 25px;
-    border-radius: 25px;
-  }
-  .navigation ul li:hover img{
-    opacity: 0.8;
-  }
-  .navigation ul li > div div{
-    position: absolute;
-    width: 90px;
-    left: 0;
-    line-height: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: 'Baloo Bhaijaan', sans-serif;
-  }
-  .clear{
-    clear:both;
-  }
-  @media all and (max-height: 470px){
-    .web .navigation{
+    width: 300px;
+    background-color: #39496e;
+    box-shadow: 0 0 4px 2px rgba(0, 0, 0, .1);
+    > img{
+      width: 180px;
+      height: 44px;
+      display: block;
       position: absolute;
-      top: 74px;
-      margin-top: 0;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
     }
-  }
-  @media all and (max-width: 768px){
-    .mobile .navigation ul li > div {
-      width: 60px;
-      height: 60px;
-    }
-    .mobile .navigation ul li img{
-      width: 30px;
-      height: 30px;
-    }
-    .mobile .navigation ul li > div div{
-      width: 70px;
-      font-size: 12px;
+    ul{
+      position: absolute;
+      top: 124px;
+      left: 0;
+      right: 0;
       bottom: 0;
-    }
-  }
-  @media all and (max-width: 390px){
-    .mobile .navigation .leftArrow{
-      visibility: visible;
-    }
-    .mobile .navigation .rightArrow{
-      visibility: visible;
+      overflow: auto;
+      padding-bottom: 20px;
+      color: #FFF;
+      > li{
+        > p{
+          padding: 14px 30px;
+          font-weight: 600;
+          font-size: 18px;
+          margin: 0;
+          line-height: 21px;
+          cursor: pointer;
+          &.active{
+            background-color: rgba(23, 32, 15, .2);
+          }
+        }
+        > div{
+          > div{
+            border-left: 1px solid #fff;
+            margin-left: 30px;
+            cursor: pointer;
+            padding: 14px 20px;
+            line-height: 21px;
+            &.active{
+              background-color: rgba(23, 32, 15, .2);
+            }
+          }
+        }
+      }
     }
   }
 </style>

@@ -17,10 +17,9 @@
     </div>
     <div class="category" v-bind:class="categoryOpen?'opened':''">
       <div class="categoryHead">
-        <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">게임</button>
-        <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">영화&드라마</button>
-        <button @click="changeCategory('book')" v-bind:class="viewCategory==='book'?'selected':''">책&음악</button>
-        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">지름신</button>
+        <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">Game</button>
+        <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">Culture</button>
+        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">Unboxing</button>
       </div>
       <div class="categoryContent">
         <ul>
@@ -41,13 +40,16 @@
     </div>
     <div v-if="reviewInfo[selectedCategory][selectedNum]" class="reviewContent">
       <p>{{ reviewInfo[selectedCategory][selectedNum].title }}</p>
-      <div
+      <template
         v-for="line in reviewInfo[selectedCategory][selectedNum].content.split('\n')"
-        v-if="line.indexOf('#img') < 0"
       >
-        {{ line ? line : '&nbsp;' }}
-      </div>
-      <img v-else v-bind:src="reviewInfo[selectedCategory][selectedNum].imgUrl[(line.split('#img')[1]).split('#')[0]]">
+        <div
+          v-if="line.indexOf('#img') < 0"
+        >
+          {{ line ? line : '&nbsp;' }}
+        </div>
+        <img v-else v-bind:src="reviewInfo[selectedCategory][selectedNum].imgUrl[(line.split('#img')[1]).split('#')[0]]">
+      </template>
     </div>
   </div>
 </template>
@@ -61,6 +63,34 @@
     },
     props: ['isMobile'],
     name: 'Review',
+    data() {
+      let initTab;
+      switch (location.pathname.split('/')[location.pathname.split('/').length - 1]) {
+        case 'unboxing':
+          initTab = 'etc';
+          break;
+        case 'game':
+          initTab = 'game';
+          break;
+        default:
+          initTab = 'movie';
+      }
+      return {
+        categoryOpen: false,
+        selectedNum: 0,
+        selectedCategory: initTab,
+        viewCategory: initTab,
+        reviewInfo: {
+          game: [],
+          book: [],
+          movie: [],
+          etc: [],
+        },
+        viewSubPaging: 1,
+        viewList: [],
+        isAuth: false,
+      };
+    },
     methods: {
       closePop() {
         const temp = confirm('정말 그만쓸거야?');
@@ -112,32 +142,19 @@
               title: list[x].title,
               imgUrl: list[x].imgUrl,
             };
-            this.reviewInfo[list[x].category].push(content);
-            if (x === latestKey) {
-              this.selectedCategory = list[x].category;
-              this.viewCategory = list[x].category;
-              this.selectedNum = this.reviewInfo[list[x].category].length - 1;
+            if (list[x].category === 'book') {
+              this.reviewInfo['movie'].push(content);
+            } else {
+              this.reviewInfo[list[x].category].push(content);
             }
+            // if (x === latestKey) {
+            //   this.selectedCategory = list[x].category;
+            //   this.viewCategory = list[x].category;
+            //   this.selectedNum = this.reviewInfo[list[x].category].length - 1;
+            // }
           });
         });
       },
-    },
-    data() {
-      return {
-        categoryOpen: false,
-        selectedNum: 0,
-        selectedCategory: 'game',
-        viewCategory: 'game',
-        reviewInfo: {
-          game: [],
-          book: [],
-          movie: [],
-          etc: [],
-        },
-        viewSubPaging: 1,
-        viewList: [],
-        isAuth: false,
-      };
     },
     mounted() {
       this.getData();
@@ -150,7 +167,7 @@
     max-width: 1080px;
     margin: 0 auto;
     font-family: 'Noto Sans KR', sans-serif;
-    padding: 0 10px;
+    padding: 0 10px 40px;
   }
   .reviewHead{
     height: 35px;
@@ -200,9 +217,10 @@
   .categoryHead{
     overflow: auto;
     width: 100%;
+    display: flex;
   }
   .categoryHead > button{
-    width: 25%;
+    flex: 0 0 33.33%;
     height: 40px;
     float: left;
     background-color: transparent;
@@ -277,15 +295,14 @@
     padding-bottom: 10px;
   }
   .mob .reviewContent{
-    padding: 10px;
+    padding: 0;
   }
   .reviewContent img{
     max-width: 90%;
     display: block;
     margin: 50px auto;
-    -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-    -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-    box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
+    box-shadow: 0 0 4px 1px rgba(0,0,0,.1);
+    border-radius: 4px;
   }
   .mob .reviewContent img{
     max-width: 100%;

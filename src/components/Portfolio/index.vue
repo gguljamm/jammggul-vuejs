@@ -115,5 +115,6 @@ export default {
 .ulPrac{
   overflow: auto;
   margin: 0;
+  padding-top: 20px
 }
 </style>

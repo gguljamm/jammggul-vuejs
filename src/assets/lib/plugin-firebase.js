@@ -29,6 +29,7 @@ export default {
               Firebase.auth().signOut();
             }
           }).catch((e) => {
+            console.log(e);
             alert('글을 쓰려면 로그인이 필요합니다.'); // eslint-disable-line
           });
         }

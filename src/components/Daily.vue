@@ -331,27 +331,25 @@
     width: 20px;
     text-align: center;
   }
+  .dailyList{
+    padding-top: 20px;
+  }
   .dailyList li{
     width: 33.3333%;
     padding: 0 10px 20px 10px;
     float: left;
   }
   .dailyList li .dailyBox{
-    height: 190px;
+    height: 200px;
   }
   .dailyList li.clickable .dailyBox{
     cursor: pointer;
   }
   .dailyList li .dailyBox > div{
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
     border-radius: 10px;
-    margin-bottom: 50px;
   }
   .dailyList li .dailyBox.selected > div{
-    -webkit-box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
-    -moz-box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
   }
   .title{
     font-size: 18px;

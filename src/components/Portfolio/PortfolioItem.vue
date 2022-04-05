@@ -70,15 +70,14 @@ export default {
   clear: both;
 }
 .portfolioItem > div{
+  padding: 10px 10px 0 10px;
   background-color: #FFF;
-  border: 1px solid #e1e3e5;
-  -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-  -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
-  box-shadow: 1px 1px 1px 0 rgba(0,0,0,.15);
+  border: 1px solid #d7d8d9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px 1px rgba(0, 0, 0, .1);
   position: relative;
 }
 .portfolioItem .contImg{
-  padding: 5px;
 }
 .portfolioItem .contImg > div{
   width: 100%;
@@ -124,7 +123,7 @@ export default {
   padding: 20px;
   width: 90%;
   margin: 0 auto;
-  border: 1px solid #a7d2cb;
+  border: 1px solid #d7d8d9;
   margin-bottom: 30px;
 }
 .portfolioItem .contPart > li{
@@ -193,7 +192,7 @@ export default {
   opacity: 1;
   background-color: transparent;
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 .portfolioItem > div .hover > div{
   position: relative;
@@ -213,12 +212,11 @@ export default {
   margin-right: 16px;
   height: 40px;
   line-height: 40px;
+  border-radius: 20px;
   color: #FFF;
   border: 0;
-  padding: 0 10px;
-  -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
-  -moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
-  box-shadow: 1px 1px 1px 0 rgba(0,0,0,.2);
+  padding: 0 20px;
+  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .1);
   position: relative;
 }
 .portfolioItem > div .hover button > span{
