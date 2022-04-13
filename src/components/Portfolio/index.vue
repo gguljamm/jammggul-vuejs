@@ -109,7 +109,6 @@ export default {
   max-width: 1080px;
   width: 100%;
   margin: 0 auto;
-  font-family: "Noto Sans KR", sans-serif;
   padding-bottom: 20px;
 }
 .ulPrac{

@@ -347,9 +347,10 @@
   }
   .dailyList li .dailyBox > div{
     border-radius: 10px;
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
   }
   .dailyList li .dailyBox.selected > div{
-    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+    box-shadow: 0 0 15px 2px rgba(0,0,0,.2);
   }
   .title{
     font-size: 18px;
@@ -360,30 +361,20 @@
     text-align: center;
     background-color: #a7d2cb;
     color: #FFF;
-    font-family: 'Open Sans', sans-serif;
-    -webkit-border-top-left-radius: 8px;
-    -moz-border-radius-topleft: 8px;
     border-top-left-radius: 8px;
-    -webkit-border-top-right-radius: 8px;
-    -moz-border-radius-topright: 8px;
     border-top-right-radius: 8px;
   }
   .content{
-    border: 1px solid #c2c2c2;
+    border: 1px solid #d7d8d9;
     background-color: #FFF;
     border-top: 0;
     height: 160px;
     padding: 10px;
     padding-bottom: 9px;
     line-height: 20px;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
     border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
     border-bottom-right-radius: 8px;
     position: relative;
-    font-family: 'Noto Sans KR', sans-serif;
   }
   .content > div{
     height: 120px;
@@ -449,7 +440,7 @@
     visibility: hidden;
   }
   .monthSelectorBack{
-    z-index: 11;
+    z-index: 13;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -458,24 +449,20 @@
     background-color: rgba(0,0,0,.3);
   }
   .monthSelector{
-    z-index:12;
+    z-index: 14;
     position: absolute;
     top: 55px;
     right: 0;
     text-align: center;
     font-family: 'Baloo Bhaijaan', sans-serif;
-    padding: 0 10px;
+    padding: 0 20px;
   }
   .monthSelector > div{
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+    border-radius: 8px;
     background-color: #FFF;
     width: 380px;
-    border: 1px solid #a1a2a3;
-    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
-    -moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
-    box-shadow: 0px 0px 10px 5px rgba(0,0,0,.3);
+    border: 1px solid #d7d8d9;
+    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
   }
   .monthSelector > div > span{
     position: absolute;
@@ -485,13 +472,13 @@
     height: 0;
     border-right: 11px solid transparent;
     border-left: 11px solid transparent;
-    border-bottom: 15px solid rgba(0,0,0,.3);
+    border-bottom: 15px solid rgba(0,0,0,.01);
   }
   .monthSelector > div > span:before{
     position: absolute;
     content: '';
     top: 2px;
-    left: -10px;
+    left: -25px;
     width: 0;
     height: 0;
     border-right: 10px solid transparent;
@@ -501,7 +488,7 @@
   .monthSelector .year{
     width: 100%;
     height: 50px;
-    border-bottom: 1px solid #e1e2e3;
+    border-bottom: 1px solid #d7d8d9;
     line-height: 49px;
     font-size: 18px;
   }
@@ -511,9 +498,10 @@
     height: 49px;
     line-height: 49px;
     color: #a7d2cb;
+    font-size: 24px;
   }
   .monthSelector .year i.disabled{
-    opacity: 0.5;
+    opacity: 0.3;
     cursor: default;
   }
   .monthSelector .year i.fa-chevron-circle-left{

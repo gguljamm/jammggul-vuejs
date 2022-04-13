@@ -252,7 +252,6 @@
   .devWrapper{
     width: 100%;
     position: relative;
-    font-family: "Noto Sans KR", sans-serif;
   }
   .devWrapper, .devWrapper > div{
     margin-top: 10px;
@@ -264,7 +263,7 @@
   .devWrapper .itList > ul li, .devWrapper > div > div > div{
     margin: 0 10px 20px 10px;
     background-color: #FFF;
-    padding: 30px;
+    padding: 30px 20px;
     word-break: break-all;
   }
   .devWrapper > div > div > div{
@@ -310,7 +309,7 @@
   .devWrapper .itList > ul li{
     line-height: 24px;
     box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
-    border: 1px solid #c2c2c2;
+    border: 1px solid #d7d8d9;
     border-radius: 8px;
   }
   .devWrapper .itList > ul li .code{

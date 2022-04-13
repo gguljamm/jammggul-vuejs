@@ -122,9 +122,7 @@ export default {
 .portfolioItem .contPart{
   padding: 20px;
   width: 90%;
-  margin: 0 auto;
-  border: 1px solid #d7d8d9;
-  margin-bottom: 30px;
+  margin: 0 auto 30px;
 }
 .portfolioItem .contPart > li{
   height: 30px;
@@ -138,8 +136,8 @@ export default {
 .portfolioItem .contPart > li .partTitle{
   width: 30%;
   float: left;
-  text-align: center;
-  padding-right: 10px;
+  text-align: right;
+  padding-right: 20px;
   white-space: nowrap;
 }
 .portfolioItem .contPart > li .partRate{

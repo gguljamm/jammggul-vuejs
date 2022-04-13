@@ -1,5 +1,5 @@
 <template>
-<div id="Travel" v-bind:class="isMobile?'mob':''">
+<div id="Travel" v-bind:class="isMobile?'mob':'web'">
   <div class="topImg">
     <img src="../assets/images/burano.jpg">
   </div>
@@ -114,7 +114,7 @@
   };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .pop{
     position: fixed;
     z-index: 200;
@@ -200,9 +200,24 @@
   .travelList > li > div{
     display: table-cell;
     vertical-align: middle;
-    width: 50%;
-    font-family: "Noto Sans KR", sans-serif;
+    &:nth-of-type(1) {
+      width: 40%;
+    }
+    &:nth-of-type(2) {
+      width: 60%;
+    }
   }
+  .web .travelList > li{
+    border: 1px solid #d7d8d9;
+    > div:nth-of-type(1){
+      padding: 30px 0 30px 20px;
+      > img{
+        border-radius: 8px;
+        box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      }
+    }
+  }
+
   .mob .travelList{
     padding: 10px;
     padding-bottom: 60px;
@@ -220,7 +235,7 @@
     text-align: center;
   }
   .travelList > li > div:last-child{
-    padding: 40px 40px 40px 0;
+    padding: 30px 40px;
   }
   .mob .travelList > li > div:last-child{
     padding: 20px;
@@ -231,7 +246,6 @@
   }
   .travelList > li > div img{
     width: 100%;
-    max-width: 450px;
     display: block;
   }
   .travelList > li > div .county{

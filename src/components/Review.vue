@@ -17,9 +17,9 @@
     </div>
     <div class="category" v-bind:class="categoryOpen?'opened':''">
       <div class="categoryHead">
-        <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">Game</button>
-        <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">Culture</button>
-        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">Unboxing</button>
+        <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">game</button>
+        <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">culture</button>
+        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">unboxing</button>
       </div>
       <div class="categoryContent">
         <ul>
@@ -166,7 +166,6 @@
   #Review{
     max-width: 1080px;
     margin: 0 auto;
-    font-family: 'Noto Sans KR', sans-serif;
     padding: 0 10px 40px;
   }
   .reviewHead{
@@ -208,9 +207,12 @@
     overflow: hidden;
     transition: .3s ease;
     background-color: #FFF;
+    border-radius: 8px;
+    border: 1px solid #d7d8d9;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, .1);
   }
   .category.opened{
-    height: 340px;
+    height: 360px;
     opacity: 1;
     margin-bottom: 10px;
   }
@@ -225,25 +227,29 @@
     float: left;
     background-color: transparent;
     padding: 0;
-    border: 1px solid #ccc;
-    border-right: 0;
+    border: 0;
+    border-right: 1px solid #d7d8d9;
+    border-bottom: 1px solid #d7d8d9;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color .3s ease;
   }
   .categoryHead > button:last-child{
-    border-right: 1px solid #ccc;
+    border-right: 0;
   }
   .categoryHead > button.selected{
     background-color: lightskyblue;
+    color: #fff;
+    font-weight: bold;
   }
   .categoryContent{
-    border: 1px solid #ccc;
     border-top: 0;
-    height: 300px;
+    height: 320px;
     text-align: center;
   }
   .categoryContent > ul{
-    height: 270px;
-    padding: 10px;
+    height: 290px;
+    padding: 20px 10px;
     text-align: left;
   }
   .categoryContent > ul > li{
@@ -251,9 +257,7 @@
     height: 25px;
     cursor: pointer;
     padding: 0 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
+    border-radius: 8px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -262,7 +266,7 @@
     color: cornflowerblue;
   }
   .categoryContent > ul > li:hover{
-    background-color: #f2d388;
+    background-color: lightskyblue;
     color: #FFF;
   }
   .categoryContent .paging{
@@ -278,24 +282,31 @@
     padding: 0 5px;
   }
   .paging > span:hover{
-    color: #f2d388;
+    color: lightskyblue;
     opacity: 0.8;
   }
   .paging > span.selected{
-    color: #f2d388;
+    color: cornflowerblue;
   }
   .reviewContent{
     background-color: #FFF;
     margin-bottom: 30px;
-    padding: 30px;
+    border: 1px solid #d7d8d9;
+    border-radius: 8px;
+    padding: 20px 20px 40px;
+    box-shadow: 0 0 10px 1px rgb(0 0 0 / 10%);
+    margin-top: 20px;
   }
   .reviewContent > p{
     font-size: 20px;
     font-weight: bold;
-    padding-bottom: 10px;
+    border-bottom: 1px solid #d7d8d9;
+    padding: 10px 0 20px;
+    margin: 0 0 30px;
   }
-  .mob .reviewContent{
-    padding: 0;
+  .mob .reviewContent > p{
+    padding: 0 0 10px;
+    margin: 0 0 20px;
   }
   .reviewContent img{
     max-width: 90%;

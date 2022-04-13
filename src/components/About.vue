@@ -1,8 +1,13 @@
 <template>
   <div class="aboutWrapper" :class="sun ? 'day' : 'night'" :style="{ height: `${ height }px` }">
     <div class="catchphrase">
-      <div v-html="arrCatchphrase[random].content"></div>
-      <div>- {{ arrCatchphrase[random].name }} -</div>
+      <div>
+        <template v-for="(x, xIndex) in arrCatchphrase[random].content.split('<br>')">
+          <br v-if="xIndex !== 0"><span v-for="(y, yIndex) in x" :class="y !== ' ' ? { highlight: getIndex(xIndex, yIndex) === highlightIndex, before: getIndex(xIndex, yIndex) === beforeIndex } : ''">{{ y }}</span>
+        </template>
+<!--        <span v-for="x in arrCatchphrase[random].content.split('')">{{ x }}</span>-->
+      </div>
+<!--      <div>- {{ arrCatchphrase[random].name }} -</div>-->
     </div>
     <div id="CloudBack" class="cloud">
       <img src="../assets/images/cloud1.png">
@@ -20,7 +25,7 @@
 
 <script>
 import {
-  onMounted, nextTick, ref, defineComponent,
+  onMounted, nextTick, ref, defineComponent, computed,
 } from 'vue';
 
 export default {
@@ -51,10 +56,32 @@ export default {
     //     }
     //   }, 10000);
     // });
+    const maxLength = computed(() => {
+      return arrCatchphrase[random.value].content.replace(/ /g, '').replace(/<br>/g, '').length;
+    });
+    const getIndex = (xIndex, yIndex) => {
+      const length = (arrCatchphrase[random.value].content.split('<br>')[xIndex - 1]?.length || 0) + yIndex;
+      return length - (arrCatchphrase[random.value].content.replaceAll('<br>', '').substring(0, length).split(' ').length - 1);
+    };
+    const beforeIndex = ref(-1);
+    const highlightIndex = ref(0);
+    onMounted(() => {
+      setInterval(() => {
+        beforeIndex.value = highlightIndex.value;
+        if (highlightIndex.value === (maxLength.value - 1)) {
+          highlightIndex.value = 0;
+        } else {
+          highlightIndex.value += 1;
+        }
+      }, 500);
+    });
     return {
+      highlightIndex,
+      beforeIndex,
       arrCatchphrase,
       random,
       height: window.innerHeight || window.outerHeight,
+      getIndex,
     };
   },
 };
@@ -92,6 +119,18 @@ export default {
       font-size: 28px;
       line-height: 40px;
       white-space: nowrap;
+      > span{
+        transition: .8s ease;
+        &.highlight{
+          font-size: 32px;
+          color: #ffff00;
+        }
+        &.before{
+          color: #ffff00;
+          font-size: 30px;
+          opacity: .8;
+        }
+      }
     }
     > div:nth-of-type(2) {
       font-size: 16px;

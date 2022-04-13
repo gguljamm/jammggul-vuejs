@@ -122,7 +122,8 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.resize = new ResizeObserver(() => {
-        this.isMobile = (window.outerWidth || window.innerWidth) < 768;
+        this.isMobile = (window.innerWidth || window.outerWidth) < 768;
+        console.log(window.innerWidth || window.outerWidth);
       });
       this.resize.observe(window.document.body);
     });
