@@ -7,12 +7,10 @@
     ></input-review>
     <div class="reviewHead">
       <button @click="authClick()">
-        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-        <span>Write</span>
+        <i class="fa fa-pencil" aria-hidden="true"></i>
       </button>
-      <button @click="categoryOpen=!categoryOpen">
-        <i class="fa fa-list" aria-hidden="true"></i>
-        <span>{{ categoryOpen?'목록 닫기':'목록 열기' }}</span>
+      <button @click="categoryOpen = !categoryOpen">
+        <i :class="categoryOpen ? 'fa fa-times' : 'fa fa-list'" aria-hidden="true"></i>
       </button>
     </div>
     <div class="category" v-bind:class="categoryOpen?'opened':''">
@@ -162,46 +160,32 @@
   };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   #Review{
     max-width: 1080px;
     margin: 0 auto;
     padding: 0 10px 40px;
   }
   .reviewHead{
-    height: 35px;
     width: 100%;
-    margin-bottom: 10px;
     margin-top: 10px;
-  }
-  .reviewHead > button{
-    height: 35px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    padding: 0 20px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .reviewHead > button{
-    border: 0;
-    color: #FFF;
-    background-color: #c98474;
-    left: 10px;
-  }
-  .reviewHead i{
-    margin-right: 5px;
-  }
-  .reviewHead > button:first-child{
-    float: left;
-  }
-  .reviewHead > button:last-child{
-    float: right;
-    border: 1px solid #a7d2cb;
-    background-color: #FFF;
-    color: black;
+    display: flex;
+    justify-content: end;
+    > button{
+      margin-left: 10px;
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      background-color: #FFF;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      border: 1px solid #c98474;
+    }
   }
   .category{
+    margin-top: 10px;
     opacity: 0;
     height: 0;
     overflow: hidden;
@@ -295,7 +279,7 @@
     border-radius: 8px;
     padding: 20px 20px 40px;
     box-shadow: 0 0 10px 1px rgb(0 0 0 / 10%);
-    margin-top: 20px;
+    margin-top: 8px;
   }
   .reviewContent > p{
     font-size: 20px;

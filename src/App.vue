@@ -38,6 +38,9 @@
     <Transition name="fade">
       <div class="popupBack" @click="isNavOpen = false" v-show="isNavOpen"></div>
     </Transition>
+    <full-loading
+      v-show="store.isLoading"
+    ></full-loading>
   </div>
 </template>
 
@@ -53,7 +56,10 @@ import DevRetrospect from './components/Dev/Retrospect.vue';
 import Travel from './components/Travel.vue';
 import Daily from './components/Daily.vue';
 import Review from './components/Review.vue';
+import Test from './components/Test.vue';
+import FullLoading from './components/FullLoading.vue';
 import './assets/lib/sun.js';
+import { useStore } from './stores';
 
 export default {
   name: 'app',
@@ -66,8 +72,11 @@ export default {
     DevBlog,
     DevRetrospect,
     Travel,
+    Test,
+    FullLoading,
   },
   setup() {
+    const store = ref({});
     const now = new Date();
     const sunset = new Date().sunset(37.5666805, 126.9784147);
     const sunrise = new Date().sunrise(37.5666805, 126.9784147);
@@ -82,6 +91,7 @@ export default {
       return name.replace('/', '-');
     });
     onMounted(() => {
+      store.value = useStore();
       window.addEventListener('scroll', scroll);
     });
     onUnmounted(() => {
@@ -92,6 +102,7 @@ export default {
       page,
       sun,
       isScrollTop: isScrollTop,
+      store,
     };
   },
   data() {
@@ -123,7 +134,6 @@ export default {
     this.$nextTick(() => {
       this.resize = new ResizeObserver(() => {
         this.isMobile = (window.innerWidth || window.outerWidth) < 768;
-        console.log(window.innerWidth || window.outerWidth);
       });
       this.resize.observe(window.document.body);
     });

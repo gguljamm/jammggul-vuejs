@@ -1,7 +1,7 @@
 <template>
 <div id="DevInfo">
-  <div class="input">
-    <button @click="authClick"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>Write</span></button>
+  <div class="btns">
+    <button @click="authClick"><i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i></button>
   </div>
   <input-it v-if="isAuth" v-bind:isMobile="isMobile" @reload="getData"></input-it>
   <div class="devWrapper">
@@ -226,28 +226,28 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
   #DevInfo{
     max-width: 1080px;
     margin: 0 auto;
-  }
-  .input{
-    padding: 10px;
-    height: 55px;
-  }
-  .input > button{
-    height: 35px;
-    border-radius: 8px;
-    padding: 0 20px;
-    cursor: pointer;
-    font-size: 14px;
-    border: 0;
-    color: #FFF;
-    background-color: #c98474;
-    left: 10px;
-  }
-  .input i{
-    margin-right: 5px;
+    .btns{
+      display: flex;
+      margin-top: 10px;
+      padding: 0 10px;
+      justify-content: end;
+      > button{
+        margin-left: 10px;
+        padding: 0;
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 16px;
+        background-color: #FFF;
+        box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+        border: 1px solid #c98474;
+      }
+    }
   }
   .devWrapper{
     width: 100%;

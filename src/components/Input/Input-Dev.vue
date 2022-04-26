@@ -1,14 +1,19 @@
 <template>
   <div id="InputBox" class="inputBox">
     <div>
-      <span class="desc">( a태그 공간 #url#유알엘#url#설명#url# 이미지 공간 #img# )</span>
-      <select id="Category" title="category">
-        <option value="it">IT</option>
-        <option value="dev">dev</option>
-        <option value="hardware">hardware</option>
-      </select>
-      <textarea title="textArea" id="TextArea"></textarea>
-      <input id="ImgArea" type="file" v-bind:multiple="!isMobile"> <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+      <div class="desc">( a태그 공간 #url#유알엘#url#설명#url# 이미지 공간 #img# )</div>
+      <div>
+        <select ref="category" class="category" title="category">
+          <option value="it">IT</option>
+          <option value="dev">dev</option>
+          <option value="hardware">hardware</option>
+        </select>
+      </div>
+      <textarea ref="textArea" title="textArea"></textarea>
+      <div class="btns">
+        <input id="ImgArea" type="file" v-bind:multiple="!isMobile">
+        <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+      </div>
     </div>
   </div>
 </template>
@@ -99,8 +104,8 @@
         });
       },
       upload(url) {
-        const text = document.getElementById('TextArea').value;
-        const thisCategory = document.getElementById('Category').value;
+        const text = this.$refs.textArea.value;
+        const thisCategory = this.$refs.category.value;
         this.$firebase.database('/it-info').push({
           category: thisCategory,
           content: text,
@@ -114,42 +119,78 @@
   };
 </script>
 
-<style scoped>
-  .inputBox{
-    text-align: right;
-    padding-bottom: 20px;
-  }
-  .inputBox button{
-    width: 100px;
-    height: 30px;
-    border: 0;
-    color: #FFF;
-    background-color: #c98474;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  .inputBox > div{
-    border: 1px solid #c98474;
-    padding: 10px;
-    -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
-    -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
-    box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
+<style scoped lang="scss">
+.inputBox{
+  padding: 10px;
+  > div{
+    padding: 20px 16px 20px 16px;
+    box-shadow: 0 0 4px 1px rgba(0,0,0,.1);
     background-color: #FFF;
+    border-radius: 10px;
+    text-align: right;
+    textarea{
+      width: 100%;
+      height: 300px;
+      margin-bottom: 10px;
+      resize: none;
+      border: 1px solid #f1f2f3;
+      border-radius: 10px;
+      padding: 10px;
+      &:focus-visible{
+        outline: none;
+      }
+    }
+    .category{
+      height: 24px;
+      margin: 5px 0 10px;
+    }
+    .desc{
+      line-height: 24px;
+      font-size: 14px;
+    }
+    .btns{
+      display: flex;
+      justify-content: space-between;
+      button{
+        width: 100px;
+        height: 40px;
+        border: 0;
+        color: #FFF;
+        background-color: #c98474;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+    }
   }
-  .inputBox textarea{
-    width: 100%;
-    height: 300px;
-    margin-bottom: 10px;
-    resize: none;
-  }
-  #Category{
-    height: 24px;
-    margin: 0 0 5px 5px;
-  }
-  .desc{
-    font-size: 14px;
-  }
+}
+  //.inputBox{
+  //  text-align: right;
+  //  padding-bottom: 20px;
+  //}
+  //.inputBox button{
+  //  width: 100px;
+  //  height: 30px;
+  //  border: 0;
+  //  color: #FFF;
+  //  background-color: #c98474;
+  //  -webkit-border-radius: 10px;
+  //  -moz-border-radius: 10px;
+  //  border-radius: 10px;
+  //  margin-bottom: 10px;
+  //  cursor: pointer;
+  //}
+  //.inputBox > div{
+  //  border: 1px solid #c98474;
+  //  padding: 10px;
+  //  -webkit-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
+  //  -moz-box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
+  //  box-shadow: 1px 1px 1px 1px rgba(0,0,0,.3);
+  //  background-color: #FFF;
+  //}
+  //.inputBox textarea{
+  //  width: 100%;
+  //  height: 300px;
+  //  margin-bottom: 10px;
+  //  resize: none;
+  //}
 </style>

@@ -1,9 +1,8 @@
 <template>
   <div id="Practice">
-    <div class="portfolioHead">
+    <div class="btns">
       <button @click="authClick()">
-        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-        <span>Write</span>
+        <i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i>
       </button>
     </div>
     <input-portfolio
@@ -83,33 +82,30 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.portfolioHead{
-  height: 55px;
-  padding: 10px;
-}
-.portfolioHead > button{
-  height: 35px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
-  padding: 0 20px;
-  cursor: pointer;
-  font-size: 14px;
-  border: 0;
-  color: #FFF;
-  background-color: #c98474;
-  left: 10px;
-  float: left;
-}
-.portfolioHead i{
-  margin-right: 5px;
-}
+<style scoped lang="scss">
 #Practice{
   max-width: 1080px;
   width: 100%;
   margin: 0 auto;
   padding-bottom: 20px;
+  .btns{
+    display: flex;
+    margin-top: 10px;
+    padding: 0 10px;
+    justify-content: end;
+    > button{
+      margin-left: 10px;
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      background-color: #FFF;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      border: 1px solid #c98474;
+    }
+  }
 }
 .ulPrac{
   overflow: auto;

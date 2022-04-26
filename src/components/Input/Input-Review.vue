@@ -4,9 +4,8 @@
       <div>
         <select ref="category">
           <option value="game">게임</option>
-          <option value="movie">영화&드라마</option>
-          <option value="book">책&음악</option>
-          <option value="etc">etc</option>
+          <option value="movie">문화</option>
+          <option value="etc">언박싱</option>
         </select>
       </div>
       <div>
@@ -103,7 +102,7 @@
   };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .inputReview{
     position: fixed;
     z-index: 6;
@@ -112,14 +111,14 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0,.5);
+    padding: 20px;
   }
   .inputReview > div{
     max-width: 1080px;
-    padding: 30px;
+    padding: 20px;
     max-height: 100%;
     top: 50%;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
+    border-radius: 8px;
     transform: translateY(-50%);
     position: relative;
     margin: 0 auto;
@@ -128,6 +127,19 @@
   }
   .inputReview > div > div:not(:last-child){
     margin-bottom: 10px;
+  }
+  .inputReview > div > div:last-child{
+    display: flex;
+    justify-content: space-between;
+    button{
+      width: 100px;
+      height: 40px;
+      border: 0;
+      color: #FFF;
+      background-color: #c98474;
+      border-radius: 20px;
+      cursor: pointer;
+    }
   }
   textarea{
     border: 1px solid #ddd;

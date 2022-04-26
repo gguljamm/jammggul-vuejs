@@ -2,6 +2,8 @@ import Firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import 'firebase/compat/storage';
+import 'firebase/compat/firestore';
+// import { getFirestore, addDoc, collection, query, where, getDocs, doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 
 /* eslint-disable */
 
@@ -14,15 +16,18 @@ export default {
       storage: (path) => {
         return Firebase.storage().ref(path);
       },
+      firestore: (path) => {
+        return Firebase.firestore().collection(path);
+      },
       login: async () => {
         const user = Firebase.auth().currentUser;
         let flag = false;
-        if (user && user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+        if (user && user.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2') {
           flag = true;
         } else {
           const provider = new Firebase.auth.GoogleAuthProvider();
           await Firebase.auth().signInWithPopup(provider).then((result) => {
-            if (result.user.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2') {
+            if (result.user.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2') {
               flag = true;
             } else {
               alert('나만 글쓸거야!!'); // eslint-disable-line
@@ -36,7 +41,7 @@ export default {
         return flag;
       },
       user: () => {
-        return Firebase.auth().currentUser && Firebase.auth().currentUser.uid === '6UbFoqLwRIdGulNFzs7VtkagKyC2';
+        return Firebase.auth().currentUser && Firebase.auth().currentUser.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2';
       },
       logout: () => {
         Firebase.auth().signOut().then(() => {

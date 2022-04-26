@@ -15,12 +15,12 @@ app.use(createPinia())
 app.component('loading', Loading);
 
 const config = {
-  apiKey: 'AIzaSyAqlLiycvD34mzlTSQN4aL_kaF9eXSITSk',
-  authDomain: 'jammggul.firebaseapp.com',
-  databaseURL: 'https://jammggul.firebaseio.com',
-  projectId: 'jammggul',
-  storageBucket: 'jammggul.appspot.com',
-  messagingSenderId: '1013193559148',
+  apiKey: "AIzaSyCl_3LNsOUZuIO5IBNo9EN0-Pf3SSRfUZM",
+  authDomain: "jammggul2.firebaseapp.com",
+  projectId: "jammggul2",
+  storageBucket: "jammggul2.appspot.com",
+  messagingSenderId: "81221003139",
+  appId: "1:81221003139:web:ea969345e03fc16c83f8b6"
 };
 
 Firebase.initializeApp(config);

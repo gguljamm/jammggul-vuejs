@@ -1,53 +1,51 @@
 <template>
 <div id="Daily">
   <div class="mainTitle">
-    <div v-if="itemsView.length > 0" class="filter">
-      <button @click="filterOpen=!filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i><span>{{ filterOption }}</span></button>
-      <div v-if="filterOpen">
-        <div class="monthSelector" @click.stop><div>
-          <span></span>
-          <div class="year">
-            <i class="fa fa-chevron-circle-left" aria-hidden="true"
-              v-bind:class="selectedYear > 2017 ? '' : 'disabled'"
-              @click="selectedYear > 2017 ? changeYear(false) : ''"
-            ></i>
-            {{ selectedYear }}
-            <i class="fa fa-chevron-circle-right" aria-hidden="true"
-              v-bind:class="selectedYear < nowYear ? '' : 'disabled'"
-              @click="selectedYear < nowYear ? changeYear(true) : ''"
-            ></i>
-          </div>
-          <ul>
-            <li
-              v-for="(month, index) in arrMonth"
-              v-bind:class="{
-                nonSelectable: month.num === 0,
-                selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
-              }"
-              @click="month.num > 0?monthClick(index):null"
-              >{{ month.text }}<span v-if="month.num > 0">{{ month.num }}</span>
-            </li>
-          </ul>
-          <div class="recent">
-            <button @click="filtering('recent')">Recently 20<i v-if="'Recent' === filterOption" class="fa fa-check"></i></button>
-          </div>
-        </div></div>
-        <div class="monthSelectorBack" @click="popClose"></div>
-      </div>
-    </div>
-    <div class="write">
+    <div class="btns">
+      <button v-if="itemsView.length > 0" @click="filterOpen = !filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
       <button @click="authClick">
-        <span v-if="!isAuth"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>Write</span></span>
-        <span v-else><i class="fa fa-minus-square-o" aria-hidden="true"></i> 접기</span>
+        <i v-if="!isAuth" class="fa fa-pencil" aria-hidden="true"></i>
+        <i v-else class="fa fa-times" aria-hidden="true"></i>
       </button>
     </div>
+    <div class="monthSelector" v-if="filterOpen">
+      <div @click.stop><div>
+        <span></span>
+        <div class="year">
+          <i class="fa fa-chevron-circle-left" aria-hidden="true"
+            v-bind:class="selectedYear > 2017 ? '' : 'disabled'"
+            @click="selectedYear > 2017 ? changeYear(false) : ''"
+          ></i>
+          {{ selectedYear }}
+          <i class="fa fa-chevron-circle-right" aria-hidden="true"
+            v-bind:class="selectedYear < nowYear ? '' : 'disabled'"
+            @click="selectedYear < nowYear ? changeYear(true) : ''"
+          ></i>
+        </div>
+        <ul>
+          <li
+            v-for="(month, index) in arrMonth"
+            v-bind:class="{
+              nonSelectable: !selectedMonthCount[index],
+              selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
+            }"
+            @click="selectedMonthCount[index] > 0 ? changeMonth(index) : null"
+            >{{ month }}<span v-if="selectedMonthCount[index]">{{ selectedMonthCount[index] }}</span>
+          </li>
+        </ul>
+        <div class="recent">
+          <button @click="changeRecent()">Recently 20<i v-if="'Recent' === filterOption" class="fa fa-check"></i></button>
+        </div>
+      </div></div>
+    </div>
+    <div class="monthSelectorBack" v-if="filterOpen" @click="filterOpen = false"></div>
   </div>
-  <input-box v-if="isAuth" v-bind:isMobile="isMobile" @reload="getData"></input-box>
+  <input-box v-if="isAuth" v-bind:isMobile="isMobile" @uploadComplete="uploadComplete"></input-box>
   <loading v-if="!loaded"></loading>
   <ul class="dailyList">
     <transition-group tag="div" name="component-fade" mode="out-in">
       <li
-        v-for="item, index in itemsView"
+        v-for="(item, index) in itemsView"
         v-bind:key="`${item.date}-${index}`"
         v-bind:class="item.isMore?'clickable':''"
         v-getHeight="{ item }">
@@ -56,18 +54,18 @@
               <div class="title">{{ item.date }}</div>
               <div class="content">
                 <div>
-                  <div><div v-for="line,key in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
+                  <div><div v-for="(line,key) in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
                   <span class="icons">
                     <i v-if="item.isMore&&item.isMore.indexOf('more')>=0" class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
-                    <span class="img_gif" v-if="item.imgUrl && item.imgUrl.indexOf('.gif')>=0">.gif</span>
-                    <i class="fa fa-picture-o" aria-hidden="true" v-else-if="item.imgUrl"></i>
+                    <span class="img_gif" v-if="item.imgUrl.join('').indexOf('.gif') >= 0">.gif</span>
+                    <i class="fa fa-picture-o" aria-hidden="true" v-else-if="item.imgUrl.length > 0"></i>
                   </span>
                   <div v-if="isLoaded(item.imgUrl, item.loaded)" class="imgLoader">
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
                   <transition-group name="component-fade" mode="out-in" tag="div" class="images">
-                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in itemList(item.imgUrl)" v-bind:key="url" v-bind:src="item.loaded?url:''">
+                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in item.imgUrl" v-bind:key="url" v-bind:src="item.loaded?url:''">
                   </transition-group>
                 </div>
               </div>
@@ -80,7 +78,165 @@
 </div>
 </template>
 
-<script>
+<script setup>
+import InputBox from './Input/Input-Daily.vue';
+import { ref, onMounted, getCurrentInstance, defineProps, computed } from 'vue';
+const app = getCurrentInstance()
+const $firebase = app.appContext.config.globalProperties.$firebase
+
+const itemsView = ref([]);
+const loaded = ref(false);
+const isLoaded = (a, b) => (a && !b);
+const selectedYear = ref(new Date().getFullYear());
+const nowYear = ref(new Date().getFullYear());
+const filterOpen = ref(false);
+const filterOption = ref('Recent');
+const objCount = ref({});
+const isAuth = ref(false);
+
+const props = defineProps({
+  isMobile: Boolean,
+});
+
+const getData = async () => {
+  isAuth.value = false;
+  let querySnapshot;
+  if (filterOption.value === 'Recent') {
+    querySnapshot = await $firebase.firestore('daily').orderBy('date', 'desc').limit(20).get()
+  } else {
+    const min = parseInt(`${filterOption.value.replace(/-/g, '')}01000000`);
+    const max = parseInt(`${filterOption.value.replace(/-/g, '')}31999999`);
+    querySnapshot = await $firebase.firestore('daily').where('date', '>=', min).where('date', '<=', max).orderBy('date').get();
+  }
+  itemsView.value = [];
+  loaded.value = false;
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    const d = doc.data();
+    const getDate = d.date.toString();
+    d.date = `${getDate.slice(0, 4)}-${getDate.slice(4, 6)}-${getDate.slice(6, 8)}`;
+    d.loaded = false;
+    if (d.imgUrl.length > 0) {
+      d.isMore = 'img';
+    } else {
+      d.isMore = false;
+    }
+    d.viewMore = false;
+    itemsView.value.push(d);
+  });
+  loaded.value = true;
+}
+
+const getCount = () => {
+  $firebase.firestore('daily-count').doc('0').get().then((snap) => {
+    objCount.value = snap.data();
+  });
+};
+
+const authClick = async () => {
+  if (isAuth.value) {
+    isAuth.value = false;
+    return;
+  }
+  isAuth.value = await $firebase.login();
+};
+
+const zeros = (n) => {
+  let zero = '';
+  let newN = n;
+  newN = n.toString();
+
+  if (newN.length < 2) {
+    for (let i = 0; i < 2 - newN.length; i += 1) {
+      zero += '0';
+    }
+  }
+  return zero + newN;
+}
+
+const arrMonth = ['JAN', 'FEB', 'MAR', 'AFR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const selectedMonthCount = computed(() => {
+  const arr = [];
+  for (let x = 1; x <= arrMonth.length; x += 1) {
+    arr.push(objCount.value[`${selectedYear.value}-${zeros(x)}`]);
+  }
+  return arr;
+});
+
+const changeYear = (acc) => {
+  if (acc) {
+    selectedYear.value += 1;
+  } else {
+    selectedYear.value -= 1;
+  }
+};
+
+const changeMonth = (index) => {
+  filterOpen.value = false;
+  filterOption.value = `${selectedYear.value}-${zeros(index + 1)}`;
+  getData();
+}
+
+const changeRecent = () => {
+  filterOpen.value = false;
+  filterOption.value = 'Recent';
+  getData();
+};
+
+const promiseLoading = (item, url) => {
+  return new Promise((resolve) => {
+    const loadImg = new Image();
+    loadImg.src = url;
+    loadImg.onload = () => {
+      resolve(true);
+    };
+  });
+};
+const listClick = (item) => {
+  if (!item.viewMore) {
+    for (let x = 0, leng = itemsView.value.length; x < leng; x += 1) {
+      itemsView.value[x].viewMore = false;
+    }
+    const arrPromise = [];
+    for (let y = 0; y < item.imgUrl.length; y += 1) {
+      arrPromise.push(promiseLoading(item, item.imgUrl[y]));
+    }
+    Promise.all(arrPromise).then(() => {
+      item.loaded = true;
+    });
+  }
+  item.viewMore = !item.viewMore;
+};
+
+const uploadComplete = async (ym) => {
+  await $firebase.firestore('daily-count').doc('0').update({
+    [ym]: objCount.value[ym] + 1,
+  })
+  objCount.value[ym] += 1;
+  getData();
+};
+
+onMounted(() => {
+  getData();
+  getCount();
+});
+
+const vGetHeight = {
+  inserted: (ele, value) => {
+    const val = value.value;
+    const height = ele.querySelector('.content > div > div').offsetHeight;
+    if (height > 120) {
+      if (val.item.isMore) {
+        val.item.isMore = 'img more';
+      } else {
+        val.item.isMore = 'more';
+      }
+    }
+  }
+};
+</script>
+
+<noscript>
   import InputBox from './Input/Input-Daily.vue';
 
   export default {
@@ -104,12 +260,6 @@
     },
     props: ['isMobile'],
     methods: {
-      itemList(i) {
-        if (!Array.isArray(i)) {
-          return [i];
-        }
-        return i;
-      },
       changeYear(flag) {
         if (flag) {
           this.selectedYear += 1;
@@ -131,42 +281,29 @@
         };
         this.filtering(obj);
       },
-      promiseImg(item, url) {
-        const thisItem = item;
-        return new Promise(() => {
+      promiseLoading(item, url) {
+        return new Promise((resolve) => {
           const loadImg = new Image();
           loadImg.src = url;
           loadImg.onload = () => {
-            thisItem.loaded = true;
+            resolve(true);
           };
         });
-      },
-      notPromiseImg(item, url) {
-        const thisItem = item;
-        const loadImg = new Image();
-        loadImg.src = url;
-        loadImg.onload = () => {
-          thisItem.loaded = true;
-        };
       },
       listClick(item) {
         if (!item.viewMore) {
           for (let x = 0, leng = this.itemsView.length; x < leng; x += 1) {
             this.itemsView[x].viewMore = false;
           }
-          if (item.imgUrl) {
-            if (Array.isArray(item.imgUrl)) {
-              const arrPromise = [];
-              for (let y = 0; y < item.imgUrl.length; y += 1) {
-                arrPromise.push(this.notPromiseImg(item, item.imgUrl[y]));
-              }
-            } else {
-              this.promiseImg(item, item.imgUrl);
-            }
+          const arrPromise = [];
+          for (let y = 0; y < item.imgUrl.length; y += 1) {
+            arrPromise.push(this.promiseLoading(item, item.imgUrl[y]));
           }
+          Promise.all(arrPromise).then(() => {
+            item.loaded = true;
+          });
         }
-        const item2 = item;
-        item2.viewMore = !item2.viewMore;
+        item.viewMore = !item.viewMore;
       },
       async authClick() {
         if (this.isAuth) {
@@ -219,21 +356,15 @@
       },
       getData() {
         this.isAuth = false;
-        this.$firebase.database('/daily')
-          .orderByChild('date')
-          .once('value')
-          .then((data) => {
-            data.forEach((key) => {
-              const resp = key.val();
+        this.$firebase.firestore('daily').get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              // doc.data() is never undefined for query doc snapshots
+              const resp = doc.data();
               const getDate = resp.date.toString();
-              let newDate = getDate.slice(0, 4);
-              newDate += '-';
-              newDate += getDate.slice(4, 6);
-              newDate += '-';
-              newDate += getDate.slice(6, 8);
-              resp.date = newDate;
+              resp.date = `${getDate.slice(0, 4)}-${getDate.slice(4, 6)}-${getDate.slice(6, 8)}`;
               resp.loaded = false;
-              if (resp.imgUrl) {
+              if (resp.imgUrl.length > 0) {
                 resp.isMore = 'img';
               } else {
                 resp.isMore = false;
@@ -259,12 +390,56 @@
             }
             this.filtering('recent');
             this.loaded = true;
+          })
+          .catch((error) => {
+            console.log("Error getting documents: ", error);
           });
+        // this.$firebase.database('/daily')
+        //   .orderByChild('date')
+        //   .once('value')
+        //   .then((data) => {
+        //     data.forEach((key) => {
+        //       const resp = key.val();
+        //       const getDate = resp.date.toString();
+        //       let newDate = getDate.slice(0, 4);
+        //       newDate += '-';
+        //       newDate += getDate.slice(4, 6);
+        //       newDate += '-';
+        //       newDate += getDate.slice(6, 8);
+        //       resp.date = newDate;
+        //       resp.loaded = false;
+        //       if (resp.imgUrl) {
+        //         resp.isMore = 'img';
+        //       } else {
+        //         resp.isMore = false;
+        //       }
+        //       resp.viewMore = false;
+        //       this.items.push(resp);
+        //       const year = resp.date.slice(0, 4);
+        //       const month = parseInt(resp.date.slice(5, 7), 10);
+        //       if (this.itemsLength[year]) {
+        //         if (this.itemsLength[year][month]) {
+        //           this.itemsLength[year][month].push(resp);
+        //         } else {
+        //           this.itemsLength[year][month] = [resp];
+        //         }
+        //       } else {
+        //         this.itemsLength[year] = {};
+        //         this.itemsLength[year][month] = [resp];
+        //       }
+        //     });
+        //     if (!this.itemsLength[this.nowYear]) {
+        //       this.nowYear -= 1;
+        //       this.selectedYear -= 1;
+        //     }
+        //     this.filtering('recent');
+        //     this.loaded = true;
+        //   });
       },
     },
-    mounted() {
-      this.getData();
-    },
+    // mounted() {
+    //   this.getData();
+    // },
     directives: {
       getHeight: {
         inserted: (ele, value) => {
@@ -281,38 +456,32 @@
       },
     },
   };
-</script>
+</noscript>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
   #Daily{
     max-width: 1080px;
     width: 100%;
     margin: 0 auto;
-  }
-  .mainTitle{
-    position: relative;
-    height: 55px;
-    padding: 0 10px;
-  }
-  .mainTitle > div{
-    margin-top: 10px;
-    top: 0;
-  }
-  .mainTitle > div > button{
-    height: 35px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    padding: 0 20px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .mainTitle > div.filter{
-    float: right;
-  }
-  .mainTitle > div.write{
-    float: left;
+    .mainTitle .btns{
+      display: flex;
+      margin-top: 10px;
+      padding: 0 10px;
+      justify-content: end;
+      > button{
+        margin-left: 10px;
+        padding: 0;
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 16px;
+        background-color: #FFF;
+        box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+        border: 1px solid #c98474;
+      }
+    }
   }
   .filter > button{
     border: 1px solid #a7d2cb;
@@ -449,41 +618,45 @@
     background-color: rgba(0,0,0,.3);
   }
   .monthSelector{
-    z-index: 14;
-    position: absolute;
-    top: 55px;
-    right: 0;
-    text-align: center;
-    font-family: 'Baloo Bhaijaan', sans-serif;
-    padding: 0 20px;
-  }
-  .monthSelector > div{
-    border-radius: 8px;
-    background-color: #FFF;
-    width: 380px;
-    border: 1px solid #d7d8d9;
-    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
-  }
-  .monthSelector > div > span{
-    position: absolute;
-    right: 30px;
-    top: -15px;
-    width: 0;
-    height: 0;
-    border-right: 11px solid transparent;
-    border-left: 11px solid transparent;
-    border-bottom: 15px solid rgba(0,0,0,.01);
-  }
-  .monthSelector > div > span:before{
-    position: absolute;
-    content: '';
-    top: 2px;
-    left: -25px;
-    width: 0;
-    height: 0;
-    border-right: 10px solid transparent;
-    border-left: 10px solid transparent;
-    border-bottom: 14px solid #FFF;
+    position: relative;
+    > div{
+      z-index: 14;
+      position: absolute;
+      top: 15px;
+      right: 0;
+      text-align: center;
+      font-family: 'Baloo Bhaijaan', sans-serif;
+      padding: 0 20px;
+      > div{
+        border-radius: 8px;
+        background-color: #FFF;
+        max-width: 380px;
+        width: 100%;
+        border: 1px solid #d7d8d9;
+        box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+        > span{
+          position: absolute;
+          right: 55px;
+          top: -15px;
+          width: 0;
+          height: 0;
+          border-right: 11px solid transparent;
+          border-left: 11px solid transparent;
+          border-bottom: 15px solid rgba(0,0,0,.01);
+          &:before{
+            position: absolute;
+            content: '';
+            top: 2px;
+            left: -25px;
+            width: 0;
+            height: 0;
+            border-right: 10px solid transparent;
+            border-left: 10px solid transparent;
+            border-bottom: 14px solid #FFF;
+          }
+        }
+      }
+    }
   }
   .monthSelector .year{
     width: 100%;

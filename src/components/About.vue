@@ -33,7 +33,11 @@ export default {
   props: ['sun'],
   methods: {
     logout() {
-      this.$firebase.logout();
+      if (this.$firebase.user()) {
+        this.$firebase.logout();
+      } else {
+        this.$firebase.login();
+      }
     },
   },
   setup() {
