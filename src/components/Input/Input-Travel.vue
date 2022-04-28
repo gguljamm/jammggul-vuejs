@@ -24,6 +24,7 @@
     props: ['isMobile'],
     methods: {
       submit() {
+        this.store.setLoading(true);
         const file = this.$refs.thumbnail.files;
         if (file && file.length > 0) {
           this.resizeImage(file[0]);
@@ -83,13 +84,14 @@
         });
       },
       upload(url) {
-        this.$firebase.database('/travel').push({
+        this.$firebase.firestore('travel').add({
           country: this.$refs.country.value,
           tags: this.$refs.tags.value,
           dates: this.$refs.dates.value,
           description: this.$refs.description.value,
           thumbnail: url ? this.arrImgUrl : '',
         }).then(() => {
+          this.store.setLoading(false);
           alert('포스팅 성공!'); // eslint-disable-line
           this.$emit('reload');
         });

@@ -1342,14 +1342,14 @@
       "category": "dev",
       "content": "기존 vue.js 프로젝트에 tdd적용\n\n1. Action 분리하기\n\n제가 개발한 환경은 vue-cli로 기본 환경을 설정하였고 store폴더에 vuex 관련 설정을 하였었습니다.\n아래 코드와 같이 기능에 따라서 module들을 분리해서 구성을 했었고 하나의 module 안에 state, mutations, actions, getters를 모두 담은 구조로 개발해놓은 상태였었습니다.\n#img#\n이런 형태로요 그런데…\nAction을 Unit Test하는 방법을 찾아보니 Action들을 테스트하기 위해서는 모듈에서 별도의 파일로 분리되어 있어야 테스트 코드에서 Action들만 inject-loader로 삽입하여 활용하기가 용이한것을 알 수 있었습니다. 그래서 아래 구조와 같이 하나의 모듈은 한 폴더에 담고 actions 파일만 따로 분리하였습니다. 파일을 분리하는 방법은 각자가 사용하기 편한 스타일로 하면 될것 같습니다.\n#img##img##img#\n2. API 함수화 하기\n\n여기까지는 뭐 모듈 파일들이 그리 많지 않으니 이렇게 구조 바꿔도 괜찮겠구나 생각했습니다…\n또 그런데… 각 Action들에 심어져 있는 axios로 API를 호출하는 부분들을 별도로 함수화 해서 정리해주는 것이 필요했습니다.\n이부분에서 느꼈던 것이 아직 개발 경험이 많이 없다 보니 구글에서 검색하면 나오는 자료들을 바탕으로 개발하며 일하다보니 내가 잘하고 있는 건가 하는 의문이 있었는데 그렇지 못하다는 것을 알 수 있었습니다. 그냥 봐왔던 예제들이 거의다 axios.get(), axios.post() 요런 형태들로 직접 호출하는것만 봐왔지 이부분을 분리해서 관리할 수 있겠구나 하는 생각은 해보지 못했었습니다. Action을 Unit Test하는 자료들을 보니 대부분이 API 호출 부분을 분리해서 관리할 수 있구나 하는 것을 알 수 있었습니다.\n그래서 Action들 내의 axios 를 활용한 API 호출 관련 코드들을 아래와 같이 별도의 함수로 분리하였습니다.\n#img##img##img#\n이제 Unit Test를 해봅시다\n\n위에 설명드린 것과 같이 코드를 구성해놓으면 이제 하나의 Action을 Unit Test 해볼 수 있습니다. api들을 모두 함수화해 놓으면 다른 Action들도 테스트가 가능할것이구요.\n\n관련문서: #url#https://vuex.vuejs.org/kr/testing.html#url#Vuex Testing#url#\n\n1. Action helper\n\n먼저 문서를 확인해보면 비동기 Action을 테스트하기 위해서는 helper 함수가 필요합니다. helper 함수는 대부분 Action을 사용할 때 어떤 작업을 마치고 난 이후에 Mutation으로 State에 값을 저장하는 일들을 하기 때문에 실행할 Mutation을 인자로 받아서 실제 Action처럼 동작할 수 있도록 해주는 부분 입니다. 저는 아래와 같은 구조로 구성해놓았습니다.\n#img##img#\n2. Mock 환경 구성하기\n\n그리고 api 실행을 할 때 일정한 요청으로 하더라도 DB에 값이 변한다면 응답 값이 바뀔수도 있기 때문에 api 요청에 대한 일정한 응답을 할 수 있도록 Mock 환경을 구성해주어야 합니다.\n\n관련문서:#url#https://github.com/ctimmerm/axios-mock-adapter#url#axios-mock-adapter#url#\n\n여기에서 아래와 같이 axios-mock-adapter를 활용합니다. axios-mock-adapter 자세한 활용 방법은 위에 링크를 확인해보시기 바랍니다.\n#img#\n3. 진짜 막판왕 테스트 코드…\n\n여기까지 모든 환경구성이 완료가 되었으면 Action을 Unit Test를 하기 위한 준비가 끝났습니다.\n\n이제 테스트 코드를 작성하면 됩니다.\n#img#\n테스트 코드에서 위에 설정된 부분들을 구성하기 위해서 앞서 설명드린 환경 구성을 하였습니다.\n그리고 테스트 코드를 작성할 때는 헬퍼 함수인 testAction을 활용합니다. 테스트 할 Action, Action에 전달하는 값들, State, 사용될 Mutation과 예상되는 결과 값을 인자로 넣어주면 테스트 코드가 완료 됩니다.\n그러면 대망의 테스트 결과를 확인하실수 있을 것입니다.\n#img#\n\n참조url: #url#https://hanwong.github.io/2017/09/23/vuex-actions-unit-test/#url#뉴스잴리 김한웅 개발자님 블로그#url#",
       "imgUrl": [
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F1.JPG?alt=media&token=5b0e7abb-b8f6-4673-86ae-a221d1a2fde4",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F2.JPG?alt=media&token=3142c32e-8761-45f6-aa0f-0388ef67d0bc",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F3.JPG?alt=media&token=8f4aff60-a96c-41bc-a3a5-9ea0586f4398",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F4.JPG?alt=media&token=347e8e83-07b1-4cec-88c1-27bc46a5f01c",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F5.JPG?alt=media&token=10225cce-d79f-4a91-a9b7-4f8514c6b268",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F6.JPG?alt=media&token=32c38ecb-c0a4-4a50-b76c-2334bee8d68d",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F7.JPG?alt=media&token=8faff065-dd4d-4598-bc3b-2971e774cd29",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F8.JPG?alt=media&token=2293029c-3ceb-46db-a860-c69e7b12e173",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_1.png?alt=media&token=d2547542-90ca-4ad2-a305-9a36581d5d15",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_2.png?alt=media&token=167a8d62-80a6-4902-9884-7cd7817c0036",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_3.png?alt=media&token=6ac0d4dc-3d8f-4bed-b9f5-3f7ddd831f45",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_4.png?alt=media&token=ac40c7e0-9eb9-4b39-a58f-de13f828fc26",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_5.png?alt=media&token=07c22d8c-52f1-4abe-a3ed-827979ce1a65",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_6.png?alt=media&token=a4544036-0704-4019-8c0e-35206bda5cb3",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_7.png?alt=media&token=01089f16-1a0e-4609-b77d-b0bc7f4659b8",
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F123_8.png?alt=media&token=934ca396-f40a-41c8-8f51-9ec69895929b",
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F9.JPG?alt=media&token=9b7d0e3f-6db7-40a8-8927-5751f1f94a09",
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F10.JPG?alt=media&token=ad49dc04-76e6-4b9a-8691-4862fad30e48",
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/it-info%2F11.JPG?alt=media&token=ac4a4e62-bd77-4745-a8e0-4ee9c0c93183",
@@ -1538,7 +1538,7 @@
           "percent": "100"
         }
       ],
-      "date": "2015-01 ~ ",
+      "date": "2015-01 ~ 2018-10",
       "spec": [
         "HTML5",
         "CSS5",
@@ -1567,7 +1567,7 @@
           "percent": "10"
         }
       ],
-      "date": "2015-01 ~ ",
+      "date": "2015-01 ~ 2018-10",
       "operate": [
         {
           "name": "SITE",
@@ -1884,8 +1884,7 @@
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2FKakaoTalk_20171122_112728924.jpg?alt=media&token=9f867d19-f92e-4cfb-a42a-bb96fe9562a0",
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2FKakaoTalk_20171122_112728632.jpg?alt=media&token=91f4d7f6-11df-4aff-ad28-fde4f022842a",
         "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2FKakaoTalk_20171122_112728355.jpg?alt=media&token=d1f61b7e-81cd-4c7e-93b1-8b017f25912a",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2FKakaoTalk_20171122_112728010.jpg?alt=media&token=97527b2e-ac91-442b-84c1-e14a7220ae80",
-        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2F%EC%BA%A1%EC%B2%98.JPG?alt=media&token=cee10074-d0fc-4a85-8f5f-ffe8a504cafa"
+        "https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/review%2FKakaoTalk_20171122_112728010.jpg?alt=media&token=97527b2e-ac91-442b-84c1-e14a7220ae80"
       ],
       "title": "Sades SA-903 Stereo Gaming Headset"
     },

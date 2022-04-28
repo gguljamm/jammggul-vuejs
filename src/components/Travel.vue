@@ -47,71 +47,69 @@
 </div>
 </template>
 
-<script>
-  import InputTravel from './Input/Input-Travel.vue';
+<script setup>
+import { ref, onMounted, getCurrentInstance, computed } from 'vue';
+const app = getCurrentInstance()
+const $firebase = app.appContext.config.globalProperties.$firebase
+import InputTravel from './Input/Input-Travel.vue';
 
-  export default {
-    components: {
-      InputTravel,
-    },
-    props: ['isMobile'],
-    name: 'travel',
-    methods: {
-      closePop(flag) {
-        if (flag === 'direct' || confirm('정말 그만쓸거야?')) {
-          this.popOpen = false;
-          this.isAuth = false;
-        }
-      },
-      async authClick(tag) {
-        if (this.isAuth) {
-          this.isAuth = false;
-          return;
-        }
-        this.isAuth = await this.$firebase.login();
-        if (this.isAuth) {
-          this.writePopOpen(tag);
-        }
-      },
-      writePopOpen(flag) {
-        this.popOpen = true;
-        this.buttonPop = false;
-        this.popFlag = flag;
-      },
-      travelPopClick() {
-        this.popOpen = true;
-        this.popFlag = 'travelPop';
-      },
-      getData() {
-        this.closePop('direct');
-        this.$firebase.database('/travel').once('value', (snap) => {
-          const list = snap.val();
-          Object.keys(list).reverse().forEach((x) => {
-            const content = {
-              country: list[x].country,
-              tags: list[x].tags.split(','),
-              dates: list[x].dates,
-              description: list[x].description,
-              thumbnail: list[x].thumbnail,
-            };
-            this.travelArray.push(content);
-          });
-        });
-      },
-    },
-    data() {
-      return {
-        buttonPop: false,
-        popOpen: false,
-        popFlag: '',
-        travelArray: [],
-        isAuth: false,
+const props = defineProps(['isMobile']);
+
+const buttonPop = ref(false);
+const popOpen = ref(false);
+const popFlag = ref('');
+const travelArray = ref([]);
+const isAuth = ref(false);
+
+const closePop = (flag) => {
+  if (flag === 'direct' || confirm('정말 그만 쓸거야?')) {
+    popOpen.value = false;
+    isAuth.value = false;
+  }
+};
+
+const authClick = async (tag) => {
+  if (isAuth.value) {
+    isAuth.value = false;
+    return;
+  }
+  isAuth.value = await $firebase.login();
+  if (isAuth.value) {
+    writePopOpen(tag);
+  }
+};
+
+const writePopOpen = (tag) => {
+  popOpen.value = true;
+  buttonPop.value = false;
+  popFlag.value = tag;
+};
+
+const travelPopClick = () => {
+  popOpen.value = true;
+  popFlag.value = 'travelPop';
+};
+
+const getData = () => {
+  closePop('direct');
+  $firebase.firestore('travel').orderBy('date', 'desc').get().then((querySnapshot) => {
+    querySnapshot.docs.forEach((x) => {
+      const data = x.data();
+      const content = {
+        country: data.country,
+        tags: data.tags.split(','),
+        dates: data.dates,
+        description: data.description,
+        thumbnail: data.thumbnail,
       };
-    },
-    mounted() {
-      this.getData();
-    },
-  };
+      travelArray.value.push(content);
+    });
+  });
+};
+
+onMounted(() => {
+  getData();
+});
 </script>
 
 <style scoped lang="scss">

@@ -75,6 +75,7 @@ export default {
   props: ['isMobile'],
   methods: {
     submit() {
+      this.store.setLoading(true);
       const file = this.$refs.thumbnail.files;
       if (file && file.length > 0) {
         this.resizeImage(file[0]);
@@ -134,7 +135,7 @@ export default {
       });
     },
     upload(url) {
-      this.$firebase.database('/portfolio').push({
+      this.$firebase.firestore('dev-portfolio').add({
         title: this.title,
         spec: this.spec.map(v => v.name).filter(v => v),
         date: this.date,
@@ -142,6 +143,7 @@ export default {
         operate: this.operate.filter(v => v.url && v.name),
         thumbnail: url ? this.arrImgUrl : '',
       }).then(() => {
+        this.store.setLoading(false);
         alert('포스팅 성공!'); // eslint-disable-line
         this.$emit('reload');
       });

@@ -16,8 +16,8 @@
     <div class="category" v-bind:class="categoryOpen?'opened':''">
       <div class="categoryHead">
         <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">game</button>
-        <button @click="changeCategory('movie')" v-bind:class="viewCategory==='movie'?'selected':''">culture</button>
-        <button @click="changeCategory('etc')" v-bind:class="viewCategory==='etc'?'selected':''">unboxing</button>
+        <button @click="changeCategory('culture')" v-bind:class="viewCategory==='culture'?'selected':''">culture</button>
+        <button @click="changeCategory('unboxing')" v-bind:class="viewCategory==='unboxing'?'selected':''">unboxing</button>
       </div>
       <div class="categoryContent">
         <ul>
@@ -62,17 +62,7 @@
     props: ['isMobile'],
     name: 'Review',
     data() {
-      let initTab;
-      switch (location.pathname.split('/')[location.pathname.split('/').length - 1]) {
-        case 'unboxing':
-          initTab = 'etc';
-          break;
-        case 'game':
-          initTab = 'game';
-          break;
-        default:
-          initTab = 'movie';
-      }
+      let initTab = location.pathname.split('/').pop();
       return {
         categoryOpen: false,
         selectedNum: 0,
@@ -80,9 +70,8 @@
         viewCategory: initTab,
         reviewInfo: {
           game: [],
-          book: [],
-          movie: [],
-          etc: [],
+          culture: [],
+          unboxing: [],
         },
         viewSubPaging: 1,
         viewList: [],
@@ -130,26 +119,16 @@
       },
       getData() {
         this.isAuth = false;
-        this.$firebase.database('/review').once('value', (snap) => {
-          const list = snap.val();
-          const keys = Object.keys(list);
-          const latestKey = keys[keys.length - 1];
-          keys.reverse().forEach((x) => {
+        this.$firebase.firestore('review').orderBy('date', 'desc').get().then((querySnapshot) => {
+          querySnapshot.docs.forEach((x) => {
+            const data = x.data();
             const content = {
-              content: list[x].content,
-              title: list[x].title,
-              imgUrl: list[x].imgUrl,
+              content: data.content,
+              title: data.title,
+              imgUrl: data.imgUrl,
             };
-            if (list[x].category === 'book') {
-              this.reviewInfo['movie'].push(content);
-            } else {
-              this.reviewInfo[list[x].category].push(content);
-            }
-            // if (x === latestKey) {
-            //   this.selectedCategory = list[x].category;
-            //   this.viewCategory = list[x].category;
-            //   this.selectedNum = this.reviewInfo[list[x].category].length - 1;
-            // }
+            console.log(data.category);
+            this.reviewInfo[data.category].push(content);
           });
         });
       },

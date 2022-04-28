@@ -11,7 +11,7 @@
       </div>
       <textarea ref="textArea" title="textArea"></textarea>
       <div class="btns">
-        <input id="ImgArea" type="file" v-bind:multiple="!isMobile">
+        <input id="ImgArea" type="file" multiple>
         <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
       </div>
     </div>
@@ -20,17 +20,22 @@
 
 <script>
   import LoadImage from 'blueimp-load-image';
+  import dayjs from "dayjs";
+  import { useStore } from "../../stores";
 
   export default {
     name: 'input-it',
     data() {
+      const store = useStore();
       return {
         arrImgUrl: [],
+        store,
       };
     },
     props: ['isMobile'],
     methods: {
       submit() {
+        this.store.setLoading(true);
         const file = document.getElementById('ImgArea').files;
         if (file && file.length > 0) {
           for (let x = 0; x < file.length; x += 1) {
@@ -42,7 +47,7 @@
         }
       },
       submitImage(file, resizedImage, index) {
-        const name = `it-info/${file.name}`;
+        const name = `dev-blog/${dayjs().format('YYYYMMDDHHmmssSSS')}.${file.type.split('/')[1]}`;
         const uploadTask = this.$firebase.storage(name).put(resizedImage);
         uploadTask.on('state_changed', () => {}, () => {}, () => {
           uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
@@ -106,11 +111,13 @@
       upload(url) {
         const text = this.$refs.textArea.value;
         const thisCategory = this.$refs.category.value;
-        this.$firebase.database('/it-info').push({
+        this.$firebase.firestore('dev-blog').add({
           category: thisCategory,
           content: text,
-          imgUrl: url ? this.arrImgUrl : '',
+          imgUrl: url ? this.arrImgUrl : [],
+          date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
         }).then(() => {
+          this.store.setLoading(false);
           alert('포스팅 성공!'); // eslint-disable-line
           this.$emit('reload');
         });

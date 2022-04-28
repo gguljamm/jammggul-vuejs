@@ -45,26 +45,46 @@ export default {
     getData() {
       this.list = [];
       this.isAuth = false;
-      this.$firebase.database('/portfolio').once('value', (snap) => {
-        const list = snap.val();
-        const keys = Object.values(list);
-        keys.reverse().forEach((x) => {
-          const content = {
-            title: x.title,
-            thumbnail: x.thumbnail,
-            spec: x.spec,
-            date: x.date,
-            url: x.operate ? x.operate.map(v => ({
+      // this.$firebase.database('/portfolio').once('value', (snap) => {
+      //   const list = snap.val();
+      //   const keys = Object.values(list);
+      //   keys.reverse().forEach((x) => {
+      //     const content = {
+      //       title: x.title,
+      //       thumbnail: x.thumbnail,
+      //       spec: x.spec,
+      //       date: x.date,
+      //       url: x.operate ? x.operate.map(v => ({
+      //         name: v.name,
+      //         clickEvent: v.url,
+      //       })) : [],
+      //       participate: x.contribute ? x.contribute.map(v => ({
+      //         title: v.name,
+      //         width: 0,
+      //         rate: v.percent,
+      //       })) : [],
+      //     };
+      //     this.list.push(content);
+      //   });
+      // });
+      this.$firebase.firestore('dev-portfolio').orderBy('date', 'desc').get().then(async (querySnapshot) => {
+        querySnapshot.docs.forEach((x, index) => {
+          const data = x.data();
+          this.list.push({
+            title: data.title,
+            thumbnail: data.thumbnail,
+            spec: data.spec,
+            date: data.date,
+            url: data.operate ? data.operate.map(v => ({
               name: v.name,
               clickEvent: v.url,
             })) : [],
-            participate: x.contribute ? x.contribute.map(v => ({
+            participate: data.contribute ? data.contribute.map(v => ({
               title: v.name,
               width: 0,
               rate: v.percent,
             })) : [],
-          };
-          this.list.push(content);
+          })
         });
       });
     },

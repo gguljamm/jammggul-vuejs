@@ -203,20 +203,19 @@
       },
       getData() {
         this.isAuth = false;
-        this.$firebase.database('/it-info')
-          .once('value', (snap) => {
-            const list = snap.val();
-            Object.keys(list).reverse().forEach((x, index) => {
-              const content = { content: list[x].content, imgUrl: list[x].imgUrl };
-              if (this.objList[list[x].category]) {
-                this.objList[list[x].category].push(content);
-              }
-              if (index < 20) {
-                this.objList.recent.push(content);
-              }
-            });
-            this.changeIndex(this.selectIndex);
+        this.$firebase.firestore('dev-blog').orderBy('date', 'desc').get().then(async (querySnapshot) => {
+          querySnapshot.docs.forEach((x, index) => {
+            const data = x.data();
+            const content = { content: data.content, imgUrl: data.imgUrl };
+            if (this.objList[data.category]) {
+              this.objList[data.category].push(content);
+            }
+            if (index < 20) {
+              this.objList.recent.push(content);
+            }
           });
+          this.changeIndex(this.selectIndex);
+        })
       },
     },
     mounted() {

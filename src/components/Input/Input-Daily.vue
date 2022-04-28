@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, getCurrentInstance, defineEmits } from 'vue';
+import { ref, getCurrentInstance } from 'vue';
 import dayjs from "dayjs";
 import { useStore } from '../../stores';
 

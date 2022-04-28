@@ -24,6 +24,7 @@
 
 <script>
   import LoadImage from 'blueimp-load-image';
+  import dayjs from 'dayjs';
 
   export default {
     data() {
@@ -33,12 +34,15 @@
     },
     methods: {
       submit() {
-        this.$firebase.database('/review').push({
+        this.store.setLoading(true);
+        this.$firebase.firestore('review').add({
           category: this.$refs.category.value,
           title: this.$refs.title.value,
           content: this.$refs.content.value,
           imgUrl: this.arrImg,
+          date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
         }).then(() => {
+          this.store.setLoading(false);
           alert('포스팅 성공!'); // eslint-disable-line
           this.$emit('reload');
         });
