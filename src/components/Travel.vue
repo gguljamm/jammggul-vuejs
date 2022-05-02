@@ -7,7 +7,7 @@
     <ul class="travelList">
       <li v-for="list in travelArray" @click="travelPopClick">
         <div>
-          <img v-bind:src="list.thumbnail || 'https://firebasestorage.googleapis.com/v0/b/jammggul.appspot.com/o/thumbnail.jpg?alt=media&token=e46035b1-12c7-445e-9a89-6af32e90daa2'">
+          <img v-bind:src="list.thumbnail || thumbnail">
         </div>
         <div>
           <div class="county">{{ list.country }} <span class="dates">( {{ list.dates }} )</span></div>
@@ -48,6 +48,7 @@
 </template>
 
 <script setup>
+import thumbnail from '../assets/images/thumbnail.jpg';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase

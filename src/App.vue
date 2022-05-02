@@ -56,7 +56,6 @@ import DevRetrospect from './components/Dev/Retrospect.vue';
 import Travel from './components/Travel.vue';
 import Daily from './components/Daily.vue';
 import Review from './components/Review.vue';
-import Test from './components/Test.vue';
 import FullLoading from './components/FullLoading.vue';
 import './assets/lib/sun.js';
 import { useStore } from './stores';
@@ -72,7 +71,6 @@ export default {
     DevBlog,
     DevRetrospect,
     Travel,
-    Test,
     FullLoading,
   },
   setup() {

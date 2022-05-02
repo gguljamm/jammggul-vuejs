@@ -48,7 +48,7 @@
         v-for="(item, index) in itemsView"
         v-bind:key="`${item.date}-${index}`"
         v-bind:class="item.isMore?'clickable':''"
-        v-getHeight="{ item }">
+        v-get-height="{ item }">
           <div class="dailyBox" v-bind:class="item.viewMore?'selected':''" @click="item.isMore?listClick(item):''">
             <div>
               <div class="title">{{ item.date }}</div>
@@ -222,7 +222,7 @@ onMounted(() => {
 });
 
 const vGetHeight = {
-  inserted: (ele, value) => {
+  mounted: (ele, value) => {
     const val = value.value;
     const height = ele.querySelector('.content > div > div').offsetHeight;
     if (height > 120) {

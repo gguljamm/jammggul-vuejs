@@ -74,7 +74,7 @@ export default {
             title: data.title,
             thumbnail: data.thumbnail,
             spec: data.spec,
-            date: data.date,
+            date: data.dates,
             url: data.operate ? data.operate.map(v => ({
               name: v.name,
               clickEvent: v.url,
