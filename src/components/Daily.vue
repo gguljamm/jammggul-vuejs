@@ -40,16 +40,20 @@
     </div>
     <div class="monthSelectorBack" v-if="filterOpen" @click="filterOpen = false"></div>
   </div>
-  <input-box v-if="isAuth" v-bind:isMobile="isMobile" @uploadComplete="uploadComplete"></input-box>
+  <input-box v-if="isAuth" :isMobile="isMobile" :editData="editData" @uploadComplete="uploadComplete" :key="editData ? editData.id : ''"></input-box>
   <loading v-if="!loaded"></loading>
   <ul class="dailyList">
     <transition-group tag="div" name="component-fade" mode="out-in">
       <li
         v-for="(item, index) in itemsView"
-        v-bind:key="`${item.date}-${index}`"
-        v-bind:class="item.isMore?'clickable':''"
+        :key="`${item.date}-${index}`"
+        :class="item.isMore?'clickable':''"
         v-get-height="{ item }">
-          <div class="dailyBox" v-bind:class="item.viewMore?'selected':''" @click="item.isMore?listClick(item):''">
+          <div
+            class="dailyBox"
+            v-bind:class="item.viewMore?'selected':''"
+            @click="isAuth ? edit(item) : listClick(item)"
+          >
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
@@ -93,6 +97,7 @@ const filterOpen = ref(false);
 const filterOption = ref('Recent');
 const objCount = ref({});
 const isAuth = ref(false);
+const editData = ref(null);
 
 const props = defineProps({
   isMobile: Boolean,
@@ -100,6 +105,7 @@ const props = defineProps({
 
 const getData = async () => {
   isAuth.value = false;
+  editData.value = null;
   let querySnapshot;
   if (filterOption.value === 'Recent') {
     querySnapshot = await $firebase.firestore('daily').orderBy('date', 'desc').limit(20).get()
@@ -122,6 +128,7 @@ const getData = async () => {
       d.isMore = false;
     }
     d.viewMore = false;
+    d.id = doc.id;
     itemsView.value.push(d);
   });
   loaded.value = true;
@@ -136,6 +143,7 @@ const getCount = () => {
 const authClick = async () => {
   if (isAuth.value) {
     isAuth.value = false;
+    editData.value = null;
     return;
   }
   isAuth.value = await $firebase.login();
@@ -193,6 +201,9 @@ const promiseLoading = (item, url) => {
   });
 };
 const listClick = (item) => {
+  if (!item.isMore) {
+    return;
+  }
   if (!item.viewMore) {
     for (let x = 0, leng = itemsView.value.length; x < leng; x += 1) {
       itemsView.value[x].viewMore = false;
@@ -208,12 +219,29 @@ const listClick = (item) => {
   item.viewMore = !item.viewMore;
 };
 
-const uploadComplete = async (ym) => {
-  await $firebase.firestore('daily-count').doc('0').update({
-    [ym]: objCount.value[ym] + 1,
-  })
-  objCount.value[ym] += 1;
+const uploadComplete = async (ym, del) => {
+  if (ym) {
+    const v = del ? (objCount.value[ym] || 0) - 1 : (objCount.value[ym] || 0) + 1;
+    await $firebase.firestore('daily-count').doc('0').update({
+      [ym]: v,
+    })
+    objCount.value[ym] = v;
+  }
   getData();
+};
+
+const edit = async (e) => {
+  editData.value = {
+    id: e.id,
+    data: {
+      arrImage: e.imgUrl,
+      text: e.content,
+      isSecure: e.isSecure,
+      date: e.date,
+    },
+  };
+  isAuth.value = true;
+  window.scrollTo(0, 0);
 };
 
 onMounted(() => {

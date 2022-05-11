@@ -3,13 +3,13 @@
     <div class="btns">
       <button @click="authClick"><i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i></button>
     </div>
-    <input-retrospect v-if="isAuth" v-bind:isMobile="isMobile" @uploadComplete="getData"></input-retrospect>
+    <input-retrospect v-if="isAuth" v-bind:isMobile="isMobile" @uploadComplete="getData" :editData="editData" :key="editData ? editData.id : ''"></input-retrospect>
     <loading v-if="!loaded"></loading>
     <ul>
-      <li v-for="x in itemsView">
+      <li v-for="x in itemsView" @click="isAuth ? edit(x) : ''">
         <div>{{ `${x.date}`.substring(0, 4) }}년 {{ `${x.date}`.substring(4, 5) }}분기</div>
         <div>
-          <div v-for="x in x.content.split('\n')">{{ x }}<br></div>
+          <div v-for="x in x.content.split('\n')" :class="{ strong: x.indexOf('#') === 0 }">{{ x }}<br></div>
         </div>
       </li>
     </ul>
@@ -29,6 +29,7 @@ const itemsView = ref([]);
 const authClick = async () => {
   if (isAuth.value) {
     isAuth.value = false;
+    editData.value = null;
     return;
   }
   isAuth.value = await $firebase.login();
@@ -41,21 +42,33 @@ const props = defineProps({
 const getData = async () => {
   isAuth.value = false;
   loaded.value = false;
-  const querySnapshot = await $firebase.firestore('dev-retrospect').get()
+  editData.value = null;
+  itemsView.value = [];
+  const querySnapshot = await $firebase.firestore('dev-retrospect').orderBy('date', 'desc').get()
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
     const d = doc.data();
-    itemsView.value.push(d);
+    itemsView.value.push({ ...d, id: doc.id });
   });
   loaded.value = true;
 }
+
+const editData = ref(null);
+const edit = (item) => {
+  editData.value = {
+    content: item.content,
+    date: item.date,
+    id: item.id,
+  };
+  window.scrollTo(0, 0);
+};
 
 onMounted(() => {
   getData();
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .devRetrospect{
   max-width: 1080px;
   margin: 0 auto;
@@ -78,20 +91,28 @@ onMounted(() => {
     }
   }
   ul{
-    padding: 20px 10px 0;
+    padding: 20px 10px 20px;
     li{
       line-height: 24px;
       box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
       border: 1px solid #d7d8d9;
       border-radius: 8px;
       margin-bottom: 20px;
-      padding: 10px;
+      padding: 10px 20px;
       > div:first-of-type{
-        padding-bottom: 10px;
+        text-align: center;
+        padding-top: 6px;
+        padding-bottom: 16px;
         border-bottom: 1px solid #e1e3e5;
       }
       > div:nth-of-type(2){
         padding-top: 10px;
+        > div.strong{
+          color: coral;
+          line-height: 30px;
+          font-size: 20px;
+          font-weight: bold;
+        }
       }
     }
   }

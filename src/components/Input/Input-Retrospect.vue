@@ -7,7 +7,7 @@
       <textarea v-model="text"></textarea>
       <div class="btns">
         <div></div>
-        <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+        <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}</button>
       </div>
     </div>
   </div>
@@ -24,19 +24,18 @@ const $firebase = app.appContext.config.globalProperties.$firebase
 
 const emit = defineEmits(['uploadComplete']);
 
-const props = defineProps({
-  isMobile: Boolean,
-});
+const props = defineProps(['isMobile', 'editData']);
 
-const text = ref('');
-const date = ref('');
+const text = ref(props.editData ? props.editData.content : '');
+const date = ref(props.editData ? props.editData.date : '');
 
 const submit = () => {
   store.setLoading(true);
-  $firebase.firestore('dev-retrospect').add({
+  const data = {
     content: text.value,
     date: date.value,
-  }).then(() => {
+  };
+  (props.editData ? $firebase.firestore('dev-retrospect').doc(props.editData.id).update(data) : $firebase.firestore('dev-retrospect').add(data)).then(() => {
     store.setLoading(false);
     alert('포스팅 성공!'); // eslint-disable-line
     emit('uploadComplete');

@@ -127,7 +127,6 @@
               title: data.title,
               imgUrl: data.imgUrl,
             };
-            console.log(data.category);
             this.reviewInfo[data.category].push(content);
           });
         });

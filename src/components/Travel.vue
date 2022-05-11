@@ -10,7 +10,8 @@
           <img v-bind:src="list.thumbnail || thumbnail">
         </div>
         <div>
-          <div class="county">{{ list.country }} <span class="dates">( {{ list.dates }} )</span></div>
+          <div class="county">{{ list.country }}</div>
+          <div class="dates">{{ list.dates }}</div>
           <div class="tags"><span v-for="tag in list.tags">{{ tag }}</span></div>
           <div class="description">
             <div v-for="desc in list.description.split('\n')">
@@ -39,7 +40,7 @@
     <div v-if="buttonPop" class="travelButtonPop">
       <ul>
         <li @click="authClick('addTravel')">새로운 여행 추가</li>
-        <li @click="authClick('appendList')">여행 일정 추가</li>
+<!--        <li @click="authClick('appendList')">여행 일정 추가</li>-->
       </ul>
       <div class="clamp"></div>
     </div>
@@ -87,8 +88,8 @@ const writePopOpen = (tag) => {
 };
 
 const travelPopClick = () => {
-  popOpen.value = true;
-  popFlag.value = 'travelPop';
+  // popOpen.value = true;
+  // popFlag.value = 'travelPop';
 };
 
 const getData = () => {
@@ -248,7 +249,7 @@ onMounted(() => {
     display: block;
   }
   .travelList > li > div .county{
-    color: #874c62;
+    font-weight: bold;
     font-size: 24px;
   }
   .travelList > li > div .tags{
@@ -261,20 +262,19 @@ onMounted(() => {
   }
   .travelList > li > div .tags > span{
     float:left;
-    background-color: #a7d2cb;
+    background-color: coral;
     color: #FFF;
     height: 30px;
     line-height: 30px;
-    padding: 0 10px;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
+    padding: 0 12px;
+    border-radius: 15px;
     margin-right: 10px;
     margin-bottom: 5px;
   }
   .travelList > li > div .dates{
-    color: #c98474;
     font-size: 14px;
+    margin-top: 4px;
+    opacity: 0.4;
   }
   .travelList > li > div .description{
     height: auto;

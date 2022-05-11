@@ -1,6 +1,7 @@
 <template>
   <div id="InputBox" class="inputBox">
     <div>
+      <label class="secure"><input type="checkbox" v-model="isSecure" /><div>나만보기</div></label>
       <textarea id="TextArea" v-model="text"></textarea>
       <div class="preview" v-if="arrImage.length > 0">
         <div v-for="(x, index) in arrImage">
@@ -10,7 +11,8 @@
       </div>
       <div class="btns">
         <input ref="inputImage" type="file" accept="image/*" multiple @input="setPreview" />
-        <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+        <button class="del" v-if="editData" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
+        <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}</button>
       </div>
     </div>
   </div>
@@ -28,14 +30,13 @@ const $firebase = app.appContext.config.globalProperties.$firebase
 import LoadImage from 'blueimp-load-image';
 const emit = defineEmits(['uploadComplete']);
 
-const props = defineProps({
-  isMobile: Boolean,
-});
+const props = defineProps(['isMobile', 'editData']);
 
-const arrImage = ref([]);
-const arrCanvas = ref([]);
+const arrImage = ref(props.editData ? [...props.editData.data.arrImage] : []);
+const isSecure = ref(props.editData ? props.editData.data.isSecure : false);
+const arrCanvas = ref(props.editData ? [...props.editData.data.arrImage] : []);
 const inputImage = ref(null);
-const text = ref('');
+const text = ref(props.editData ? props.editData.data.text : '');
 
 const getImage = (file) => (
   new Promise((resolve) => {
@@ -49,168 +50,77 @@ const getImage = (file) => (
 
 const popImage = (index) => {
   arrImage.value.splice(index, 1);
+  arrCanvas.value.splice(index, 1);
 };
 
 const setPreview = async ($event) => {
-  arrImage.value = [];
-  arrCanvas.value = [];
   await Promise.all([...$event.target.files].map((v) => getImage(v)));
   inputImage.value.value = '';
+};
+
+const del = async () => {
+  store.setLoading(true);
+  for (let x in props.editData.data.arrImage) {
+    const path = props.editData.data.arrImage[x].split('/o/')[1].split('?')[0];
+    await $firebase.storage(decodeURIComponent(path)).delete();
+  }
+  await $firebase.firestore('daily').doc(props.editData.id).delete();
+  store.setLoading(false);
+  alert('삭제 성공!'); // eslint-disable-line
+  const ym = `${`${props.editData.data.date}`.substring(0, 4)}-${`${props.editData.data.date}`.substring(5, 7)}`;
+  emit('uploadComplete', ym, true);
 };
 
 const submit = async () => {
   store.setLoading(true);
   const promise = (img) => new Promise(async (resolve) => {
+    if (typeof img === 'string') {
+      resolve(img);
+      return;
+    }
     // const ex = img.substring(0, img.indexOf(';')).split('/')[1];
     const ex = img.type.split('/')[1];
     const resp = await $firebase.storage(`daily/${dayjs().format('YYYYMMDDHHmmssSSS')}.${ex}`).put(img);
-    resolve(resp);
+    const url = await resp.ref.getDownloadURL();
+    resolve(url);
   });
   const arrPromise = arrCanvas.value.map((v) => promise(v));
   const arrImgSrc = [];
-  await Promise.all(arrPromise).then(async (resp) => {
+  await Promise.all(arrPromise).then((resp) => {
     for (let x in resp) {
-      const url = await resp[x].ref.getDownloadURL();
+      const url = resp[x];
       arrImgSrc.push(url);
     }
   });
-  const day = dayjs();
-  $firebase.firestore('daily').add({
-    content: text.value,
-    date: parseInt(day.format('YYYYMMDDHHmmss'), 10),
-    imgUrl: arrImgSrc,
-    isSecure: false,
-  }).then(() => {
-    store.setLoading(false);
-    alert('포스팅 성공!'); // eslint-disable-line
-    emit('uploadComplete', `${day.format('YYYY-MM')}`);
-  });
+  if (props.editData) {
+    const arrDelImg = props.editData.data.arrImage.filter((v) => !arrImage.value.some((v2) => v2 === v))
+    for (let x in arrDelImg) {
+      const path = arrDelImg[x].split('/o/')[1].split('?')[0];
+      await $firebase.storage(decodeURIComponent(path)).delete();
+    }
+    $firebase.firestore('daily').doc(props.editData.id).update({
+      content: text.value,
+      imgUrl: arrImgSrc,
+      isSecure: isSecure.value,
+    }).then(() => {
+      store.setLoading(false);
+      alert('수정 성공!'); // eslint-disable-line
+      emit('uploadComplete');
+    });
+  } else {
+    const day = dayjs();
+    $firebase.firestore('daily').add({
+      content: text.value,
+      date: parseInt(day.format('YYYYMMDDHHmmss'), 10),
+      imgUrl: arrImgSrc,
+      isSecure: isSecure.value,
+    }).then(() => {
+      store.setLoading(false);
+      alert('포스팅 성공!'); // eslint-disable-line
+      emit('uploadComplete', `${day.format('YYYY-MM')}`);
+    });
+  }
 };
-
-  // import LoadImage from 'blueimp-load-image';
-  //
-  // export default {
-  //   name: 'input-box',
-  //   data() {
-  //     return {
-  //       arrImgUrl: [],
-  //       arrPreview: [],
-  //     };
-  //   },
-  //   props: ['isMobile'],
-  //   methods: {
-  //     setPreview() {
-  //       const img = this.$refs.inputImg.files;
-  //       for (let x = 0; x < img.length; x +=1) {
-  //
-  //       }
-  //     },
-  //     getImage() {
-  //       return new Promise((resolve) => {
-  //         const reader = new FileReader();
-  //
-  //       });
-  //     },
-  //     submit() {
-  //       const file = document.getElementById('ImgArea').files;
-  //       if (file && file.length > 0) {
-  //         for (let x = 0; x < file.length; x += 1) {
-  //           this.arrImgUrl.push(null);
-  //           this.resizeImage(file[x], x);
-  //         }
-  //       } else {
-  //         this.upload(false);
-  //       }
-  //     },
-  //     submitImage(file, resizedImage, index) {
-  //       const name = `daily/${file.name}`;
-  //       this.$firebase.storage(name).put(resizedImage).then(async () => {
-  //         const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
-  //         this.arrImgUrl[index] = downloadUrl;
-  //         let flag = true;
-  //         for (let x = 0; x < this.arrImgUrl.length; x += 1) {
-  //           if (!this.arrImgUrl[x]) {
-  //             flag = false;
-  //             break;
-  //           }
-  //         }
-  //         if (flag) {
-  //           this.upload(true);
-  //         }
-  //       });
-  //     },
-  //     resizeImage(file, index) {
-  //       if (file.type === 'image/gif') {
-  //         this.submitImage(file, file, index);
-  //         return false;
-  //       }
-  //       const reader = new FileReader();
-  //       const image = new Image();
-  //       const dataURItoBlob = (dataURI) => {
-  //         const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
-  //           atob(dataURI.split(',')[1]) :
-  //           unescape(dataURI.split(',')[1]);
-  //         const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-  //         const max = bytes.length;
-  //         const ia = new Uint8Array(max);
-  //         for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
-  //         return new Blob([ia], { type: mime });
-  //       };
-  //       const resize = () => {
-  //         LoadImage.parseMetaData(file, (data) => {
-  //           let orientation = 0;
-  //           if (data.exif) {
-  //             orientation = data.exif.get('Orientation');
-  //           }
-  //           LoadImage(file, (canvas) => {
-  //             const dataUrl = canvas.toDataURL(file.type);
-  //             this.submitImage(file, dataURItoBlob(dataUrl), index);
-  //           }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
-  //         });
-  //       };
-  //
-  //       return new Promise((ok) => {
-  //         if (!file.type.match(/image.*/)) {
-  //           alert('no image file!'); // eslint-disable-line
-  //           return;
-  //         }
-  //
-  //         reader.onload = (readerEvent) => {
-  //           image.onload = () => ok(resize());
-  //           image.src = readerEvent.target.result;
-  //         };
-  //         reader.readAsDataURL(file);
-  //       });
-  //     },
-  //     upload(isUrl) {
-  //       const newDate = new Date();
-  //       const text = document.getElementById('TextArea').value;
-  //       let dateString = newDate.getFullYear();
-  //       dateString += this.zeros(parseInt(newDate.getMonth(), 10) + 1);
-  //       dateString += this.zeros(newDate.getDate());
-  //       this.$firebase.database('/daily').push({
-  //         date: parseInt(dateString, 10),
-  //         content: text,
-  //         imgUrl: isUrl ? this.arrImgUrl : '',
-  //       }).then(() => {
-  //         alert('포스팅 성공!'); // eslint-disable-line
-  //         this.$emit('reload');
-  //       });
-  //     },
-  //     zeros(n) {
-  //       let zero = '';
-  //       let newN = n;
-  //       newN = n.toString();
-  //
-  //       if (newN.length < 2) {
-  //         for (let i = 0; i < 2 - newN.length; i += 1) {
-  //           zero += '0';
-  //         }
-  //       }
-  //       return zero + newN;
-  //     },
-  //   },
-  // };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -222,6 +132,14 @@ const submit = async () => {
       box-shadow: 0 0 4px 1px rgba(0,0,0,.1);
       background-color: #FFF;
       border-radius: 10px;
+      .secure{
+        display: flex;
+        align-items: center;
+        padding-bottom: 4px;
+        > div{
+          margin-left: 4px;
+        }
+      }
       textarea{
         width: 100%;
         height: 300px;
@@ -273,12 +191,26 @@ const submit = async () => {
       .btns{
         display: flex;
         justify-content: space-between;
-        button{
-          width: 100px;
+        .submit{
+          white-space: nowrap;
+          padding: 0 10px;
+          width: auto;
           height: 40px;
           border: 0;
           color: #FFF;
           background-color: #c98474;
+          border-radius: 20px;
+          cursor: pointer;
+        }
+        .del{
+          white-space: nowrap;
+          width: auto;
+          margin-right: 10px;
+          padding: 0 10px;
+          height: 40px;
+          border: 0;
+          color: #FFF;
+          background-color: coral;
           border-radius: 20px;
           cursor: pointer;
         }

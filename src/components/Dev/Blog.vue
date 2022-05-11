@@ -297,9 +297,11 @@
     border-bottom: 1px solid #eee;
     padding: 10px;
     margin-top: 10px;
+    transition: .2s ease;
   }
   .category > li.selected{
     color: coral;
+    font-weight: bold;
   }
   .category > li:not(.selected):hover{
     color: coral;

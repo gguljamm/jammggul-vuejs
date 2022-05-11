@@ -155,7 +155,13 @@ export default {
 <style lang="scss">
   @import './assets/lib/normalize.css';
   @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan');
-  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+  @font-face {
+    font-family: 'MaplestoryLight';
+    font-weight: 800;
+    font-display: swap;
+    src: local('MaplestoryLight'), url('./assets/font/MaplestoryLight.woff') format('woff');
+  }
 
   html, body {
     width: 100%;
@@ -174,7 +180,7 @@ export default {
     list-style: none;
   }
   #app {
-    font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: MaplestoryLight, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     color: #2c3e50;
     font-size: 16px;
   }
