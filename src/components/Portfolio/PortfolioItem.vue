@@ -1,5 +1,5 @@
 <template>
-  <li class="portfolioItem" ref="item" v-bind:class="isMobile?'mob':''">
+  <li class="portfolioItem" ref="item" :class="isMobile?'mob':''">
     <div>
       <div class="contImg"><div :style="{
           backgroundImage: `url(${item.thumbnail?item.thumbnail:'/public/thumbnail.jpg'})`
@@ -10,7 +10,7 @@
       <ul v-if="item.participate" class="contPart">
         <li v-for="part in item.participate">
           <div class="partTitle">{{ part.title }}</div>
-          <div class="partRate"><div v-bind:style="{width: part.width}">{{ part.rate }}%</div></div>
+          <div class="partRate"><div :style="{width: part.width}">{{ part.rate }}%</div></div>
         </li>
       </ul>
       <div class="hover">

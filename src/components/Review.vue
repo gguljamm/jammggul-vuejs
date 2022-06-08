@@ -1,5 +1,5 @@
 <template>
-  <div id="Review" v-bind:class="isMobile?'mob':''">
+  <div id="Review" :class="isMobile?'mob':''">
     <input-review
       v-if="isAuth"
       @close-pop="closePop"
@@ -13,17 +13,18 @@
         <i :class="categoryOpen ? 'fa fa-times' : 'fa fa-list'" aria-hidden="true"></i>
       </button>
     </div>
-    <div class="category" v-bind:class="categoryOpen?'opened':''">
+    <div v-if="error" style="padding: 40px; text-align: center; color: coral; font-size: 24px;" v-html="error"></div>
+    <div class="category" :class="categoryOpen?'opened':''">
       <div class="categoryHead">
-        <button @click="changeCategory('game')" v-bind:class="viewCategory==='game'?'selected':''">game</button>
-        <button @click="changeCategory('culture')" v-bind:class="viewCategory==='culture'?'selected':''">culture</button>
-        <button @click="changeCategory('unboxing')" v-bind:class="viewCategory==='unboxing'?'selected':''">unboxing</button>
+        <button @click="changeCategory('game')" :class="viewCategory==='game'?'selected':''">game</button>
+        <button @click="changeCategory('culture')" :class="viewCategory==='culture'?'selected':''">culture</button>
+        <button @click="changeCategory('unboxing')" :class="viewCategory==='unboxing'?'selected':''">unboxing</button>
       </div>
       <div class="categoryContent">
         <ul>
           <li
             v-for="(cont, index) in returnViewList(reviewInfo[viewCategory])"
-            v-bind:class="selectedCategory === viewCategory && selectedNum === index + ((viewSubPaging - 1) * 10) ? 'selected' : ''"
+            :class="selectedCategory === viewCategory && selectedNum === index + ((viewSubPaging - 1) * 10) ? 'selected' : ''"
             @click="changeContent(index + ((viewSubPaging - 1) * 10))"
           >{{ cont.title }}</li>
         </ul>
@@ -31,7 +32,7 @@
           <span
             v-for="num in returnListNum(reviewInfo[viewCategory])"
             @click="viewSubPaging=num"
-            v-bind:class="num===viewSubPaging?'selected':''"
+            :class="num===viewSubPaging?'selected':''"
           >{{ num }}</span>
         </div>
       </div>
@@ -46,14 +47,14 @@
         >
           {{ line ? line : '&nbsp;' }}
         </div>
-        <img v-else v-bind:src="reviewInfo[selectedCategory][selectedNum].imgUrl[(line.split('#img')[1]).split('#')[0]]">
+        <img v-else :src="reviewInfo[selectedCategory][selectedNum].imgUrl[(line.split('#img')[1]).split('#')[0]]">
       </template>
     </div>
   </div>
 </template>
 
 <script>
-  import inputReview from './Input/Input-Review.vue';
+  import inputReview from './Input/InputReview.vue';
 
   export default {
     components: {
@@ -76,6 +77,7 @@
         viewSubPaging: 1,
         viewList: [],
         isAuth: false,
+        error: '',
       };
     },
     methods: {
@@ -129,6 +131,8 @@
             };
             this.reviewInfo[data.category].push(content);
           });
+        }).catch((e) => {
+          this.error = (e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........<br>왜?ㅠ,.ㅠ 이걸 누가 본다고' : e);
         });
       },
     },

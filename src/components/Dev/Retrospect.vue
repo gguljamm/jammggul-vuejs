@@ -3,7 +3,7 @@
     <div class="btns">
       <button @click="authClick"><i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i></button>
     </div>
-    <input-retrospect v-if="isAuth" v-bind:isMobile="isMobile" @uploadComplete="getData" :editData="editData" :key="editData ? editData.id : ''"></input-retrospect>
+    <input-retrospect v-if="isAuth" :isMobile="isMobile" @uploadComplete="getData" :editData="editData" :key="editData ? editData.id : ''"></input-retrospect>
     <loading v-if="!loaded"></loading>
     <ul>
       <li v-for="x in itemsView" @click="isAuth ? edit(x) : ''">
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import InputRetrospect from "../Input/Input-Retrospect.vue";
+import InputRetrospect from "../Input/InputRetrospect.vue";
 import {ref, getCurrentInstance, onMounted} from 'vue';
 const app = getCurrentInstance();
 const $firebase = app.appContext.config.globalProperties.$firebase;

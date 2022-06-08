@@ -1,5 +1,5 @@
 <template>
-<div id="Travel" v-bind:class="isMobile?'mob':'web'">
+<div id="Travel" :class="isMobile?'mob':'web'">
   <div class="topImg">
     <img src="../assets/images/burano.jpg">
   </div>
@@ -7,7 +7,7 @@
     <ul class="travelList">
       <li v-for="list in travelArray" @click="travelPopClick">
         <div>
-          <img v-bind:src="list.thumbnail || thumbnail">
+          <img :src="list.thumbnail || thumbnail">
         </div>
         <div>
           <div class="county">{{ list.country }}</div>
@@ -33,7 +33,7 @@
       </div>
     </div>
   </transition>
-  <button id="TravelWrite" v-bind:class="buttonPop?'clicked':''" @click="buttonPop = !buttonPop">
+  <button id="TravelWrite" :class="buttonPop?'clicked':''" @click="buttonPop = !buttonPop">
     <i class="fa fa-plus" aria-hidden="true"></i>
   </button>
   <transition name="showSlideLeft" mode="out-in">
@@ -53,7 +53,7 @@ import thumbnail from '../assets/images/thumbnail.jpg';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
-import InputTravel from './Input/Input-Travel.vue';
+import InputTravel from './Input/InputTravel.vue';
 
 const props = defineProps(['isMobile']);
 

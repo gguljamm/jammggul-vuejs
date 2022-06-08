@@ -8,24 +8,25 @@
         <i v-else class="fa fa-times" aria-hidden="true"></i>
       </button>
     </div>
+    <div v-if="error" style="padding: 40px; text-align: center; color: coral; font-size: 24px;" v-html="error"></div>
     <div class="monthSelector" v-if="filterOpen">
       <div @click.stop><div>
         <span></span>
         <div class="year">
           <i class="fa fa-chevron-circle-left" aria-hidden="true"
-            v-bind:class="selectedYear > 2017 ? '' : 'disabled'"
-            @click="selectedYear > 2017 ? changeYear(false) : ''"
+            :class="selectedYear > minYear ? '' : 'disabled'"
+            @click="selectedYear > minYear ? changeYear(false) : ''"
           ></i>
           {{ selectedYear }}
           <i class="fa fa-chevron-circle-right" aria-hidden="true"
-            v-bind:class="selectedYear < nowYear ? '' : 'disabled'"
-            @click="selectedYear < nowYear ? changeYear(true) : ''"
+            :class="selectedYear < maxYear ? '' : 'disabled'"
+            @click="selectedYear < maxYear ? changeYear(true) : ''"
           ></i>
         </div>
         <ul>
           <li
             v-for="(month, index) in arrMonth"
-            v-bind:class="{
+            :class="{
               nonSelectable: !selectedMonthCount[index],
               selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
             }"
@@ -51,14 +52,14 @@
         v-get-height="{ item }">
           <div
             class="dailyBox"
-            v-bind:class="item.viewMore?'selected':''"
+            :class="item.viewMore?'selected':''"
             @click="isAuth ? edit(item) : listClick(item)"
           >
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
                 <div>
-                  <div><div v-for="(line,key) in item.content.split('\n')" v-bind:key="key">{{ line }}<br></div></div>
+                  <div><div v-for="(line,key) in item.content.split('\n')" :key="key">{{ line }}<br></div></div>
                   <span class="icons">
                     <i v-if="item.isMore&&item.isMore.indexOf('more')>=0" class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
                     <span class="img_gif" v-if="item.imgUrl.join('').indexOf('.gif') >= 0">.gif</span>
@@ -83,21 +84,24 @@
 </template>
 
 <script lang="ts" setup>
-import InputBox from './Input/Input-Daily.vue';
+import InputBox from './Input/InputDaily.vue';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
+
+const maxYear = new Date().getFullYear();
+const minYear = 2017;
 
 const itemsView = ref([]);
 const loaded = ref(false);
 const isLoaded = (a, b) => (a && !b);
 const selectedYear = ref(new Date().getFullYear());
-const nowYear = ref(new Date().getFullYear());
 const filterOpen = ref(false);
 const filterOption = ref('Recent');
 const objCount = ref({});
 const isAuth = ref(false);
 const editData = ref(null);
+const error = ref(null);
 
 const props = defineProps({
   isMobile: Boolean,
@@ -107,15 +111,20 @@ const getData = async () => {
   isAuth.value = false;
   editData.value = null;
   let querySnapshot;
-  if (filterOption.value === 'Recent') {
-    querySnapshot = await $firebase.firestore('daily').orderBy('date', 'desc').limit(20).get()
-  } else {
-    const min = parseInt(`${filterOption.value.replace(/-/g, '')}01000000`);
-    const max = parseInt(`${filterOption.value.replace(/-/g, '')}31999999`);
-    querySnapshot = await $firebase.firestore('daily').where('date', '>=', min).where('date', '<=', max).orderBy('date').get();
+  loaded.value = false;
+  try {
+    if (filterOption.value === 'Recent') {
+      querySnapshot = await $firebase.firestore('daily').orderBy('date', 'desc').limit(20).get()
+    } else {
+      const min = parseInt(`${filterOption.value.replace(/-/g, '')}01000000`);
+      const max = parseInt(`${filterOption.value.replace(/-/g, '')}31999999`);
+      querySnapshot = await $firebase.firestore('daily').where('date', '>=', min).where('date', '<=', max).orderBy('date').get();
+    }
+  } catch (e) {
+    error.value = (e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........' : e);
+    loaded.value = true;
   }
   itemsView.value = [];
-  loaded.value = false;
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
     const d = doc.data();

@@ -3,7 +3,7 @@
   <div class="btns">
     <button @click="authClick"><i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i></button>
   </div>
-  <input-it v-if="isAuth" v-bind:isMobile="isMobile" @reload="getData"></input-it>
+  <input-it v-if="isAuth" :isMobile="isMobile" @reload="getData" :data="editData" :key="editData ? editData.id : ''"></input-it>
   <div class="devWrapper">
     <div>
       <div>
@@ -16,250 +16,156 @@
         <div class="categoryBox">
           <p>카테고리</p>
           <ul class="category">
-            <li @click="changeIndex('recent')" v-bind:class="selectIndex==='recent'?'selected':''">RECENT 20</li>
-            <li @click="changeIndex('it')" v-bind:class="selectIndex==='it'?'selected':''">IT <span>({{objList.it.length}})</span></li>
-            <li @click="changeIndex('dev')" v-bind:class="selectIndex==='dev'?'selected':''">웹개발 <span>({{objList.dev.length}})</span></li>
-            <li @click="changeIndex('hardware')" v-bind:class="selectIndex==='hardware'?'selected':''">하드웨어 <span>({{objList.hardware.length}})</span></li>
+            <li @click="changeIndex('recent')" :class="selectedIndex === 'recent' ? 'selected' : ''">RECENT 20</li>
+            <li @click="changeIndex('it')" :class="selectedIndex === 'it' ? 'selected' : ''">IT <span>({{ objCount.it }})</span></li>
+            <li @click="changeIndex('dev')" :class="selectedIndex === 'dev' ? 'selected' : ''">웹개발 <span>({{ objCount.dev }})</span></li>
+            <li @click="changeIndex('hardware')" :class="selectedIndex === 'hardware' ? 'selected' : ''">하드웨어 <span>({{ objCount.hardware }})</span></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="itList" v-if="!isMobile">
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in evenArray" :key="`even_${idx}`">
-        <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
-            <template v-if="text && text.type === 'img'">
-              <span>{{ text.value[0] }}</span>
-              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
-              <span>{{ text.value[3] }}</span>
-            </template>
-            <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value"
-                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
-              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
-            </template>
-            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
-          </div></div>
-          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
-        </div>
-      </li></transition-group></ul>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in oddArray" :key="`odd_${idx}`">
-        <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
-            <template v-if="text && text.type === 'img'">
-              <span>{{ text.value[0] }}</span>
-              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
-              <span>{{ text.value[3] }}</span>
-            </template>
-            <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value"
-                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
-              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
-            </template>
-            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
-          </div></div>
-          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
-        </div>
-      </li></transition-group></ul>
+      <ul>
+        <transition-group name="component-fade" mode="out-in">
+          <blog-content
+            v-for="(list, idx) in filteredData.filter((_, index) => index % 2 === 0)" :key="list.id" :data="list" @imgPopupOpen="imgPopupOpen" @openEdit="openEdit"
+          ></blog-content>
+        </transition-group>
+      </ul>
+      <ul>
+        <transition-group name="component-fade" mode="out-in">
+          <blog-content
+            v-for="(list, idx) in filteredData.filter((_, index) => index % 2 === 1)" :key="list.id" :data="list" @imgPopupOpen="imgPopupOpen" @openEdit="openEdit"
+          ></blog-content>
+        </transition-group>
+      </ul>
     </div>
     <div class="itList" v-else>
-      <ul><transition-group name="component-fade" mode="out-in"><li v-for="(list, idx) in mobList" v-bind:key="`mob_${idx}`">
-        <div v-for="(content, index) in list">
-          <div v-if="index%2===0"><div v-for="text in content" :class="text.type === 'code' ? 'code' : ''">
-            <template v-if="text && text.type === 'img'">
-              <span>{{ text.value[0] }}</span>
-              <a v-bind:href="text.value[1]" target="_blank">{{ text.value[2] }}</a>
-              <span>{{ text.value[3] }}</span>
-            </template>
-            <template v-else-if="text && text.type === 'code'">
-              <div v-for="(text2, index2) in text.value"
-                :style="{ textIndent: text2.indexOf('  ') >= 0 ? `${text2.match(/  /g).length * 10}px` : '' }"
-              >{{ !text2 && (index2 !== 0 && index2 !== text.value.length -1) ? '&nbsp;' : text2 }}</div>
-            </template>
-            <template v-else-if="text !== 'delete'">{{ text?text:'&nbsp;' }}</template>
-          </div></div>
-          <div v-else class="imgCont"><img v-lazy="content" @click="imgPop(content)"></div>
-        </div>
-      </li></transition-group></ul>
+      <ul>
+        <transition-group name="component-fade" mode="out-in">
+          <blog-content
+            v-for="(list, idx) in filteredData" :key="list.id" :data="list" @imgPopupOpen="imgPopupOpen" @openEdit="openEdit"
+          ></blog-content>
+        </transition-group>
+      </ul>
     </div>
   </div>
-  <div v-if="popFlag" @click="popFlag = false" class="imgPop" v-bind:class="imgHeightOver?'over':''">
+  <div v-if="popImgSrc" @click="imgPopupOpen(null)" class="imgPop">
     <div>
-      <img v-bind:src="popImgSrc" ref="popImg">
+      <img :src="popImgSrc" ref="popImg">
     </div>
   </div>
 </div>
 </template>
 
-<script>
-  import inputIt from '../Input/Input-Dev.vue';
+<script setup>
+import InputIt from '../Input/InputDev.vue';
+import BlogContent from './BlogContent.vue';
 
-  export default {
-    name: 'devInfo',
-    components: {
-      inputIt,
-    },
-    props: ['isMobile'],
-    data() {
-      return {
-        mobList: [],
-        popFlag: false,
-        popImgSrc: '',
-        isAuth: false,
-        objList: {
-          recent: [],
-          it: [],
-          dev: [],
-          hardware: [],
-        },
-        selectIndex: 'recent',
-        imgHeightOver: false,
-      };
-    },
-    computed: {
-      oddArray() {
-        const arr = [];
-        for (let x = 0; x < this.mobList.length; x += 1) {
-          if (x % 2 === 1) {
-            arr.push(this.mobList[x]);
-          }
-        }
-        return arr;
-      },
-      evenArray() {
-        const arr = [];
-        for (let x = 0; x < this.mobList.length; x += 1) {
-          if (x % 2 === 0) {
-            arr.push(this.mobList[x]);
-          }
-        }
-        return arr;
-      },
-    },
-    methods: {
-      changeIndex(index) {
-        this.selectIndex = index;
-        const list = this.objList[index];
-        this.mobList = [];
-        for (let x = 0, leng = list.length; x < leng; x += 1) {
-          const arrContent = list[x].content.split('#img#');
-          const arrContentImg = [];
-          for (let y = 0; y < arrContent.length; y += 1) {
-            const text = arrContent[y].split('\n');
-            let procCode = false;
-            for (let z = 0, leng2 = text.length; z < leng2; z += 1) {
-              if (!procCode) {
-                const urlMatch = text[z].match(/#url#/g);
-                if (urlMatch && urlMatch.length >= 3) {
-                  text[z] = {
-                    type: 'img',
-                    value: text[z].split('#url#'),
-                  };
-                } else if (text[z].indexOf('<code>') >= 0) {
-                  text[z] = {
-                    type: 'code',
-                    value: [
-                      text[z].split('<code>')[1],
-                    ],
-                  };
-                  if (text[z].value[0].indexOf('</code>') >= 0) {
-                    text[z].value[0] = text[z].value[0].replace('</code>', '');
-                  } else {
-                    procCode = text[z];
-                  }
-                }
-              } else if (text[z].indexOf('</code>') >= 0) {
-                procCode.value.push(text[z].split('</code>')[0]);
-                text[z] = 'delete';
-                procCode = false;
-              } else {
-                procCode.value.push(text[z]);
-                text[z] = 'delete';
-              }
-            }
-            arrContentImg.push(text);
-            if (y < (arrContent.length - 1)) {
-              arrContentImg.push(list[x].imgUrl[y]);
-            }
-          }
-          this.mobList.push(arrContentImg);
-        }
-      },
-      async authClick() {
-        if (this.isAuth) {
-          this.isAuth = false;
-          return;
-        }
-        this.isAuth = await this.$firebase.login();
-      },
-      imgPop(src) {
-        this.popFlag = true;
-        this.popImgSrc = src;
-        setTimeout(() => {
-          const imgHeight = this.$refs.popImg.height;
-          const windowHeight = window.innerHeight;
-          this.imgHeightOver = (imgHeight > windowHeight);
-        }, 100);
-      },
-      getData() {
-        this.isAuth = false;
-        this.$firebase.firestore('dev-blog').orderBy('date', 'desc').get().then(async (querySnapshot) => {
-          querySnapshot.docs.forEach((x, index) => {
-            const data = x.data();
-            const content = { content: data.content, imgUrl: data.imgUrl };
-            if (this.objList[data.category]) {
-              this.objList[data.category].push(content);
-            }
-            if (index < 20) {
-              this.objList.recent.push(content);
-            }
-          });
-          this.changeIndex(this.selectIndex);
-        })
-      },
-    },
-    mounted() {
-      this.getData();
-    },
-  };
+import { ref, onMounted, getCurrentInstance, computed } from 'vue';
+const app = getCurrentInstance()
+const $firebase = app.appContext.config.globalProperties.$firebase;
+
+const props = defineProps(['isMobile']);
+
+const objCount = ref({
+  it: 0,
+  dev: 0,
+  hardware: 0,
+});
+const allData = ref([]);
+const filteredData = computed(() => {
+  if (selectedIndex.value === 'recent') {
+    return allData.value.slice(0, 20);
+  }
+  return allData.value.filter((v) => v.category === selectedIndex.value)
+});
+
+const getData = () => {
+  isAuth.value = false;
+  $firebase.firestore('dev-blog').orderBy('date', 'desc').get().then((querySnapshot) => {
+    allData.value = [];
+    querySnapshot.docs.forEach((x) => {
+      const data = x.data();
+      allData.value.push({
+        ...data,
+        id: x.id,
+      });
+      objCount.value[data.category] += 1;
+    });
+  });
+};
+
+const selectedIndex = ref('recent');
+const changeIndex = (tag) => {
+  selectedIndex.value = tag;
+};
+
+const isAuth = ref(false);
+const authClick = async () => {
+  if (isAuth.value) {
+    isAuth.value = false;
+    editData.value = null;
+    return;
+  }
+  isAuth.value = await $firebase.login();
+};
+
+const popImgSrc = ref(null);
+const imgPopupOpen = (imgUrl) => {
+  popImgSrc.value = imgUrl;
+};
+
+const editData = ref(null);
+const openEdit = (index) => {
+  console.log(index);
+  if (isAuth.value) {
+    editData.value = filteredData.value.find((v) => v.id === index);
+    window.scrollTo(0, 0);
+  }
+};
+
+onMounted(() => {
+  getData();
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  #DevInfo{
-    max-width: 1080px;
-    margin: 0 auto;
-    .btns{
-      display: flex;
-      margin-top: 10px;
-      padding: 0 10px;
-      justify-content: end;
-      > button{
-        margin-left: 10px;
-        padding: 0;
-        height: 40px;
-        width: 40px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 16px;
-        background-color: #FFF;
-        box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
-        border: 1px solid #c98474;
-      }
+#DevInfo{
+  max-width: 1080px;
+  margin: 0 auto;
+  .btns{
+    display: flex;
+    margin-top: 10px;
+    padding: 0 10px;
+    justify-content: end;
+    > button{
+      margin-left: 10px;
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      background-color: #FFF;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      border: 1px solid #c98474;
     }
   }
   .devWrapper{
     width: 100%;
     position: relative;
+    > div {
+      margin-top: 10px;
+    }
   }
-  .devWrapper, .devWrapper > div{
-    margin-top: 10px;
-  }
-  .devWrapper .itList > ul, .devWrapper > div > div{
+  .itList > ul, .devWrapper > div > div{
     float:left;
     width: 50%;
   }
-  .devWrapper .itList > ul li, .devWrapper > div > div > div{
+}
+  .devWrapper > div > div > div{
     margin: 0 10px 20px 10px;
     background-color: #FFF;
     padding: 30px 20px;
@@ -278,10 +184,12 @@
     line-height: 50px;
     font-family: 'Baloo Bhaijaan', sans-serif;
     color: #f2d388;
+    white-space: nowrap;
   }
   .devWrapper > div > div > div > span:last-child{
     font-size: 20px;
     line-height: 40px;
+    white-space: nowrap;
   }
   .categoryBox p{
     margin: 0;
@@ -306,29 +214,6 @@
   .category > li:not(.selected):hover{
     color: coral;
     opacity: .8;
-  }
-  .devWrapper .itList > ul li{
-    line-height: 24px;
-    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
-    border: 1px solid #d7d8d9;
-    border-radius: 8px;
-  }
-  .devWrapper .itList > ul li .code{
-    background-color: #3a3b3c;
-    color: #FFF;
-    font-size: 14px;
-    padding: 12px;
-    border-radius: 10px;
-    white-space: nowrap;
-    overflow: auto;
-  }
-  .imgCont{
-    text-align: center;
-  }
-  .devWrapper .itList > ul li img{
-    max-width: 100%;
-    margin: 10px 0;
-    cursor: zoom-in;
   }
   .imgPop{
     z-index: 11;
@@ -359,14 +244,10 @@
   }
   .imgPop:not(.over) > div > img{
     top: 50%;
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -o-transform: translateY(-50%);
     transform: translateY(-50%);
   }
   @media all and (max-width: 940px){
-    .devWrapper > div > div > div > span:first-child{
+    #DevInfo .devWrapper > div > div > div > span:first-child{
       font-size: 60px;
       line-height: 50px;
       font-family: 'Baloo Bhaijaan', sans-serif;
@@ -374,23 +255,23 @@
     }
   }
   @media all and (max-width: 768px){
-    .devWrapper .itList > ul, .devWrapper > div > div{
+    #DevInfo .devWrapper .itList > ul, #DevInfo .devWrapper > div > div{
       width: 100%;
       float: none;
     }
-    .devWrapper > div > div:first-child > div{
+    #DevInfo .devWrapper > div > div:first-child > div{
       padding: 10px;
       min-height: inherit;
     }
-    .devWrapper > div > div > div > span:first-child{
+    #DevInfo .devWrapper > div > div > div > span:first-child{
       font-size: 30px;
       line-height: 20px
     }
-    .devWrapper > div > div > div > span:last-child{
+    #DevInfo .devWrapper > div > div > div > span:last-child{
       font-size: 16px;
       line-height: 16px;
     }
-    .devWrapper > div > div > div.categoryBox{
+    #DevInfo .devWrapper > div > div > div.categoryBox{
       min-height: inherit;
     }
   }

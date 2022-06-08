@@ -11,8 +11,8 @@
       <li>
         <p>develop.</p>
         <div>
-          <div :class="{ active: page === 'portfolio' }" @click="navChange('portfolio')">portfolio</div>
           <div :class="{ active: page === 'dev/blog' }" @click="navChange('dev/blog')">blog</div>
+          <div :class="{ active: page === 'portfolio' }" @click="navChange('portfolio')">portfolio</div>
           <div :class="{ active: page === 'dev/retrospect' }" @click="navChange('dev/retrospect')">retrospect</div>
         </div>
       </li>
