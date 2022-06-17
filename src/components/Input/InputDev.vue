@@ -1,20 +1,19 @@
 <template>
   <div id="InputDevBox" class="inputBox">
     <div>
-      <div class="desc">( a태그 공간 #url#유알엘#url#설명#url# 이미지 공간 #img# )</div>
       <div>
-        <select ref="category" class="category" title="category">
-          <option value="it">IT</option>
-          <option value="dev">dev</option>
-          <option value="hardware">hardware</option>
+        <select class="category" title="category" v-model="category">
+          <option value="dev">개발 관련</option>
+          <option value="it">IT 이슈</option>
+          <option value="hardware">하드웨어</option>
         </select>
       </div>
-<!--      <textarea ref="textArea" title="textArea"></textarea>-->
-      <p class="textarea" ref="textArea" contenteditable="true"></p>
+      <textarea v-if="isOldContent" ref="textArea" title="textArea"></textarea>
+      <p v-else class="textarea" ref="textArea" contenteditable="true"></p>
       <div class="btns">
         <input id="ImgArea" type="file" accept="image/*" @input="inputImg">
         <button class="del" v-if="data" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
-        <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> 올리기</button>
+        <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ props.data ? '수정' : '올리기' }}</button>
       </div>
     </div>
   </div>
@@ -33,8 +32,11 @@ const store = useStore();
 const props = defineProps(['isMobile', 'data']);
 const emit = defineEmits(['reload']);
 
+const isOldContent = props.data && props.data.content.slice(-6) !== '</div>';
+console.log(props.data?.content.slice(-6))
+
 const textArea = ref(null);
-const category = ref(null);
+const category = ref(props.data?.category || 'dev');
 
 const inputImg = async ($event) => {
   const file = $event.target.files[0];
@@ -78,26 +80,38 @@ const submit = async () => {
         }).catch((e) => {
           console.log(e);
         });
+      } else {
+        resolve(true);
       }
     })
   );
   await Promise.all(arrImg.map((v) => replaceImage(v)));
-  const text = textArea.value.innerHTML.replace(/\n\n\n/g, '\n\n');
-  const thisCategory = category.value.value;
+  const text = isOldContent ? textArea.value.value : textArea.value.innerHTML.replace(/\n\n\n/g, '\n\n');
+  const thisCategory = category.value;
 
-  await $firebase.firestore('dev-blog').add({
-    category: thisCategory,
-    content: text,
-    date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
-  });
+  if (props.data) {
+    await $firebase.firestore('dev-blog').doc(props.data.id).update({
+      category: thisCategory,
+      content: text,
+      // date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
+    });
+  } else {
+    await $firebase.firestore('dev-blog').add({
+      category: thisCategory,
+      content: text,
+      date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
+    });
+  }
   alert('포스팅 성공!'); // eslint-disable-line
   emit('reload');
   store.setLoading(false);
 };
 
 onMounted(() => {
-  if (props.data) {
+  if (props.data && !isOldContent) {
     textArea.value.innerHTML = props.data.content;
+  } else if (isOldContent) {
+    textArea.value.value = props.data.content;
   }
 });
 </script>
@@ -111,7 +125,7 @@ onMounted(() => {
     background-color: #FFF;
     border-radius: 10px;
     text-align: right;
-    .textarea{
+    .textarea, textarea{
       width: 100%;
       height: 300px;
       margin-bottom: 10px;

@@ -2,9 +2,9 @@
   <li class="blogContentList" @click="openEdit()">
     <div v-for="content in arrContent" :class="content.type === 'code' ? 'code' : ''">
       <template v-if="content.type !== 'code'">
-        <div v-for="x in splitContent(content.content)" :style="{ paddingLeft: x.match(/  /g) ? `${ x.match(/  /g).length * 10 }px` : '' }"
-          v-html="x || '&nbsp;'"
-        >
+        <div v-for="x in splitContent(content.content)">
+          <template v-if="x.indexOf('##') === 0">{{ x.replace('##', '') }}</template>
+          <div v-else v-html="replaceHTMLTag(x)"></div>
         </div>
       </template>
       <template v-else>
@@ -25,7 +25,7 @@ const openEdit = () => {
   emit('openEdit', props.data.id);
 };
 
-const content = props.data.content;
+const content = props.data.content.replace(/<div>&lt;code&gt;<\/div>/g, '<code>').replace(/<div>&lt;\/code&gt;<\/div>/g, '</code>');
 const arrContent = [];
 if (content.indexOf('<code>') >= 0 && content.indexOf('</code>') > content.indexOf('<code>')) {
   const arr = content.split('</code>');
@@ -53,8 +53,18 @@ if (content.indexOf('<code>') >= 0 && content.indexOf('</code>') > content.index
   });
 }
 
+const replaceHTMLTag = (text) => {
+  let html = text;
+  text.match(/&lt;a.*&gt;.*&lt;\/a&gt;/g)?.forEach((v) => {
+    let line = v;
+    line = line.replace('&lt;', '<').replace('&gt;', '>').replace('&lt;/a&gt;', '</a>');
+    html = html.replace(v, line);
+  });
+  return html || '&nbsp;';
+};
+
 const splitContent = (html) => {
-  if (html.slice(-5) === '</div>') {
+  if (html.slice(-6) === '</div>') {
     const div = document.createElement('div');
     div.innerHTML = html;
     return [...div.childNodes].map((v) => v.innerHTML || v.textContent);

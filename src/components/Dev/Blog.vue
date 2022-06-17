@@ -85,6 +85,11 @@ const getData = () => {
   isAuth.value = false;
   $firebase.firestore('dev-blog').orderBy('date', 'desc').get().then((querySnapshot) => {
     allData.value = [];
+    objCount.value = {
+      it: 0,
+      dev: 0,
+      hardware: 0,
+    };
     querySnapshot.docs.forEach((x) => {
       const data = x.data();
       allData.value.push({
@@ -118,7 +123,6 @@ const imgPopupOpen = (imgUrl) => {
 
 const editData = ref(null);
 const openEdit = (index) => {
-  console.log(index);
   if (isAuth.value) {
     editData.value = filteredData.value.find((v) => v.id === index);
     window.scrollTo(0, 0);
