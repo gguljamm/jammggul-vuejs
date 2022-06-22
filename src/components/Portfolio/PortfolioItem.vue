@@ -1,9 +1,18 @@
 <template>
   <li class="portfolioItem" ref="item" :class="isMobile?'mob':''">
     <div>
-      <div class="contImg"><div :style="{
-          backgroundImage: `url(${item.thumbnail?item.thumbnail:'/public/thumbnail.jpg'})`
-        }"></div></div>
+      <div class="contImg">
+        <div>
+          <div :style="{
+            backgroundImage: `url(${item.thumbnail?item.thumbnail:'/public/thumbnail.jpg'})`
+          }"></div>
+        </div>
+      </div>
+      <div class="hideBox">
+        <button v-for="button in item.url" @click="urlClick(button.clickEvent)" :title="button.name">
+          {{ button.name }}
+        </button>
+      </div>
       <div class="contTitle" v-html="item.title"></div>
       <div class="contSpec"><span v-for="spec in item.spec">{{ spec }}</span></div>
       <div class="contDate" v-if="item.date">[{{ item.date }}]</div>
@@ -13,11 +22,11 @@
           <div class="partRate"><div :style="{width: part.width}">{{ part.rate }}%</div></div>
         </li>
       </ul>
-      <div class="hover">
-        <div>
-          <button v-for="button in item.url" @click="urlClick(button.clickEvent)"><span>{{ button.name }}</span></button>
-        </div>
-      </div>
+<!--      <div class="hover">-->
+<!--        <div>-->
+<!--          <button v-for="button in item.url" @click="urlClick(button.clickEvent)"><span>{{ button.name }}</span></button>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
   </li>
 </template>
@@ -59,12 +68,62 @@ export default {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .portfolioItem{
   width: 50%;
   float: left;
-  padding: 0 10px;
-  padding-bottom: 20px;
+  padding: 0 10px 20px;
+  .contImg{
+    transition: transform .3s cubic-bezier(.34,1.61,.7,1);
+    background-color: #FFF;
+    position: relative;
+    z-index: 1;
+    > div{
+      transition: box-shadow .3s ease;
+      border-radius: 8px;
+      > div{
+        width: 100%;
+        padding-bottom: 60%;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+    }
+  }
+  .hideBox{
+    margin-top: -42px;
+    height: 40px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    position: relative;
+    z-index: 0;
+    > button{
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: #FFF;
+      margin-right: 10px;
+      cursor: pointer;
+      border: 0;
+      font-size: 12px;
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, .08);
+      &:hover{
+        background-color: ghostwhite;
+      }
+      > i {
+        color: coral;
+      }
+    }
+  }
+  &:hover{
+    .contImg{
+      transform: translateY(-40px);
+      > div{
+        box-shadow: 0 0 4px 1px rgb(0 0 0 / 8%);
+      }
+    }
+  }
 }
 .portfolioItem:nth-child(odd){
   clear: both;
@@ -76,15 +135,6 @@ export default {
   border-radius: 8px;
   box-shadow: 0 0 10px 1px rgba(0, 0, 0, .1);
   position: relative;
-}
-.portfolioItem .contImg{
-}
-.portfolioItem .contImg > div{
-  width: 100%;
-  padding-bottom: 60%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center center;
 }
 .portfolioItem .contTitle{
   font-size: 20px;
