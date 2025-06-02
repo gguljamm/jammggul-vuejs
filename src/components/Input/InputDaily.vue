@@ -1,7 +1,12 @@
 <template>
   <div id="InputBox" class="inputBox">
     <div>
-      <label class="secure"><input type="checkbox" v-model="isSecure" /><div>나만보기</div></label>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label class="secure"><input type="checkbox" v-model="isSecure" /><div>나만보기</div></label>
+        <div v-if="editData">
+          <input type="date" v-model="date"/>
+        </div>
+      </div>
       <textarea id="TextArea" v-model="text"></textarea>
       <div class="preview" v-if="arrImage.length > 0">
         <div v-for="(x, index) in arrImage">
@@ -11,8 +16,10 @@
       </div>
       <div class="btns">
         <input ref="inputImage" type="file" accept="image/*" multiple @input="setPreview" />
-        <button class="del" v-if="editData" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
-        <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}</button>
+        <div>
+          <button class="del" v-if="editData" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
+          <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}</button>
+        </div>
       </div>
     </div>
   </div>
@@ -20,12 +27,15 @@
 
 <script setup>
 import { ref, getCurrentInstance } from 'vue';
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
+import { ref as storageRef, getStorage, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import dayjs from "dayjs";
 import { useStore } from '../../stores';
 
 const store = useStore();
 const app = getCurrentInstance()
-const $firebase = app.appContext.config.globalProperties.$firebase
+const $firebase = app.appContext.config.globalProperties.$firebase;
+const db = getFirestore();
 
 import LoadImage from 'blueimp-load-image';
 const emit = defineEmits(['uploadComplete']);
@@ -34,6 +44,7 @@ const props = defineProps(['isMobile', 'editData']);
 
 const arrImage = ref(props.editData ? [...props.editData.data.arrImage] : []);
 const isSecure = ref(props.editData ? props.editData.data.isSecure : false);
+const date = ref(props.editData ? props.editData.data.date : false);
 const arrCanvas = ref(props.editData ? [...props.editData.data.arrImage] : []);
 const inputImage = ref(null);
 const text = ref(props.editData ? props.editData.data.text : '');
@@ -62,9 +73,17 @@ const del = async () => {
   store.setLoading(true);
   for (let x in props.editData.data.arrImage) {
     const path = props.editData.data.arrImage[x].split('/o/')[1].split('?')[0];
-    await $firebase.storage(decodeURIComponent(path)).delete();
+
+    const storage = getStorage();
+    const fileRef = storageRef(storage, decodeURIComponent(path));
+
+    try {
+      await deleteObject(fileRef);
+    } catch (e) {
+      console.error('Error deleting file:', e);
+    }
   }
-  await $firebase.firestore('daily').doc(props.editData.id).delete();
+  await deleteDoc(doc(db, 'daily', props.editData.id));
   store.setLoading(false);
   alert('삭제 성공!'); // eslint-disable-line
   const ym = `${`${props.editData.data.date}`.substring(0, 4)}-${`${props.editData.data.date}`.substring(5, 7)}`;
@@ -78,10 +97,13 @@ const submit = async () => {
       resolve(img);
       return;
     }
-    // const ex = img.substring(0, img.indexOf(';')).split('/')[1];
     const ex = img.type.split('/')[1];
-    const resp = await $firebase.storage(`daily/${dayjs().format('YYYYMMDDHHmmssSSS')}.${ex}`).put(img);
-    const url = await resp.ref.getDownloadURL();
+
+    const storage = getStorage();
+    const _ref = storageRef(storage, `daily/${dayjs().format('YYYYMMDDHHmmssSSS')}.${ex}`);
+
+    const resp = await uploadBytes(_ref, img);
+    const url = await getDownloadURL(resp.ref);
     resolve(url);
   });
   const arrPromise = arrCanvas.value.map((v) => promise(v));
@@ -95,11 +117,20 @@ const submit = async () => {
   if (props.editData) {
     const arrDelImg = props.editData.data.arrImage.filter((v) => !arrImage.value.some((v2) => v2 === v))
     for (let x in arrDelImg) {
-      const path = arrDelImg[x].split('/o/')[1].split('?')[0];
-      await $firebase.storage(decodeURIComponent(path)).delete();
+      const path = props.editData.data.arrImage[x].split('/o/')[1].split('?')[0];
+
+      const storage = getStorage();
+      const fileRef = storageRef(storage, decodeURIComponent(path));
+
+      try {
+        await deleteObject(fileRef);
+      } catch (e) {
+        console.error('Error deleting file:', e);
+      }
     }
-    $firebase.firestore('daily').doc(props.editData.id).update({
+    updateDoc(doc(db, 'daily', props.editData.id), {
       content: text.value,
+      date: parseInt(dayjs(date.value).format('YYYYMMDDHHmmssSSS'), 10),
       imgUrl: arrImgSrc,
       isSecure: isSecure.value,
     }).then(() => {
@@ -109,7 +140,7 @@ const submit = async () => {
     });
   } else {
     const day = dayjs();
-    $firebase.firestore('daily').add({
+    addDoc(collection(db, 'daily'), {
       content: text.value,
       date: parseInt(day.format('YYYYMMDDHHmmss'), 10),
       imgUrl: arrImgSrc,
@@ -191,6 +222,7 @@ const submit = async () => {
       .btns{
         display: flex;
         justify-content: space-between;
+        align-items: center;
         .submit{
           white-space: nowrap;
           padding: 0 10px;

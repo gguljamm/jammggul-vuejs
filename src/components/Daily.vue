@@ -58,7 +58,10 @@
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
-                <div>
+                <div v-if="item.isSecure">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%"><i class="fa fa-lock fa-2x" aria-hidden="true" /></div>
+                </div>
+                <div v-else>
                   <div><div v-for="(line,key) in item.content.split('\n')" :key="key">{{ line }}<br></div></div>
                   <span class="icons">
                     <i v-if="item.isMore&&item.isMore.indexOf('more')>=0" class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
@@ -86,6 +89,8 @@
 <script lang="ts" setup>
 import InputBox from './Input/InputDaily.vue';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
+import {collection, getFirestore, query, orderBy, limit, getDocs, where, updateDoc, doc} from 'firebase/firestore';
+
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
 
@@ -103,7 +108,9 @@ const isAuth = ref(false);
 const editData = ref(null);
 const error = ref(null);
 
-const props = defineProps({
+const db = getFirestore();
+
+defineProps({
   isMobile: Boolean,
 });
 
@@ -114,11 +121,23 @@ const getData = async () => {
   loaded.value = false;
   try {
     if (filterOption.value === 'Recent') {
-      querySnapshot = await $firebase.firestore('daily').orderBy('date', 'desc').limit(20).get()
+      const dailyQuery = query(
+        collection(db, 'daily'),
+        orderBy('date', 'desc'),
+        limit(20),
+      );
+      querySnapshot = await getDocs(dailyQuery);
     } else {
       const min = parseInt(`${filterOption.value.replace(/-/g, '')}01000000`);
       const max = parseInt(`${filterOption.value.replace(/-/g, '')}31999999`);
-      querySnapshot = await $firebase.firestore('daily').where('date', '>=', min).where('date', '<=', max).orderBy('date').get();
+
+      const dailyQuery = query(
+        collection(db, 'daily'),
+        where('date', '>=', min),
+        where('date', '<=', max),
+        orderBy('date'),
+      );
+      querySnapshot = await getDocs(dailyQuery);
     }
   } catch (e) {
     error.value = (e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........' : e);
@@ -143,10 +162,11 @@ const getData = async () => {
   loaded.value = true;
 }
 
-const getCount = () => {
-  $firebase.firestore('daily-count').doc('0').get().then((snap) => {
-    objCount.value = snap.data();
-  });
+const getCount = async () => {
+  const querySnapshot = await getDocs(query(
+    collection(db, 'daily-count'),
+  ));
+  objCount.value = querySnapshot.docs[0].data();
 };
 
 const authClick = async () => {
@@ -231,7 +251,8 @@ const listClick = (item) => {
 const uploadComplete = async (ym, del) => {
   if (ym) {
     const v = del ? (objCount.value[ym] || 0) - 1 : (objCount.value[ym] || 0) + 1;
-    await $firebase.firestore('daily-count').doc('0').update({
+
+    updateDoc(doc(db, 'daily-count', '0'), {
       [ym]: v,
     })
     objCount.value[ym] = v;
