@@ -58,7 +58,7 @@
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
-                <div v-if="item.isSecure">
+                <div v-if="item.isSecure && !isAdmin">
                   <div style="display: flex; align-items: center; justify-content: center; height: 100%"><i class="fa fa-lock fa-2x" aria-hidden="true" /></div>
                 </div>
                 <div v-else>
@@ -89,7 +89,8 @@
 <script lang="ts" setup>
 import InputBox from './Input/InputDaily.vue';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
-import {collection, getFirestore, query, orderBy, limit, getDocs, where, updateDoc, doc} from 'firebase/firestore';
+import { collection, getFirestore, query, orderBy, limit, getDocs, where, updateDoc, doc } from 'firebase/firestore';
+import {getAuth, onAuthStateChanged} from 'firebase/auth';
 
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
@@ -107,6 +108,7 @@ const objCount = ref({});
 const isAuth = ref(false);
 const editData = ref(null);
 const error = ref(null);
+const isAdmin = ref();
 
 const db = getFirestore();
 
@@ -277,7 +279,13 @@ const edit = async (e) => {
 onMounted(() => {
   getData();
   getCount();
+
 });
+
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  isAdmin.value = $firebase.user();
+})
 
 const vGetHeight = {
   mounted: (ele, value) => {

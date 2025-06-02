@@ -34,7 +34,6 @@ import { useStore } from '../../stores';
 
 const store = useStore();
 const app = getCurrentInstance()
-const $firebase = app.appContext.config.globalProperties.$firebase;
 const db = getFirestore();
 
 import LoadImage from 'blueimp-load-image';
