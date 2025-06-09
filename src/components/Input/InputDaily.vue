@@ -128,7 +128,7 @@ const submit = async () => {
     }
     updateDoc(doc(db, 'daily', props.editData.id), {
       content: text.value,
-      date: parseInt(dayjs(date.value).format('YYYYMMDDHHmmssSSS'), 10),
+      date: parseInt(dayjs(date.value).format('YYYYMMDDHHmmss'), 10),
       imgUrl: arrImgSrc,
       isSecure: isSecure.value,
     }).then(() => {

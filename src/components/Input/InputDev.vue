@@ -20,20 +20,20 @@
 </template>
 
 <script setup>
-import {ref, getCurrentInstance, onMounted} from 'vue';
-const app = getCurrentInstance();
-const $firebase = app.appContext.config.globalProperties.$firebase;
+import {onMounted, ref} from 'vue';
+import {addDoc, deleteDoc, doc, getFirestore, updateDoc, collection} from 'firebase/firestore';
 
-// import LoadImage from 'blueimp-load-image';
 import dayjs from "dayjs";
-import { useStore } from "../../stores";
+import {useStore} from "../../stores";
+import {getDownloadURL, getStorage, ref as storageRef, uploadBytes, uploadString} from "firebase/storage";
+
 const store = useStore();
+const db = getFirestore();
 
 const props = defineProps(['isMobile', 'data']);
 const emit = defineEmits(['reload']);
 
 const isOldContent = props.data && props.data.content.slice(-6) !== '</div>';
-console.log(props.data?.content.slice(-6))
 
 const textArea = ref(null);
 const category = ref(props.data?.category || 'dev');
@@ -58,7 +58,7 @@ const inputImg = async ($event) => {
 
 const del = async () => {
   store.setLoading(true);
-  await $firebase.firestore('dev-blog').doc(props.data.id).delete();
+  await deleteDoc(doc(db, 'dev-blog', props.data.id));
   store.setLoading(false);
   emit('reload');
   alert('삭제 성공!'); // eslint-disable-line
@@ -72,14 +72,13 @@ const submit = async () => {
       if (imgTag.src.startsWith('data:image/')) {
         const mediatype = imgTag.src.split(';')[0].split('data:image/')[1];
         const name = `dev-blog/${dayjs().format('YYYYMMDDHHmmssSSS')}.${mediatype}`;
-        $firebase.storage(name).putString(imgTag.src, 'data_url').then(async (snap) => {
-          const url = await snap.ref.getDownloadURL();
-          imgTag.src = url;
-          imgTag.removeAttribute('style');
-          resolve(true);
-        }).catch((e) => {
-          console.log(e);
-        });
+        const storage = getStorage();
+        const _ref = storageRef(storage, name);
+
+        const resp = await uploadString(_ref, imgTag.src, 'data_url');
+        imgTag.src = await getDownloadURL(resp.ref);
+        imgTag.removeAttribute('style');
+        resolve(true);
       } else {
         resolve(true);
       }
@@ -90,13 +89,12 @@ const submit = async () => {
   const thisCategory = category.value;
 
   if (props.data) {
-    await $firebase.firestore('dev-blog').doc(props.data.id).update({
+    await updateDoc(doc(db, 'dev-blog', props.data.id), {
       category: thisCategory,
       content: text,
-      // date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
     });
   } else {
-    await $firebase.firestore('dev-blog').add({
+    await addDoc(collection(db, 'dev-blog'), {
       category: thisCategory,
       content: text,
       date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),

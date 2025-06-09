@@ -6,11 +6,11 @@
       @reload="getData"
     ></input-review>
     <div class="reviewHead">
-      <button @click="authClick()">
-        <i class="fa fa-pencil" aria-hidden="true"></i>
-      </button>
       <button @click="categoryOpen = !categoryOpen">
         <i :class="categoryOpen ? 'fa fa-times' : 'fa fa-list'" aria-hidden="true"></i>
+      </button>
+      <button @click="authClick()">
+        <i class="fa fa-pencil" aria-hidden="true"></i>
       </button>
     </div>
     <div v-if="error" style="padding: 40px; text-align: center; color: coral; font-size: 24px;" v-html="error"></div>
@@ -170,7 +170,11 @@
       font-size: 16px;
       background-color: #FFF;
       box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
-      border: 1px solid #c98474;
+      border: 1px solid #d7d8d9;
+      transition: background-color .3s ease;
+      &:hover {
+        background-color: #f1f2f3;
+      }
     }
   }
   .category{

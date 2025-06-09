@@ -4,7 +4,7 @@
       <template v-if="content.type !== 'code'">
         <div v-for="x in splitContent(content.content)">
           <template v-if="x.indexOf('##') === 0">{{ x.replace('##', '') }}</template>
-          <div v-else v-html="replaceHTMLTag(x)"></div>
+          <div v-else v-html="replaceHTMLTag(x)" @click="bindClick"></div>
         </div>
       </template>
       <template v-else>
@@ -17,7 +17,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 const props = defineProps(['data']);
 const emit = defineEmits(['imgPopupOpen', 'openEdit']);
 
@@ -60,6 +59,7 @@ const replaceHTMLTag = (text) => {
     line = line.replace('&lt;', '<').replace('&gt;', '>').replace('&lt;/a&gt;', '</a>');
     html = html.replace(v, line);
   });
+
   return html || '&nbsp;';
 };
 
@@ -70,6 +70,14 @@ const splitContent = (html) => {
     return [...div.childNodes].map((v) => v.innerHTML || v.textContent);
   }
   return html.split('\n');
+};
+
+const bindClick = (html) => {
+  const target = html.target || html.srcElement;
+  if (target.tagName === 'IMG') {
+    const imgSrc = target.src;
+    emit('imgPopupOpen', imgSrc);
+  }
 };
 </script>
 

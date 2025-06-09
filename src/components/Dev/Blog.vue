@@ -162,7 +162,11 @@ onMounted(() => {
       font-size: 16px;
       background-color: #FFF;
       box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
-      border: 1px solid #c98474;
+      border: 1px solid #d7d8d9;
+      transition: background-color .3s ease;
+      &:hover {
+        background-color: #f1f2f3;
+      }
     }
   }
   .devWrapper{
@@ -245,11 +249,13 @@ onMounted(() => {
     margin: 0 auto;
     text-align: center;
     height: 100%;
+    padding: 40px 0;
   }
   .imgPop > div > img{
     position: relative;
     max-width: 100%;
     box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+    max-height: 100%;
   }
   .imgPop.over > div > img{
     margin: 40px 0;

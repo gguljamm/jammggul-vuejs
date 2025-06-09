@@ -96,7 +96,11 @@ onMounted(() => {
       font-size: 16px;
       background-color: #FFF;
       box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
-      border: 1px solid #c98474;
+      border: 1px solid #d7d8d9;
+      transition: background-color .3s ease;
+      &:hover {
+        background-color: #f1f2f3;
+      }
     }
   }
   ul{
