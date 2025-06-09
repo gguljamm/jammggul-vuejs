@@ -19,6 +19,7 @@
 <script lang="ts" setup>
 import InputRetrospect from "../Input/InputRetrospect.vue";
 import {ref, getCurrentInstance, onMounted} from 'vue';
+import {collection, getDocs, getFirestore, orderBy, query} from "firebase/firestore";
 const app = getCurrentInstance();
 const $firebase = app.appContext.config.globalProperties.$firebase;
 
@@ -44,12 +45,20 @@ const getData = async () => {
   loaded.value = false;
   editData.value = null;
   itemsView.value = [];
-  const querySnapshot = await $firebase.firestore('dev-retrospect').orderBy('date', 'desc').get()
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    const d = doc.data();
-    itemsView.value.push({ ...d, id: doc.id });
+
+  const db = getFirestore();
+
+  const dailyQuery = query(
+    collection(db, 'dev-retrospect'),
+    orderBy('date', 'desc'),
+  );
+  getDocs(dailyQuery).then((querySnapshot) => {
+    querySnapshot.forEach((x) => {
+      const data = x.data();
+      itemsView.value.push({ ...data, id: data.id });
+    });
   });
+
   loaded.value = true;
 }
 

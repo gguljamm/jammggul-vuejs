@@ -63,6 +63,7 @@ import InputIt from '../Input/InputDev.vue';
 import BlogContent from './BlogContent.vue';
 
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
+import {collection, getDocs, getFirestore, orderBy, query} from "firebase/firestore";
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase;
 
@@ -83,14 +84,21 @@ const filteredData = computed(() => {
 
 const getData = () => {
   isAuth.value = false;
-  $firebase.firestore('dev-blog').orderBy('date', 'desc').get().then((querySnapshot) => {
+
+  const db = getFirestore();
+
+  const dailyQuery = query(
+    collection(db, 'dev-blog'),
+    orderBy('date', 'desc'),
+  );
+  getDocs(dailyQuery).then((querySnapshot) => {
     allData.value = [];
     objCount.value = {
       it: 0,
       dev: 0,
       hardware: 0,
     };
-    querySnapshot.docs.forEach((x) => {
+    querySnapshot.forEach((x) => {
       const data = x.data();
       allData.value.push({
         ...data,

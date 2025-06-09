@@ -20,6 +20,7 @@
 <script>
 import inputPortfolio from '../Input/InputPortfolio.vue';
 import PortfolioItem from './PortfolioItem.vue';
+import { collection, getFirestore, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 export default {
   components: {
@@ -45,31 +46,17 @@ export default {
     getData() {
       this.list = [];
       this.isAuth = false;
-      // this.$firebase.database('/portfolio').once('value', (snap) => {
-      //   const list = snap.val();
-      //   const keys = Object.values(list);
-      //   keys.reverse().forEach((x) => {
-      //     const content = {
-      //       title: x.title,
-      //       thumbnail: x.thumbnail,
-      //       spec: x.spec,
-      //       date: x.date,
-      //       url: x.operate ? x.operate.map(v => ({
-      //         name: v.name,
-      //         clickEvent: v.url,
-      //       })) : [],
-      //       participate: x.contribute ? x.contribute.map(v => ({
-      //         title: v.name,
-      //         width: 0,
-      //         rate: v.percent,
-      //       })) : [],
-      //     };
-      //     this.list.push(content);
-      //   });
-      // });
-      this.$firebase.firestore('dev-portfolio').orderBy('date', 'desc').get().then(async (querySnapshot) => {
-        querySnapshot.docs.forEach((x, index) => {
-          const data = x.data();
+
+      const db = getFirestore();
+
+      const dailyQuery = query(
+        collection(db, 'dev-portfolio'),
+        orderBy('date', 'desc'),
+      );
+      getDocs(dailyQuery).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+
           this.list.push({
             title: data.title,
             thumbnail: data.thumbnail,
@@ -84,7 +71,7 @@ export default {
               width: 0,
               rate: v.percent,
             })) : [],
-          })
+          });
         });
       });
     },

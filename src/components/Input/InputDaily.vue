@@ -26,14 +26,13 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue';
+import { ref } from 'vue';
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref as storageRef, getStorage, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import dayjs from "dayjs";
 import { useStore } from '../../stores';
 
 const store = useStore();
-const app = getCurrentInstance()
 const db = getFirestore();
 
 import LoadImage from 'blueimp-load-image';

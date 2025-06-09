@@ -55,6 +55,7 @@
 
 <script>
   import inputReview from './Input/InputReview.vue';
+  import {collection, getDocs, getFirestore, limit, orderBy, query} from "firebase/firestore";
 
   export default {
     components: {
@@ -121,9 +122,17 @@
       },
       getData() {
         this.isAuth = false;
-        this.$firebase.firestore('review').orderBy('date', 'desc').get().then((querySnapshot) => {
-          querySnapshot.docs.forEach((x) => {
-            const data = x.data();
+
+        const db = getFirestore();
+
+        const dailyQuery = query(
+          collection(db, 'review'),
+          orderBy('date', 'desc'),
+        );
+        getDocs(dailyQuery).then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+
             const content = {
               content: data.content,
               title: data.title,
@@ -131,8 +140,6 @@
             };
             this.reviewInfo[data.category].push(content);
           });
-        }).catch((e) => {
-          this.error = (e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........<br>왜?ㅠ,.ㅠ 이걸 누가 본다고' : e);
         });
       },
     },

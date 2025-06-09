@@ -54,6 +54,7 @@ import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
 import InputTravel from './Input/InputTravel.vue';
+import {collection, getDocs, getFirestore, orderBy, query} from "firebase/firestore";
 
 const props = defineProps(['isMobile']);
 
@@ -94,9 +95,17 @@ const travelPopClick = () => {
 
 const getData = () => {
   closePop('direct');
-  $firebase.firestore('travel').orderBy('date', 'desc').get().then((querySnapshot) => {
-    querySnapshot.docs.forEach((x) => {
-      const data = x.data();
+
+  const db = getFirestore();
+
+  const dailyQuery = query(
+    collection(db, 'travel'),
+    orderBy('date', 'desc'),
+  );
+  getDocs(dailyQuery).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+
       const content = {
         country: data.country,
         tags: data.tags.split(','),

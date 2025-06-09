@@ -90,7 +90,7 @@
 import InputBox from './Input/InputDaily.vue';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where, updateDoc, doc } from 'firebase/firestore';
-import {getAuth, onAuthStateChanged} from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const app = getCurrentInstance()
 const $firebase = app.appContext.config.globalProperties.$firebase
