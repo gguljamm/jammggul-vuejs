@@ -28,14 +28,15 @@
 <script setup>
 import { ref } from 'vue';
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import { ref as storageRef, getStorage, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import dayjs from "dayjs";
 import { useStore } from '../../stores';
+import LoadImage from 'blueimp-load-image';
 
 const store = useStore();
 const db = getFirestore();
+const storage = getStorage();
 
-import LoadImage from 'blueimp-load-image';
 const emit = defineEmits(['uploadComplete']);
 
 const props = defineProps(['isMobile', 'editData']);
@@ -72,7 +73,6 @@ const del = async () => {
   for (let x in props.editData.data.arrImage) {
     const path = props.editData.data.arrImage[x].split('/o/')[1].split('?')[0];
 
-    const storage = getStorage();
     const fileRef = storageRef(storage, decodeURIComponent(path));
 
     try {

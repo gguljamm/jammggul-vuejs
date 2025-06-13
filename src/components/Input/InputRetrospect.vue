@@ -14,32 +14,41 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, getCurrentInstance } from 'vue';
-import dayjs from "dayjs";
+import { ref } from 'vue';
 import { useStore } from '../../stores';
+import { addDoc, doc, getFirestore, updateDoc, collection } from 'firebase/firestore';
 
 const store = useStore();
-const app = getCurrentInstance()
-const $firebase = app.appContext.config.globalProperties.$firebase
+const db = getFirestore();
 
 const emit = defineEmits(['uploadComplete']);
-
 const props = defineProps(['isMobile', 'editData']);
 
 const text = ref(props.editData ? props.editData.content : '');
 const date = ref(props.editData ? props.editData.date : '');
 
-const submit = () => {
+const submit = async () => {
   store.setLoading(true);
+
   const data = {
     content: text.value,
     date: date.value,
   };
-  (props.editData ? $firebase.firestore('dev-retrospect').doc(props.editData.id).update(data) : $firebase.firestore('dev-retrospect').add(data)).then(() => {
-    store.setLoading(false);
+
+  try {
+    if (props.editData) {
+      await updateDoc(doc(db, 'daily', props.editData.id), data);
+    } else {
+      await addDoc(collection(db, 'daily'), data);
+    }
     alert('포스팅 성공!'); // eslint-disable-line
     emit('uploadComplete');
-  });
+  } catch (error) {
+    alert(error);
+  } finally {
+    store.setLoading(false);
+  }
+
 };
 </script>
 

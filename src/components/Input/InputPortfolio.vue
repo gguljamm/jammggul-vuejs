@@ -47,109 +47,117 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import LoadImage from 'blueimp-load-image';
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { useStore } from "@/stores";
+import { ref } from "vue";
+import dayjs from "dayjs";
 
-export default {
-  name: 'input-it',
-  data() {
-    return {
-      title: '',
-      spec: [{ name: '' }],
-      date: '',
-      contribute: [
-        {
-          name: '',
-          percent: 0,
-        },
-      ],
-      operate: [
-        {
-          name: '',
-          url: '',
-        },
-      ],
-      arrImgUrl: '',
-    };
+const store = useStore();
+const db = getFirestore();
+const storage = getStorage();
+
+const emit = defineEmits(['reload']);
+
+const title =  ref('');
+const spec = ref( [{ name: '' }]);
+const date = ref( '');
+const thumbnail = ref(null);
+const contribute = ref( [
+  {
+    name: '',
+    percent: 0,
   },
-  props: ['isMobile'],
-  methods: {
-    submit() {
-      this.store.setLoading(true);
-      const file = this.$refs.thumbnail.files;
-      if (file && file.length > 0) {
-        this.resizeImage(file[0]);
-      } else {
-        this.upload(false);
-      }
-    },
-    submitImage(file, resizedImage) {
-      const name = `travel/${file.name}`;
-      this.$firebase.storage(name).put(resizedImage).then(async () => {
-        const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
-        this.arrImgUrl = downloadUrl;
-        this.upload(true);
-      });
-    },
-    resizeImage(file) {
-      if (file.type === 'image/gif') {
-        this.submitImage(file, file);
-        return false;
-      }
-      const reader = new FileReader();
-      const image = new Image();
-      const dataURItoBlob = (dataURI) => {
-        const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
-          atob(dataURI.split(',')[1]) :
-          unescape(dataURI.split(',')[1]);
-        const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const max = bytes.length;
-        const ia = new Uint8Array(max);
-        for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
-        return new Blob([ia], { type: mime });
-      };
-      const resize = () => {
-        LoadImage.parseMetaData(file, (data) => {
-          let orientation = 0;
-          if (data.exif) {
-            orientation = data.exif.get('Orientation');
-          }
-          LoadImage(file, (canvas) => {
-            const dataUrl = canvas.toDataURL(file.type);
-            this.submitImage(file, dataURItoBlob(dataUrl));
-          }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
-        });
-      };
-
-      return new Promise((ok) => {
-        if (!file.type.match(/image.*/)) {
-          alert('no image file!'); // eslint-disable-line
-          return;
-        }
-
-        reader.onload = (readerEvent) => {
-          image.onload = () => ok(resize());
-          image.src = readerEvent.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    },
-    upload(url) {
-      this.$firebase.firestore('dev-portfolio').add({
-        title: this.title,
-        spec: this.spec.map(v => v.name).filter(v => v),
-        date: this.date,
-        contribute: this.contribute.filter(v => v.name),
-        operate: this.operate.filter(v => v.url && v.name),
-        thumbnail: url ? this.arrImgUrl : '',
-      }).then(() => {
-        this.store.setLoading(false);
-        alert('포스팅 성공!'); // eslint-disable-line
-        this.$emit('reload');
-      });
-    },
+]);
+const operate = ref( [
+  {
+    name: '',
+    url: '',
   },
+]);
+const arrImgUrl = ref('');
+
+const submit = () => {
+  store.setLoading(true);
+  const file = thumbnail.value.files;
+  if (file && file.length > 0) {
+    resizeImage(file[0]);
+  } else {
+    upload(false);
+  }
 };
+
+const submitImage = async (file, resizedImage) => {
+  const name = `dev-portfolio/${file.name}`;
+
+  const _ref = storageRef(storage, name);
+
+  const resp = await uploadBytes(_ref, resizedImage);
+  arrImgUrl.value = await getDownloadURL(resp.ref);
+  upload(true);
+};
+
+const resizeImage = (file) => {
+  if (file.type === 'image/gif') {
+    submitImage(file, file);
+    return false;
+  }
+  const reader = new FileReader();
+  const image = new Image();
+  const dataURItoBlob = (dataURI) => {
+    const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
+      atob(dataURI.split(',')[1]) :
+      unescape(dataURI.split(',')[1]);
+    const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const max = bytes.length;
+    const ia = new Uint8Array(max);
+    for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
+    return new Blob([ia], { type: mime });
+  };
+  const resize = () => {
+    LoadImage.parseMetaData(file, (data) => {
+      let orientation = 0;
+      if (data.exif) {
+        orientation = data.exif.get('Orientation');
+      }
+      LoadImage(file, (canvas) => {
+        const dataUrl = canvas.toDataURL(file.type);
+        submitImage(file, dataURItoBlob(dataUrl));
+      }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
+    });
+  };
+
+  return new Promise((ok) => {
+    if (!file.type.match(/image.*/)) {
+      alert('no image file!'); // eslint-disable-line
+      return;
+    }
+
+    reader.onload = (readerEvent) => {
+      image.onload = () => ok(resize());
+      image.src = readerEvent.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const upload = (url) => {
+  addDoc(collection(db, 'dev-portfolio'), {
+    title: title.value,
+    spec: spec.value.map(v => v.name).filter(v => v),
+    dates: date.value,
+    date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
+    contribute: contribute.value.filter(v => v.name),
+    operate: operate.value.filter(v => v.url && v.name),
+    thumbnail: url ? arrImgUrl.value : '',
+  }).then(() => {
+    store.setLoading(false);
+    alert('포스팅 성공!'); // eslint-disable-line
+    emit('reload');
+  });
+}
 </script>
 
 <style scoped lang="scss">

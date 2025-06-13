@@ -22,88 +22,100 @@
   </div>
 </template>
 
-<script>
-  import LoadImage from 'blueimp-load-image';
-  import dayjs from 'dayjs';
+<script setup>
+import LoadImage from 'blueimp-load-image';
+import { addDoc, getFirestore, collection } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+import dayjs from 'dayjs';
+import { useStore } from "@/stores";
+import { ref } from "vue";
 
-  export default {
-    data() {
-      return {
-        arrImg: [],
-      };
-    },
-    methods: {
-      submit() {
-        this.store.setLoading(true);
-        this.$firebase.firestore('review').add({
-          category: this.$refs.category.value,
-          title: this.$refs.title.value,
-          content: this.$refs.content.value,
-          imgUrl: this.arrImg,
-          date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
-        }).then(() => {
-          this.store.setLoading(false);
-          alert('포스팅 성공!'); // eslint-disable-line
-          this.$emit('reload');
-        });
-      },
-      imgUpload() {
-        this.resizeImage(this.$refs.url.files[0]);
-      },
-      submitImage(file, resizedImage) {
-        const name = `review/${file.name}`;
-        this.$firebase.storage(name).put(resizedImage).then(async () => {
-          const downloadUrl = await this.$firebase.storage(name).getDownloadURL();
-          this.arrImg.push(downloadUrl);
-          this.$refs.content.value += `#img${this.arrImg.length - 1}#\n`;
-          this.$refs.url.value = '';
-        });
-      },
-      resizeImage(file) {
-        if (file.type === 'image/gif') {
-          this.submitImage(file, file);
-          return false;
-        }
-        const reader = new FileReader();
-        const image = new Image();
-        const dataURItoBlob = (dataURI) => {
-          const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
-            atob(dataURI.split(',')[1]) :
-            unescape(dataURI.split(',')[1]);
-          const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-          const max = bytes.length;
-          const ia = new Uint8Array(max);
-          for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
-          return new Blob([ia], { type: mime });
-        };
-        const resize = () => {
-          LoadImage.parseMetaData(file, (data) => {
-            let orientation = 0;
-            if (data.exif) {
-              orientation = data.exif.get('Orientation');
-            }
-            LoadImage(file, (canvas) => {
-              const dataUrl = canvas.toDataURL(file.type);
-              this.submitImage(file, dataURItoBlob(dataUrl));
-            }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
-          });
-        };
+const db = getFirestore();
+const storage = getStorage();
+const store = useStore();
+const emit = defineEmits(['reload']);
 
-        return new Promise((ok) => {
-          if (!file.type.match(/image.*/)) {
-            alert('no image file!'); // eslint-disable-line
-            return;
-          }
+const category = ref(null);
+const title = ref(null);
+const content = ref(null);
+const url = ref(null);
+const arrImg = ref([]);
 
-          reader.onload = (readerEvent) => {
-            image.onload = () => ok(resize());
-            image.src = readerEvent.target.result;
-          };
-          reader.readAsDataURL(file);
-        });
-      },
-    },
+const submit = () => {
+  store.setLoading(true);
+
+  addDoc(collection(db, 'review'), {
+    category: category.value.value,
+    title: title.value.value,
+    content: content.value.value,
+    imgUrl: arrImg.value,
+    date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
+  }).then(() => {
+    store.setLoading(false);
+    alert('포스팅 성공!'); // eslint-disable-line
+    emit('reload');
+  });
+}
+
+const imgUpload = () => {
+  resizeImage(url.value.files[0]);
+}
+
+const submitImage = async (file, resizedImage) => {
+  const name = `review/${file.name}`;
+
+  const _ref = storageRef(storage, name);
+  const resp = await uploadBytes(_ref, resizedImage);
+  const downloadUrl = await getDownloadURL(resp.ref);
+
+  arrImg.value.push(downloadUrl);
+  content.value.value += `#img${arrImg.value.length - 1}#\n`;
+  url.value.value = '';
+}
+
+const resizeImage = (file) => {
+  if (file.type === 'image/gif') {
+    submitImage(file, file);
+    return false;
+  }
+  const reader = new FileReader();
+  const image = new Image();
+  const dataURItoBlob = (dataURI) => {
+    const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
+      atob(dataURI.split(',')[1]) :
+      unescape(dataURI.split(',')[1]);
+    const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const max = bytes.length;
+    const ia = new Uint8Array(max);
+    for (let i = 0; i < max; i += 1) ia[i] = bytes.charCodeAt(i);
+    return new Blob([ia], { type: mime });
   };
+  const resize = () => {
+    LoadImage.parseMetaData(file, (data) => {
+      let orientation = 0;
+      if (data.exif) {
+        orientation = data.exif.get('Orientation');
+      }
+      LoadImage(file, (canvas) => {
+        const dataUrl = canvas.toDataURL(file.type);
+        submitImage(file, dataURItoBlob(dataUrl));
+      }, { canvas: true, orientation, maxWidth: 1280, maxHeight: 720 });
+    });
+  };
+
+  return new Promise((ok) => {
+    if (!file.type.match(/image.*/)) {
+      alert('no image file!'); // eslint-disable-line
+      return;
+    }
+
+    reader.onload = (readerEvent) => {
+      image.onload = () => ok(resize());
+      image.src = readerEvent.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 </script>
 
 <style scoped lang="scss">

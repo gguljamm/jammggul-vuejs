@@ -12,23 +12,25 @@
       <p v-else class="textarea" ref="textArea" contenteditable="true"></p>
       <div class="btns">
         <input id="ImgArea" type="file" accept="image/*" @input="inputImg">
-        <button class="del" v-if="data" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
-        <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ props.data ? '수정' : '올리기' }}</button>
+        <div>
+          <button class="del" v-if="data" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
+          <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ props.data ? '수정' : '올리기' }}</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue';
-import {addDoc, deleteDoc, doc, getFirestore, updateDoc, collection} from 'firebase/firestore';
-
+import { onMounted, ref } from 'vue';
+import { addDoc, deleteDoc, doc, getFirestore, updateDoc, collection } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref as storageRef, uploadString } from "firebase/storage";
 import dayjs from "dayjs";
-import {useStore} from "../../stores";
-import {getDownloadURL, getStorage, ref as storageRef, uploadBytes, uploadString} from "firebase/storage";
+import { useStore } from "../../stores";
 
 const store = useStore();
 const db = getFirestore();
+const storage = getStorage();
 
 const props = defineProps(['isMobile', 'data']);
 const emit = defineEmits(['reload']);
@@ -72,7 +74,7 @@ const submit = async () => {
       if (imgTag.src.startsWith('data:image/')) {
         const mediatype = imgTag.src.split(';')[0].split('data:image/')[1];
         const name = `dev-blog/${dayjs().format('YYYYMMDDHHmmssSSS')}.${mediatype}`;
-        const storage = getStorage();
+
         const _ref = storageRef(storage, name);
 
         const resp = await uploadString(_ref, imgTag.src, 'data_url');
