@@ -28,7 +28,7 @@
 <script setup>
 import { ref } from 'vue';
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import { ref as storageRef, getFirestore, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref as storageRef, getStorage, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import dayjs from "dayjs";
 import { useStore } from '../../stores';
 import LoadImage from 'blueimp-load-image';
