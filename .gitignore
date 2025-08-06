@@ -15,3 +15,4 @@ yarn-error.log*
 # firebase files
 *.firebase
 src/firebase.json
+.env

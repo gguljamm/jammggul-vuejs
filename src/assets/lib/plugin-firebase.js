@@ -11,6 +11,8 @@ import config from './config.json';
 // console.firebase.google.com > firebaseConfig 에서 가져오기
 initializeApp(config);
 
+const my_uid = import.meta.env.VITE_MY_UID;
+
 export default {
   install (Vue) {
     Vue.config.globalProperties.$firebase = {
@@ -24,12 +26,12 @@ export default {
         const auth = getAuth();
         const user = auth.currentUser;
         let flag = false;
-        if (user && user.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2') {
+        if (user && user.uid === my_uid) {
           flag = true;
         } else {
           const provider = new GoogleAuthProvider();
           signInWithPopup(auth, provider).then((result) => {
-            if (result.user.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2') {
+            if (result.user.uid === my_uid) {
               flag = true;
             } else {
               alert('나만 글쓸거야!!'); // eslint-disable-line
@@ -43,7 +45,7 @@ export default {
       },
       user: () => {
         const auth = getAuth();
-        return auth.currentUser && auth.currentUser.uid === 'AOU0Bl6hvROI3w2wcCU0IDoA6At2';
+        return auth.currentUser && auth.currentUser.uid === my_uid;
       },
       logout: () => {
         const auth = getAuth();

@@ -37,9 +37,9 @@ const submit = async () => {
 
   try {
     if (props.editData) {
-      await updateDoc(doc(db, 'daily', props.editData.id), data);
+      await updateDoc(doc(db, 'dev-retrospect', props.editData.id), data);
     } else {
-      await addDoc(collection(db, 'daily'), data);
+      await addDoc(collection(db, 'dev-retrospect'), data);
     }
     alert('포스팅 성공!'); // eslint-disable-line
     emit('uploadComplete');
