@@ -1,15 +1,25 @@
 <template>
   <div class="devRetrospect">
     <div class="btns">
-      <button @click="authClick"><i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i></button>
+      <button @click="authClick">
+        <i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i>
+      </button>
     </div>
-    <input-retrospect v-if="isAuth" :isMobile="isMobile" @uploadComplete="getData" :editData="editData" :key="editData ? editData.id : ''"></input-retrospect>
+    <input-retrospect
+      v-if="isAuth"
+      :isMobile="isMobile"
+      @uploadComplete="getData"
+      :editData="editData"
+      :key="editData ? editData.id : ''"
+    ></input-retrospect>
     <loading v-if="!loaded"></loading>
     <ul>
       <li v-for="x in itemsView" @click="isAuth ? edit(x) : ''">
         <div>{{ `${x.date}`.substring(0, 4) }}년 {{ `${x.date}`.substring(4, 5) }}분기</div>
         <div>
-          <div v-for="x in x.content.split('\n')" :class="{ strong: x.indexOf('#') === 0 }">{{ x }}<br></div>
+          <div v-for="x in x.content.split('\n')" :class="{ strong: x.indexOf('#') === 0 }">
+            {{ x }}<br />
+          </div>
         </div>
       </li>
     </ul>
@@ -17,9 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-import InputRetrospect from "../Input/InputRetrospect.vue";
-import {ref, getCurrentInstance, onMounted} from 'vue';
-import {collection, getDocs, getFirestore, orderBy, query} from "firebase/firestore";
+import InputRetrospect from '../Input/InputRetrospect.vue';
+import { ref, getCurrentInstance, onMounted } from 'vue';
+import { collection, getDocs, getFirestore, orderBy, query } from 'firebase/firestore';
 const app = getCurrentInstance();
 const $firebase = app.appContext.config.globalProperties.$firebase;
 
@@ -48,10 +58,7 @@ const getData = async () => {
 
   const db = getFirestore();
 
-  const dailyQuery = query(
-    collection(db, 'dev-retrospect'),
-    orderBy('date', 'desc'),
-  );
+  const dailyQuery = query(collection(db, 'dev-retrospect'), orderBy('date', 'desc'));
   getDocs(dailyQuery).then((querySnapshot) => {
     querySnapshot.forEach((x) => {
       const data = x.data();
@@ -60,7 +67,7 @@ const getData = async () => {
   });
 
   loaded.value = true;
-}
+};
 
 const editData = ref(null);
 const edit = (item) => {
@@ -78,15 +85,15 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.devRetrospect{
+.devRetrospect {
   max-width: 1080px;
   margin: 0 auto;
-  .btns{
+  .btns {
     display: flex;
     margin-top: 10px;
     padding: 0 10px;
     justify-content: end;
-    > button{
+    > button {
       margin-left: 10px;
       padding: 0;
       height: 40px;
@@ -94,33 +101,33 @@ onMounted(() => {
       border-radius: 20px;
       cursor: pointer;
       font-size: 16px;
-      background-color: #FFF;
-      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      background-color: #fff;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.1);
       border: 1px solid #d7d8d9;
-      transition: background-color .3s ease;
+      transition: background-color 0.3s ease;
       &:hover {
         background-color: #f1f2f3;
       }
     }
   }
-  ul{
+  ul {
     padding: 20px 10px 20px;
-    li{
+    li {
       line-height: 24px;
-      box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+      box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
       border: 1px solid #d7d8d9;
       border-radius: 8px;
       margin-bottom: 20px;
       padding: 10px 20px;
-      > div:first-of-type{
+      > div:first-of-type {
         text-align: center;
         padding-top: 6px;
         padding-bottom: 16px;
         border-bottom: 1px solid #e1e3e5;
       }
-      > div:nth-of-type(2){
+      > div:nth-of-type(2) {
         padding-top: 10px;
-        > div.strong{
+        > div.strong {
           color: coral;
           line-height: 30px;
           font-size: 20px;

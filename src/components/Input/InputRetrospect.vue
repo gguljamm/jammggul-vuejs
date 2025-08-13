@@ -2,12 +2,14 @@
   <div id="InputBox" class="inputBox">
     <div>
       <div class="date">
-        <input type="number" v-model="date" placeholder="ex)20201">
+        <input type="number" v-model="date" placeholder="ex)20201" />
       </div>
       <textarea v-model="text"></textarea>
       <div class="btns">
         <div></div>
-        <button @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}</button>
+        <button @click="submit">
+          <i class="fa fa-upload" aria-hidden="true"></i> {{ editData ? '수정하기' : '올리기' }}
+        </button>
       </div>
     </div>
   </div>
@@ -41,34 +43,33 @@ const submit = async () => {
     } else {
       await addDoc(collection(db, 'dev-retrospect'), data);
     }
-    alert('포스팅 성공!'); // eslint-disable-line
+    alert('포스팅 성공!');
     emit('uploadComplete');
   } catch (error) {
     alert(error);
   } finally {
     store.setLoading(false);
   }
-
 };
 </script>
 
 <style scoped lang="scss">
-.inputBox{
+.inputBox {
   padding: 10px;
-  > div{
+  > div {
     padding: 20px 16px 20px 16px;
-    box-shadow: 0 0 4px 1px rgba(0,0,0,.1);
-    background-color: #FFF;
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     border-radius: 10px;
-    .date{
+    .date {
       margin-bottom: 10px;
-      > input{
+      > input {
         border: 1px solid #f1f2f3;
         border-radius: 10px;
         padding: 4px 10px;
       }
     }
-    textarea{
+    textarea {
       width: 100%;
       height: 300px;
       margin-bottom: 10px;
@@ -76,18 +77,18 @@ const submit = async () => {
       border: 1px solid #f1f2f3;
       border-radius: 10px;
       padding: 10px;
-      &:focus-visible{
+      &:focus-visible {
         outline: none;
       }
     }
-    .btns{
+    .btns {
       display: flex;
       justify-content: space-between;
-      button{
+      button {
         width: 100px;
         height: 40px;
         border: 0;
-        color: #FFF;
+        color: #fff;
         background-color: #c98474;
         border-radius: 20px;
         cursor: pointer;

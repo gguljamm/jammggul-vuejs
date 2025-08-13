@@ -2,28 +2,19 @@
   <div class="no-freeze-spinner">
     <div id="no-freeze-spinner">
       <div>
-        <i class="material-icons">
-          account_circle
-        </i>
-        <i class="material-icons">
-          home
-        </i>
-        <i class="material-icons">
-          work
-        </i>
-        <div>
-        </div>
+        <i class="material-icons"> account_circle </i>
+        <i class="material-icons"> home </i>
+        <i class="material-icons"> work </i>
+        <div></div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
 
 <style lang="scss">
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 $dark: rgba(0, 0, 0, 0.8);
 
@@ -111,5 +102,4 @@ $dark: rgba(0, 0, 0, 0.8);
 .no-freeze-spinner #no-freeze-spinner i:nth-of-type(3) {
   animation: loadicons 3s 2s infinite ease-in-out;
 }
-
 </style>

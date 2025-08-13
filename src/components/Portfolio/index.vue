@@ -5,11 +5,7 @@
         <i :class="isAuth ? 'fa fa-times' : 'fa fa-pencil'" aria-hidden="true"></i>
       </button>
     </div>
-    <input-portfolio
-      v-if="isAuth"
-      @close-pop="closePop"
-      @reload="getData"
-    ></input-portfolio>
+    <input-portfolio v-if="isAuth" @close-pop="closePop" @reload="getData"></input-portfolio>
     <ul class="ulPrac">
       <portfolio-item v-for="temp in list" :item="temp" :isMobile="isMobile" />
     </ul>
@@ -49,10 +45,7 @@ export default {
 
       const db = getFirestore();
 
-      const dailyQuery = query(
-        collection(db, 'dev-portfolio'),
-        orderBy('date', 'desc'),
-      );
+      const dailyQuery = query(collection(db, 'dev-portfolio'), orderBy('date', 'desc'));
       getDocs(dailyQuery).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
@@ -62,15 +55,19 @@ export default {
             thumbnail: data.thumbnail,
             spec: data.spec,
             date: data.dates,
-            url: data.operate ? data.operate.map(v => ({
-              name: v.name,
-              clickEvent: v.url,
-            })) : [],
-            participate: data.contribute ? data.contribute.map(v => ({
-              title: v.name,
-              width: 0,
-              rate: v.percent,
-            })) : [],
+            url: data.operate
+              ? data.operate.map((v) => ({
+                  name: v.name,
+                  clickEvent: v.url,
+                }))
+              : [],
+            participate: data.contribute
+              ? data.contribute.map((v) => ({
+                  title: v.name,
+                  width: 0,
+                  rate: v.percent,
+                }))
+              : [],
           });
         });
       });
@@ -90,17 +87,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-#Practice{
+#Practice {
   max-width: 1080px;
   width: 100%;
   margin: 0 auto;
   padding-bottom: 20px;
-  .btns{
+  .btns {
     display: flex;
     margin-top: 10px;
     padding: 0 10px;
     justify-content: end;
-    > button{
+    > button {
       margin-left: 10px;
       padding: 0;
       height: 40px;
@@ -108,18 +105,18 @@ export default {
       border-radius: 20px;
       cursor: pointer;
       font-size: 16px;
-      background-color: #FFF;
-      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
+      background-color: #fff;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.1);
       border: 1px solid #d7d8d9;
-      transition: background-color .3s ease;
+      transition: background-color 0.3s ease;
       &:hover {
         background-color: #f1f2f3;
       }
     }
   }
 }
-.ulPrac{
+.ulPrac {
   margin: 0;
-  padding-top: 20px
+  padding-top: 20px;
 }
 </style>

@@ -8,7 +8,10 @@
         </div>
       </template>
       <template v-else>
-        <div v-for="x in splitContent(content.content)" :style="{ paddingLeft: x.match(/  /g) ? `${ x.match(/  /g).length * 10 }px` : '' }">
+        <div
+          v-for="x in splitContent(content.content)"
+          :style="{ paddingLeft: x.match(/  /g) ? `${x.match(/  /g).length * 10}px` : '' }"
+        >
           {{ x || '&nbsp;' }}
         </div>
       </template>
@@ -24,7 +27,9 @@ const openEdit = () => {
   emit('openEdit', props.data.id);
 };
 
-const content = props.data.content.replace(/<div>&lt;code&gt;<\/div>/g, '<code>').replace(/<div>&lt;\/code&gt;<\/div>/g, '</code>');
+const content = props.data.content
+  .replace(/<div>&lt;code&gt;<\/div>/g, '<code>')
+  .replace(/<div>&lt;\/code&gt;<\/div>/g, '</code>');
 const arrContent = [];
 if (content.indexOf('<code>') >= 0 && content.indexOf('</code>') > content.indexOf('<code>')) {
   const arr = content.split('</code>');
@@ -32,17 +37,17 @@ if (content.indexOf('<code>') >= 0 && content.indexOf('</code>') > content.index
     if (v.indexOf('<code>') >= 0) {
       arrContent.push({
         type: 'text',
-        content : v.split('<code>')[0],
+        content: v.split('<code>')[0],
       });
       arrContent.push({
         type: 'code',
-        content : v.split('<code>')[1],
+        content: v.split('<code>')[1],
       });
     } else {
       arrContent.push({
         type: 'text',
         content: v,
-      })
+      });
     }
   });
 } else {
@@ -82,28 +87,28 @@ const bindClick = (html) => {
 </script>
 
 <style lang="scss">
-.blogContentList{
+.blogContentList {
   line-height: 24px;
-  box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
+  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
   border: 1px solid #d7d8d9;
   border-radius: 8px;
   margin: 0 10px 20px 10px;
-  background-color: #FFF;
+  background-color: #fff;
   padding: 30px 20px;
   word-break: break-all;
-  .code{
+  .code {
     background-color: #3a3b3c;
-    color: #FFF;
+    color: #fff;
     font-size: 14px;
     padding: 12px;
     border-radius: 10px;
     white-space: nowrap;
     overflow: auto;
   }
-  .imgCont{
+  .imgCont {
     text-align: center;
   }
-  img{
+  img {
     max-width: 100%;
     margin: 10px 0;
     cursor: zoom-in;

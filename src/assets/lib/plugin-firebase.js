@@ -34,7 +34,7 @@ export default {
             if (result.user.uid === my_uid) {
               flag = true;
             } else {
-              alert('나만 글쓸거야!!'); // eslint-disable-line
+              alert('나만 글쓸거야!!');  
               signOut();
             }
           }).catch((e) => {

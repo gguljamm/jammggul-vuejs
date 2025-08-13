@@ -11,10 +11,14 @@
       <textarea v-if="isOldContent" ref="textArea" title="textArea"></textarea>
       <p v-else class="textarea" ref="textArea" contenteditable="true"></p>
       <div class="btns">
-        <input id="ImgArea" type="file" accept="image/*" @input="inputImg">
+        <input id="ImgArea" type="file" accept="image/*" @input="inputImg" />
         <div>
-          <button class="del" v-if="data" @click="del"><i class="fa fa-times" aria-hidden="true"></i> 삭제</button>
-          <button class="submit" @click="submit"><i class="fa fa-upload" aria-hidden="true"></i> {{ props.data ? '수정' : '올리기' }}</button>
+          <button class="del" v-if="data" @click="del">
+            <i class="fa fa-times" aria-hidden="true"></i> 삭제
+          </button>
+          <button class="submit" @click="submit">
+            <i class="fa fa-upload" aria-hidden="true"></i> {{ props.data ? '수정' : '올리기' }}
+          </button>
         </div>
       </div>
     </div>
@@ -24,9 +28,9 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { addDoc, deleteDoc, doc, getFirestore, updateDoc, collection } from 'firebase/firestore';
-import { getDownloadURL, getStorage, ref as storageRef, uploadString } from "firebase/storage";
-import dayjs from "dayjs";
-import { useStore } from "../../stores";
+import { getDownloadURL, getStorage, ref as storageRef, uploadString } from 'firebase/storage';
+import dayjs from 'dayjs';
+import { useStore } from '../../stores';
 
 const store = useStore();
 const db = getFirestore();
@@ -48,7 +52,7 @@ const inputImg = async ($event) => {
 
     reader.onload = (e) => {
       const newNode = document.createElement('div');
-      newNode.innerHTML = `<div><img src="${ e.target.result }" /></div>`;
+      newNode.innerHTML = `<div><img src="${e.target.result}" /></div>`;
       textArea.value.append(newNode);
       resolve(true);
     };
@@ -63,13 +67,13 @@ const del = async () => {
   await deleteDoc(doc(db, 'dev-blog', props.data.id));
   store.setLoading(false);
   emit('reload');
-  alert('삭제 성공!'); // eslint-disable-line
+  alert('삭제 성공!');
 };
 
 const submit = async () => {
   store.setLoading(true);
   const arrImg = [...textArea.value.querySelectorAll('img')];
-  const replaceImage = (imgTag) => (
+  const replaceImage = (imgTag) =>
     new Promise(async (resolve) => {
       if (imgTag.src.startsWith('data:image/')) {
         const mediatype = imgTag.src.split(';')[0].split('data:image/')[1];
@@ -84,10 +88,11 @@ const submit = async () => {
       } else {
         resolve(true);
       }
-    })
-  );
+    });
   await Promise.all(arrImg.map((v) => replaceImage(v)));
-  const text = isOldContent ? textArea.value.value : textArea.value.innerHTML.replace(/\n\n\n/g, '\n\n');
+  const text = isOldContent
+    ? textArea.value.value
+    : textArea.value.innerHTML.replace(/\n\n\n/g, '\n\n');
   const thisCategory = category.value;
 
   if (props.data) {
@@ -102,7 +107,7 @@ const submit = async () => {
       date: parseInt(dayjs().format('YYYYMMDDHHmmss'), 10),
     });
   }
-  alert('포스팅 성공!'); // eslint-disable-line
+  alert('포스팅 성공!');
   emit('reload');
   store.setLoading(false);
 };
@@ -117,15 +122,16 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-#InputDevBox{
+#InputDevBox {
   padding: 10px;
-  > div{
+  > div {
     padding: 20px 16px 20px 16px;
-    box-shadow: 0 0 4px 1px rgba(0,0,0,.1);
-    background-color: #FFF;
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     border-radius: 10px;
     text-align: right;
-    .textarea, textarea{
+    .textarea,
+    textarea {
       width: 100%;
       height: 300px;
       margin-bottom: 10px;
@@ -134,42 +140,42 @@ onMounted(() => {
       padding: 10px;
       text-align: left;
       overflow-y: auto;
-      img{
+      img {
         max-width: 300px;
         width: 100%;
       }
-      &:focus-visible{
+      &:focus-visible {
         outline: none;
       }
     }
-    .category{
+    .category {
       height: 24px;
       margin: 5px 0 10px;
     }
-    .desc{
+    .desc {
       line-height: 24px;
       font-size: 14px;
     }
-    .btns{
+    .btns {
       display: flex;
       justify-content: space-between;
-      .submit{
+      .submit {
         width: 100px;
         height: 40px;
         border: 0;
-        color: #FFF;
+        color: #fff;
         background-color: #c98474;
         border-radius: 20px;
         cursor: pointer;
       }
-      .del{
+      .del {
         white-space: nowrap;
         width: auto;
         margin-right: 10px;
         padding: 0 10px;
         height: 40px;
         border: 0;
-        color: #FFF;
+        color: #fff;
         background-color: coral;
         border-radius: 20px;
         cursor: pointer;

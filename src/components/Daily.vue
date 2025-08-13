@@ -1,106 +1,167 @@
 <template>
-<div id="Daily">
-  <div class="mainTitle">
-    <div class="btns">
-      <button v-if="itemsView.length > 0" @click="filterOpen = !filterOpen"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
-      <button @click="authClick">
-        <i v-if="!isAuth" class="fa fa-pencil" aria-hidden="true"></i>
-        <i v-else class="fa fa-times" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div v-if="error" style="padding: 40px; text-align: center; color: coral; font-size: 24px;" v-html="error"></div>
-    <div class="monthSelector" v-if="filterOpen">
-      <div @click.stop><div>
-        <span></span>
-        <div class="year">
-          <i class="fa fa-chevron-circle-left" aria-hidden="true"
-            :class="selectedYear > minYear ? '' : 'disabled'"
-            @click="selectedYear > minYear ? changeYear(false) : ''"
-          ></i>
-          {{ selectedYear }}
-          <i class="fa fa-chevron-circle-right" aria-hidden="true"
-            :class="selectedYear < maxYear ? '' : 'disabled'"
-            @click="selectedYear < maxYear ? changeYear(true) : ''"
-          ></i>
+  <div id="Daily">
+    <div class="mainTitle">
+      <div class="btns">
+        <button v-if="itemsView.length > 0" @click="filterOpen = !filterOpen">
+          <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+        </button>
+        <button @click="authClick">
+          <i v-if="!isAuth" class="fa fa-pencil" aria-hidden="true"></i>
+          <i v-else class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div
+        v-if="error"
+        style="padding: 40px; text-align: center; color: coral; font-size: 24px"
+        v-html="error"
+      ></div>
+      <div class="monthSelector" v-if="filterOpen">
+        <div @click.stop>
+          <div>
+            <span></span>
+            <div class="year">
+              <i
+                class="fa fa-chevron-circle-left"
+                aria-hidden="true"
+                :class="selectedYear > minYear ? '' : 'disabled'"
+                @click="selectedYear > minYear ? changeYear(false) : ''"
+              ></i>
+              {{ selectedYear }}
+              <i
+                class="fa fa-chevron-circle-right"
+                aria-hidden="true"
+                :class="selectedYear < maxYear ? '' : 'disabled'"
+                @click="selectedYear < maxYear ? changeYear(true) : ''"
+              ></i>
+            </div>
+            <ul>
+              <li
+                v-for="(month, index) in arrMonth"
+                :class="{
+                  nonSelectable: !selectedMonthCount[index],
+                  selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
+                }"
+                @click="selectedMonthCount[index] > 0 ? changeMonth(index) : null"
+              >
+                {{ month
+                }}<span v-if="selectedMonthCount[index]">{{ selectedMonthCount[index] }}</span>
+              </li>
+            </ul>
+            <div class="recent">
+              <button @click="changeRecent()">
+                Recently 20<i v-if="'Recent' === filterOption" class="fa fa-check"></i>
+              </button>
+            </div>
+          </div>
         </div>
-        <ul>
-          <li
-            v-for="(month, index) in arrMonth"
-            :class="{
-              nonSelectable: !selectedMonthCount[index],
-              selected: `${selectedYear}-${zeros(index + 1)}` === filterOption,
-            }"
-            @click="selectedMonthCount[index] > 0 ? changeMonth(index) : null"
-            >{{ month }}<span v-if="selectedMonthCount[index]">{{ selectedMonthCount[index] }}</span>
-          </li>
-        </ul>
-        <div class="recent">
-          <button @click="changeRecent()">Recently 20<i v-if="'Recent' === filterOption" class="fa fa-check"></i></button>
-        </div>
-      </div></div>
+      </div>
+      <div class="monthSelectorBack" v-if="filterOpen" @click="filterOpen = false"></div>
     </div>
-    <div class="monthSelectorBack" v-if="filterOpen" @click="filterOpen = false"></div>
-  </div>
-  <input-box v-if="isAuth" :isMobile="isMobile" :editData="editData" @uploadComplete="uploadComplete" :key="editData ? editData.id : ''"></input-box>
-  <loading v-if="!loaded"></loading>
-  <ul class="dailyList">
-    <transition-group tag="div" name="component-fade" mode="out-in">
-      <li
-        v-for="(item, index) in itemsView"
-        :key="`${item.date}-${index}`"
-        :class="item.isMore?'clickable':''"
-        v-get-height="{ item }">
+    <input-box
+      v-if="isAuth"
+      :isMobile="isMobile"
+      :editData="editData"
+      @uploadComplete="uploadComplete"
+      :key="editData ? editData.id : ''"
+    ></input-box>
+    <loading v-if="!loaded"></loading>
+    <ul class="dailyList">
+      <transition-group tag="div" name="component-fade" mode="out-in">
+        <li
+          v-for="(item, index) in itemsView"
+          :key="`${item.date}-${index}`"
+          :class="item.isMore ? 'clickable' : ''"
+          v-get-height="{ item }"
+        >
           <div
             class="dailyBox"
-            :class="item.viewMore?'selected':''"
+            :class="item.viewMore ? 'selected' : ''"
             @click="isAuth ? edit(item) : listClick(item)"
           >
             <div>
               <div class="title">{{ item.date }}</div>
               <div class="content">
                 <div v-if="item.isSecure && !isAdmin">
-                  <div style="display: flex; align-items: center; justify-content: center; height: 100%"><i class="fa fa-lock fa-2x" aria-hidden="true" /></div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      height: 100%;
+                    "
+                  >
+                    <i class="fa fa-lock fa-2x" aria-hidden="true" />
+                  </div>
                 </div>
                 <div v-else>
-                  <div><div v-for="(line,key) in item.content.split('\n')" :key="key">{{ line }}<br></div></div>
+                  <div>
+                    <div v-for="(line, key) in item.content.split('\n')" :key="key">
+                      {{ line }}<br />
+                    </div>
+                  </div>
                   <span class="icons">
-                    <i v-if="item.isMore&&item.isMore.indexOf('more')>=0" class="fa fa-ellipsis-h moreIcon" aria-hidden="true"></i>
-                    <span class="img_gif" v-if="item.imgUrl.join('').indexOf('.gif') >= 0">.gif</span>
-                    <i class="fa fa-picture-o" aria-hidden="true" v-else-if="item.imgUrl.length > 0"></i>
+                    <i
+                      v-if="item.isMore && item.isMore.indexOf('more') >= 0"
+                      class="fa fa-ellipsis-h moreIcon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="img_gif" v-if="item.imgUrl.join('').indexOf('.gif') >= 0"
+                      >.gif</span
+                    >
+                    <i
+                      class="fa fa-picture-o"
+                      aria-hidden="true"
+                      v-else-if="item.imgUrl.length > 0"
+                    ></i>
                   </span>
                   <div v-if="isLoaded(item.imgUrl, item.loaded)" class="imgLoader">
                     <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
                     <span class="sr-only">Loading...</span>
                   </div>
                   <transition-group name="component-fade" mode="out-in" tag="div" class="images">
-                    <img v-if="isLoaded(item.imgUrl, !item.loaded)" v-for="url in item.imgUrl" v-bind:key="url" v-bind:src="item.loaded?url:''">
+                    <img
+                      v-if="isLoaded(item.imgUrl, !item.loaded)"
+                      v-for="url in item.imgUrl"
+                      v-bind:key="url"
+                      v-bind:src="item.loaded ? url : ''"
+                    />
                   </transition-group>
                 </div>
               </div>
             </div>
           </div>
-      </li>
-    </transition-group>
-  </ul>
-  <div class="clear"></div>
-</div>
+        </li>
+      </transition-group>
+    </ul>
+    <div class="clear"></div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import InputBox from './Input/InputDaily.vue';
 import { ref, onMounted, getCurrentInstance, computed } from 'vue';
-import { collection, getFirestore, query, orderBy, limit, getDocs, where, updateDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  getFirestore,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  where,
+  updateDoc,
+  doc,
+} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-const app = getCurrentInstance()
-const $firebase = app.appContext.config.globalProperties.$firebase
+const app = getCurrentInstance();
+const $firebase = app.appContext.config.globalProperties.$firebase;
 
 const maxYear = new Date().getFullYear();
 const minYear = 2017;
 
 const itemsView = ref([]);
 const loaded = ref(false);
-const isLoaded = (a, b) => (a && !b);
+const isLoaded = (a, b) => a && !b;
 const selectedYear = ref(new Date().getFullYear());
 const filterOpen = ref(false);
 const filterOption = ref('Recent');
@@ -123,11 +184,7 @@ const getData = async () => {
   loaded.value = false;
   try {
     if (filterOption.value === 'Recent') {
-      const dailyQuery = query(
-        collection(db, 'daily'),
-        orderBy('date', 'desc'),
-        limit(20),
-      );
+      const dailyQuery = query(collection(db, 'daily'), orderBy('date', 'desc'), limit(20));
       querySnapshot = await getDocs(dailyQuery);
     } else {
       const min = parseInt(`${filterOption.value.replace(/-/g, '')}01000000`);
@@ -142,7 +199,7 @@ const getData = async () => {
       querySnapshot = await getDocs(dailyQuery);
     }
   } catch (e) {
-    error.value = (e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........' : e);
+    error.value = e?.code === 'resource-exhausted' ? 'Firebase 무료 할당량 초과..........' : e;
     loaded.value = true;
   }
   itemsView.value = [];
@@ -162,12 +219,10 @@ const getData = async () => {
     itemsView.value.push(d);
   });
   loaded.value = true;
-}
+};
 
 const getCount = async () => {
-  const querySnapshot = await getDocs(query(
-    collection(db, 'daily-count'),
-  ));
+  const querySnapshot = await getDocs(query(collection(db, 'daily-count')));
   objCount.value = querySnapshot.docs[0].data();
 };
 
@@ -191,9 +246,22 @@ const zeros = (n) => {
     }
   }
   return zero + newN;
-}
+};
 
-const arrMonth = ['JAN', 'FEB', 'MAR', 'AFR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const arrMonth = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'AFR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+];
 const selectedMonthCount = computed(() => {
   const arr = [];
   for (let x = 1; x <= arrMonth.length; x += 1) {
@@ -214,7 +282,7 @@ const changeMonth = (index) => {
   filterOpen.value = false;
   filterOption.value = `${selectedYear.value}-${zeros(index + 1)}`;
   getData();
-}
+};
 
 const changeRecent = () => {
   filterOpen.value = false;
@@ -256,7 +324,7 @@ const uploadComplete = async (ym, del) => {
 
     updateDoc(doc(db, 'daily-count', '0'), {
       [ym]: v,
-    })
+    });
     objCount.value[ym] = v;
   }
   getData();
@@ -279,13 +347,12 @@ const edit = async (e) => {
 onMounted(() => {
   getData();
   getCount();
-
 });
 
 const auth = getAuth();
 onAuthStateChanged(auth, (user) => {
   isAdmin.value = $firebase.user();
-})
+});
 
 const vGetHeight = {
   mounted: (ele, value) => {
@@ -298,311 +365,314 @@ const vGetHeight = {
         val.item.isMore = 'more';
       }
     }
-  }
+  },
 };
 </script>
 
 <style scoped lang="scss">
-  #Daily{
-    max-width: 1080px;
-    width: 100%;
-    margin: 0 auto;
-    .mainTitle .btns{
-      display: flex;
-      margin-top: 10px;
-      padding: 0 10px;
-      justify-content: end;
-      > button{
-        margin-left: 10px;
-        padding: 0;
-        height: 40px;
-        width: 40px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 16px;
-        background-color: #FFF;
-        box-shadow: 0 0 4px 1px rgba(0, 0, 0, .1);
-        border: 1px solid #d7d8d9;
-        transition: background-color .3s ease;
-        &:hover {
-          background-color: #f1f2f3;
-        }
+#Daily {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  .mainTitle .btns {
+    display: flex;
+    margin-top: 10px;
+    padding: 0 10px;
+    justify-content: end;
+    > button {
+      margin-left: 10px;
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      background-color: #fff;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #d7d8d9;
+      transition: background-color 0.3s ease;
+      &:hover {
+        background-color: #f1f2f3;
       }
     }
   }
-  .filter > button{
-    border: 1px solid #a7d2cb;
-    background-color: #FFF;
-  }
-  .write > button{
-    border: 0;
-    color: #FFF;
-    background-color: #c98474;
-    left: 10px;
-  }
-  .filter i, .write i{
-    margin-right: 5px;
-  }
-  .filter li > span{
-    width: 20px;
-    text-align: center;
-  }
-  .dailyList{
-    padding-top: 20px;
-  }
-  .dailyList li{
-    width: 33.3333%;
-    padding: 0 10px 20px 10px;
-    float: left;
-  }
-  .dailyList li .dailyBox{
-    height: 200px;
-  }
-  .dailyList li.clickable .dailyBox{
-    cursor: pointer;
-  }
-  .dailyList li .dailyBox > div{
-    border-radius: 10px;
-    box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
-  }
-  .dailyList li .dailyBox.selected > div{
-    box-shadow: 0 0 15px 2px rgba(0,0,0,.2);
-  }
-  .title{
-    font-size: 18px;
-    border: 1px solid #a7d2cb;
-    border-bottom: 0;
-    height: 40px;
-    line-height: 39px;
-    text-align: center;
-    background-color: #a7d2cb;
-    color: #FFF;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-  .content{
-    border: 1px solid #d7d8d9;
-    background-color: #FFF;
-    border-top: 0;
-    height: 160px;
-    padding: 10px;
-    padding-bottom: 9px;
-    line-height: 20px;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    position: relative;
-  }
-  .content > div{
-    height: 120px;
-    overflow-y: hidden;
-  }
-  .selected .content > div{
-    height: 100%;
-  }
-  .content > div img{
-    visibility: hidden;
-    max-width: 100%;
-    width: 100%;
-    margin-top: 20px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
-  }
-  .content .images{
-    padding: 0 10px 10px;
-  }
-  .content .imgLoader{
-    width: 100%;
-    text-align: center;
-    padding: 15px 0 10px 0;
-    display: none;
-  }
-  .selected .content .imgLoader{
-    display: inline-block;
-  }
-  .icons{
+}
+.filter > button {
+  border: 1px solid #a7d2cb;
+  background-color: #fff;
+}
+.write > button {
+  border: 0;
+  color: #fff;
+  background-color: #c98474;
+  left: 10px;
+}
+.filter i,
+.write i {
+  margin-right: 5px;
+}
+.filter li > span {
+  width: 20px;
+  text-align: center;
+}
+.dailyList {
+  padding-top: 20px;
+}
+.dailyList li {
+  width: 33.3333%;
+  padding: 0 10px 20px 10px;
+  float: left;
+}
+.dailyList li .dailyBox {
+  height: 200px;
+}
+.dailyList li.clickable .dailyBox {
+  cursor: pointer;
+}
+.dailyList li .dailyBox > div {
+  border-radius: 10px;
+  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
+}
+.dailyList li .dailyBox.selected > div {
+  box-shadow: 0 0 15px 2px rgba(0, 0, 0, 0.2);
+}
+.title {
+  font-size: 18px;
+  border: 1px solid #a7d2cb;
+  border-bottom: 0;
+  height: 40px;
+  line-height: 39px;
+  text-align: center;
+  background-color: #a7d2cb;
+  color: #fff;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.content {
+  border: 1px solid #d7d8d9;
+  background-color: #fff;
+  border-top: 0;
+  height: 160px;
+  padding: 10px;
+  padding-bottom: 9px;
+  line-height: 20px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  position: relative;
+}
+.content > div {
+  height: 120px;
+  overflow-y: hidden;
+}
+.selected .content > div {
+  height: 100%;
+}
+.content > div img {
+  visibility: hidden;
+  max-width: 100%;
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.content .images {
+  padding: 0 10px 10px;
+}
+.content .imgLoader {
+  width: 100%;
+  text-align: center;
+  padding: 15px 0 10px 0;
+  display: none;
+}
+.selected .content .imgLoader {
+  display: inline-block;
+}
+.icons {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  color: #c98474;
+}
+.icons > i {
+  margin-left: 10px;
+}
+.img_gif {
+  font-size: 12px;
+  font-weight: bold;
+}
+.selected .icons {
+  background: none;
+}
+.selected {
+  position: relative;
+  z-index: 10;
+}
+.selected .content {
+  height: auto;
+  min-height: 160px;
+}
+.selected .content > div {
+  overflow-y: visible;
+}
+.selected .content > div img {
+  visibility: visible;
+}
+.more .selected .icons > i {
+  visibility: hidden;
+}
+.selected .icons > i,
+.selected .icons .img_gif {
+  visibility: hidden;
+}
+.monthSelectorBack {
+  z-index: 13;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.monthSelector {
+  position: relative;
+  > div {
+    z-index: 14;
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    color: #c98474;
-  }
-  .icons > i{
-    margin-left: 10px;
-  }
-  .img_gif{
-    font-size: 12px;
-    font-weight: bold;
-  }
-  .selected .icons{
-    background: none;
-  }
-  .selected{
-    position: relative;
-    z-index: 10;
-  }
-  .selected .content{
-    height: auto;
-    min-height: 160px;
-  }
-  .selected .content > div{
-    overflow-y: visible;
-  }
-  .selected .content > div img{
-    visibility: visible;
-  }
-  .more .selected .icons > i{
-    visibility: hidden;
-  }
-  .selected .icons > i, .selected .icons .img_gif {
-    visibility: hidden;
-  }
-  .monthSelectorBack{
-    z-index: 13;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    top: 15px;
     right: 0;
-    background-color: rgba(0,0,0,.3);
-  }
-  .monthSelector{
-    position: relative;
-    > div{
-      z-index: 14;
-      position: absolute;
-      top: 15px;
-      right: 0;
-      text-align: center;
-      font-family: 'Baloo Bhaijaan', sans-serif;
-      padding: 0 20px;
-      > div{
-        border-radius: 8px;
-        background-color: #FFF;
-        max-width: 380px;
-        width: 100%;
-        border: 1px solid #d7d8d9;
-        box-shadow: 0 0 10px 1px rgba(0,0,0,.1);
-        > span{
+    text-align: center;
+    font-family: 'Baloo Bhaijaan', sans-serif;
+    padding: 0 20px;
+    > div {
+      border-radius: 8px;
+      background-color: #fff;
+      max-width: 380px;
+      width: 100%;
+      border: 1px solid #d7d8d9;
+      box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
+      > span {
+        position: absolute;
+        right: 55px;
+        top: -15px;
+        width: 0;
+        height: 0;
+        border-right: 11px solid transparent;
+        border-left: 11px solid transparent;
+        border-bottom: 15px solid rgba(0, 0, 0, 0.01);
+        &:before {
           position: absolute;
-          right: 55px;
-          top: -15px;
+          content: '';
+          top: 2px;
+          left: -25px;
           width: 0;
           height: 0;
-          border-right: 11px solid transparent;
-          border-left: 11px solid transparent;
-          border-bottom: 15px solid rgba(0,0,0,.01);
-          &:before{
-            position: absolute;
-            content: '';
-            top: 2px;
-            left: -25px;
-            width: 0;
-            height: 0;
-            border-right: 10px solid transparent;
-            border-left: 10px solid transparent;
-            border-bottom: 14px solid #FFF;
-          }
+          border-right: 10px solid transparent;
+          border-left: 10px solid transparent;
+          border-bottom: 14px solid #fff;
         }
       }
     }
   }
-  .monthSelector .year{
+}
+.monthSelector .year {
+  width: 100%;
+  height: 50px;
+  border-bottom: 1px solid #d7d8d9;
+  line-height: 49px;
+  font-size: 18px;
+}
+.monthSelector .year i {
+  cursor: pointer;
+  width: 60px;
+  height: 49px;
+  line-height: 49px;
+  color: #a7d2cb;
+  font-size: 24px;
+}
+.monthSelector .year i.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.monthSelector .year i.fa-chevron-circle-left {
+  float: left;
+}
+.monthSelector .year i.fa-chevron-circle-right {
+  float: right;
+}
+.monthSelector ul {
+  padding: 9px;
+  padding-bottom: 10px;
+  width: 378px;
+}
+.monthSelector ul li {
+  height: 50px;
+  line-height: 50px;
+  cursor: pointer;
+  width: 120px;
+  display: inline-block;
+}
+.monthSelector ul li.selected {
+  box-shadow: 0 0 0 2px #ff4e50 inset;
+}
+.monthSelector ul li.nonSelectable {
+  cursor: default;
+  opacity: 0.5;
+  background-color: #eee;
+}
+.monthSelector ul li:not(.nonSelectable):hover {
+  background-color: rgba(242, 211, 136, 0.5);
+}
+.monthSelector ul li > span {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  background-color: #c98474;
+  color: #fff;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 12px;
+}
+.monthSelector .recent {
+  width: 100%;
+  padding: 0 9px;
+  margin-bottom: 9px;
+}
+.monthSelector .recent > button {
+  width: 100%;
+  height: 40px;
+  background-color: #f2d388;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+.monthSelector .recent > button:hover {
+  opacity: 0.8;
+}
+.monthSelector .recent > button > i {
+  position: absolute;
+  color: #ff4e50;
+  margin-left: 4px;
+}
+@media all and (max-width: 768px) {
+  .dailyList li {
+    width: 50%;
+  }
+}
+@media all and (max-width: 500px) {
+  .dailyList li {
     width: 100%;
-    height: 50px;
-    border-bottom: 1px solid #d7d8d9;
-    line-height: 49px;
-    font-size: 18px;
   }
-  .monthSelector .year i{
-    cursor: pointer;
-    width: 60px;
-    height: 49px;
-    line-height: 49px;
-    color: #a7d2cb;
-    font-size: 24px;
-  }
-  .monthSelector .year i.disabled{
-    opacity: 0.3;
-    cursor: default;
-  }
-  .monthSelector .year i.fa-chevron-circle-left{
-    float: left;
-  }
-  .monthSelector .year i.fa-chevron-circle-right{
-    float: right;
-  }
-  .monthSelector ul{
-    padding: 9px;
-    padding-bottom: 10px;
-    width: 378px;
-  }
-  .monthSelector ul li{
-    height: 50px;
-    line-height: 50px;
-    cursor: pointer;
-    width: 120px;
-    display: inline-block;
-  }
-  .monthSelector ul li.selected{
-    box-shadow: 0 0 0 2px #ff4e50 inset;
-  }
-  .monthSelector ul li.nonSelectable{
-    cursor: default;
-    opacity: 0.5;
-    background-color: #eee;
-  }
-  .monthSelector ul li:not(.nonSelectable):hover{
-    background-color: rgba(242, 211, 136, .5);
-  }
-  .monthSelector ul li > span{
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-    background-color: #c98474;
-    color: #FFF;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    display: inline-block;
-    margin-left: 5px;
-    font-size: 12px;
-  }
-  .monthSelector .recent{
+  .monthSelector > div,
+  .monthSelector ul {
     width: 100%;
-    padding: 0 9px;
-    margin-bottom: 9px;
   }
-  .monthSelector .recent > button{
-    width: 100%;
-    height: 40px;
-    background-color: #f2d388;
-    border: 0;
-    color: #FFF;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
+  .monthSelector ul li {
+    width: 33.3333%;
   }
-  .monthSelector .recent > button:hover{
-    opacity: 0.8;
-  }
-  .monthSelector .recent > button > i{
-    position: absolute;
-    color: #ff4e50;
-    margin-left: 4px;
-  }
-  @media all and (max-width: 768px){
-    .dailyList li{
-      width: 50%;
-    }
-  }
-  @media all and (max-width: 500px){
-    .dailyList li{
-      width: 100%;
-    }
-    .monthSelector > div, .monthSelector ul{
-      width: 100%;
-    }
-    .monthSelector ul li{
-      width: 33.3333%;
-    }
-  }
+}
 </style>
