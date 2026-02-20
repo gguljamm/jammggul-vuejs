@@ -4,7 +4,7 @@
       <div>
         <select ref="category">
           <option value="game">게임</option>
-          <option value="movie">문화</option>
+          <option value="culture">문화</option>
           <option value="etc">언박싱</option>
         </select>
       </div>
