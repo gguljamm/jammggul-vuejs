@@ -1,5 +1,5 @@
 <template>
-  <div class="aboutWrapper" :class="sun ? 'day' : 'night'" :style="{ height: `${height}px` }">
+  <div class="aboutWrapper" :class="sun ? 'day' : 'night'">
     <div class="catchphrase">
       <div>
         <template v-for="(x, xIndex) in arrCatchphrase[random].content.split('<br>')">
@@ -113,6 +113,7 @@ export default {
   width: 100%;
   z-index: 0;
   overflow: hidden;
+  height: 100vh;
   &.day {
     background: lightskyblue; /* For browsers that do not support gradients */
     background: linear-gradient(cornflowerblue, #a7d2cb);
